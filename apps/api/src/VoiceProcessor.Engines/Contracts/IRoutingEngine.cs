@@ -19,6 +19,16 @@ public record RoutingContext
     public required int CharacterCount { get; init; }
     public required RoutingPreference Preference { get; init; }
     public Provider? PreferredProvider { get; init; }
+
+    /// <summary>
+    /// The provider that owns this voice (if voice is provider-specific)
+    /// </summary>
+    public Provider? VoiceProvider { get; init; }
+
+    /// <summary>
+    /// Set of providers that are currently available/configured
+    /// </summary>
+    public IReadOnlySet<Provider> AvailableProviders { get; init; } = new HashSet<Provider>();
 }
 
 public record RoutingDecision

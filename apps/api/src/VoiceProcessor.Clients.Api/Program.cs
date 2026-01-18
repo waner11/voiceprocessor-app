@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 using VoiceProcessor.Accessors.Data.DbContext;
 using VoiceProcessor.Accessors.DependencyInjection;
+using VoiceProcessor.Engines.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,9 @@ builder.Services.AddDbContext<VoiceProcessorDbContext>(options =>
 
 // Accessors (database, TTS providers, storage)
 builder.Services.AddAccessors(builder.Configuration);
+
+// Engines (routing, chunking, pricing)
+builder.Services.AddEngines(builder.Configuration);
 
 // OpenAPI/Swagger
 builder.Services.AddEndpointsApiExplorer();
