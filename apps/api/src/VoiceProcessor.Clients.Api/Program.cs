@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 using VoiceProcessor.Accessors.Data.DbContext;
@@ -8,8 +9,12 @@ using VoiceProcessor.Managers.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Controllers
-builder.Services.AddControllers();
+// Controllers with JSON enum string serialization
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 // Database
 builder.Services.AddDbContext<VoiceProcessorDbContext>(options =>
