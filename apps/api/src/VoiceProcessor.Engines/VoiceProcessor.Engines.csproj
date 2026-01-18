@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\VoiceProcessor.Domain\VoiceProcessor.Domain.csproj" />
+    <ProjectReference Include="..\VoiceProcessor.Utilities\VoiceProcessor.Utilities.csproj" />
+    <ProjectReference Include="..\VoiceProcessor.Accessors\VoiceProcessor.Accessors.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>
