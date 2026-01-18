@@ -28,9 +28,6 @@ public class ElevenLabsAccessor : ITtsProviderAccessor
         _httpClient = httpClient;
         _options = options.Value;
         _logger = logger;
-
-        _httpClient.BaseAddress = new Uri("https://api.elevenlabs.io/v1/");
-        _httpClient.DefaultRequestHeaders.Add("xi-api-key", _options.ApiKey);
     }
 
     public Provider Provider => Provider.ElevenLabs;

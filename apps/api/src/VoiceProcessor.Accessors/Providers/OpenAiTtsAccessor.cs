@@ -1,4 +1,3 @@
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -33,10 +32,6 @@ public class OpenAiTtsAccessor : ITtsProviderAccessor
         _httpClient = httpClient;
         _options = options.Value;
         _logger = logger;
-
-        _httpClient.BaseAddress = new Uri("https://api.openai.com/v1/");
-        _httpClient.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", _options.ApiKey);
     }
 
     public Provider Provider => Provider.OpenAI;
