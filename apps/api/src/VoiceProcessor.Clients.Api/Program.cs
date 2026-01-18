@@ -2,6 +2,7 @@ using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 using VoiceProcessor.Accessors.Data.DbContext;
+using VoiceProcessor.Accessors.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,9 @@ builder.Services.AddControllers();
 // Database
 builder.Services.AddDbContext<VoiceProcessorDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Accessors (database, TTS providers, storage)
+builder.Services.AddAccessors(builder.Configuration);
 
 // OpenAPI/Swagger
 builder.Services.AddEndpointsApiExplorer();
