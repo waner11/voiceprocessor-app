@@ -1,6 +1,4 @@
 using System.Net.Http.Json;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VoiceProcessor.Accessors.Contracts;
@@ -13,12 +11,6 @@ public class ElevenLabsAccessor : ITtsProviderAccessor
     private readonly HttpClient _httpClient;
     private readonly ILogger<ElevenLabsAccessor> _logger;
     private readonly ElevenLabsOptions _options;
-
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-    };
 
     public ElevenLabsAccessor(
         HttpClient httpClient,
@@ -68,7 +60,7 @@ public class ElevenLabsAccessor : ITtsProviderAccessor
             var response = await _httpClient.PostAsJsonAsync(
                 $"text-to-speech/{request.ProviderVoiceId}",
                 payload,
-                JsonOptions,
+                AccessorJsonOptions.Default,
                 cancellationToken);
 
             if (!response.IsSuccessStatusCode)
@@ -116,7 +108,7 @@ public class ElevenLabsAccessor : ITtsProviderAccessor
             response.EnsureSuccessStatusCode();
 
             var result = await response.Content.ReadFromJsonAsync<ElevenLabsVoicesResponse>(
-                JsonOptions, cancellationToken);
+                AccessorJsonOptions.Default, cancellationToken);
 
             return result?.Voices.Select(v => new ProviderVoice
             {

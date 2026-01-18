@@ -1,6 +1,4 @@
 using System.Net.Http.Json;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VoiceProcessor.Accessors.Contracts;
@@ -13,12 +11,6 @@ public class OpenAiTtsAccessor : ITtsProviderAccessor
     private readonly HttpClient _httpClient;
     private readonly ILogger<OpenAiTtsAccessor> _logger;
     private readonly OpenAiTtsOptions _options;
-
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-    };
 
     // Available voices for tts-1 and tts-1-hd models
     private static readonly string[] AvailableVoices =
@@ -68,7 +60,7 @@ public class OpenAiTtsAccessor : ITtsProviderAccessor
             var response = await _httpClient.PostAsJsonAsync(
                 "audio/speech",
                 payload,
-                JsonOptions,
+                AccessorJsonOptions.Default,
                 cancellationToken);
 
             if (!response.IsSuccessStatusCode)
