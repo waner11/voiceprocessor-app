@@ -7,10 +7,13 @@ interface UIState {
   selectedVoice: string | null;
   routingStrategy: RoutingStrategy;
   isGenerating: boolean;
+  favoriteVoices: string[];
 
   setSelectedVoice: (voiceId: string | null) => void;
   setRoutingStrategy: (strategy: RoutingStrategy) => void;
   setIsGenerating: (isGenerating: boolean) => void;
+  toggleFavorite: (voiceId: string) => void;
+  isFavorite: (voiceId: string) => boolean;
   reset: () => void;
 }
 
@@ -18,16 +21,27 @@ const initialState = {
   selectedVoice: null,
   routingStrategy: "balanced" as RoutingStrategy,
   isGenerating: false,
+  favoriteVoices: [] as string[],
 };
 
 export const useUIStore = create<UIState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       ...initialState,
 
       setSelectedVoice: (voiceId) => set({ selectedVoice: voiceId }),
       setRoutingStrategy: (strategy) => set({ routingStrategy: strategy }),
       setIsGenerating: (isGenerating) => set({ isGenerating }),
+
+      toggleFavorite: (voiceId) =>
+        set((state) => ({
+          favoriteVoices: state.favoriteVoices.includes(voiceId)
+            ? state.favoriteVoices.filter((id) => id !== voiceId)
+            : [...state.favoriteVoices, voiceId],
+        })),
+
+      isFavorite: (voiceId) => get().favoriteVoices.includes(voiceId),
+
       reset: () => set(initialState),
     }),
     {
@@ -35,6 +49,7 @@ export const useUIStore = create<UIState>()(
       partialize: (state) => ({
         selectedVoice: state.selectedVoice,
         routingStrategy: state.routingStrategy,
+        favoriteVoices: state.favoriteVoices,
       }),
     }
   )
