@@ -45,10 +45,11 @@ export function Header() {
         <div className="flex items-center gap-4">
           {usage && (
             <div className="hidden sm:flex items-center gap-2 text-sm">
-              <span className="text-gray-500">Credits:</span>
+              <span className="text-gray-500">Characters:</span>
               <span className="font-semibold tabular-nums">
-                {(usage.creditsRemaining ?? 0).toLocaleString()}
+                {(usage.charactersLimit - usage.charactersUsed).toLocaleString()}
               </span>
+              <span className="text-gray-400">/ {usage.charactersLimit.toLocaleString()}</span>
             </div>
           )}
 
