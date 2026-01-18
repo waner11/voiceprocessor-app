@@ -1,14 +1,12 @@
-using VoiceProcessor.Domain.Entities;
-
 namespace VoiceProcessor.Managers.Contracts;
 
 public interface IUserManager
 {
-    Task<User?> GetUserAsync(
+    Task<Domain.Entities.User?> GetUserAsync(
         Guid userId,
         CancellationToken cancellationToken = default);
 
-    Task<User?> GetUserByEmailAsync(
+    Task<Domain.Entities.User?> GetUserByEmailAsync(
         string email,
         CancellationToken cancellationToken = default);
 

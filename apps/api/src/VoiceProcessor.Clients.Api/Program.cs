@@ -4,6 +4,7 @@ using Microsoft.OpenApi;
 using VoiceProcessor.Accessors.Data.DbContext;
 using VoiceProcessor.Accessors.DependencyInjection;
 using VoiceProcessor.Engines.DependencyInjection;
+using VoiceProcessor.Managers.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,9 @@ builder.Services.AddAccessors(builder.Configuration);
 
 // Engines (routing, chunking, pricing)
 builder.Services.AddEngines(builder.Configuration);
+
+// Managers (user, voice, generation)
+builder.Services.AddManagers(builder.Configuration);
 
 // OpenAPI/Swagger
 builder.Services.AddEndpointsApiExplorer();
