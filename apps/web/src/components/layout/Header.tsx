@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useUsage } from "@/hooks";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard" },
@@ -17,10 +18,10 @@ export function Header() {
   const { data: usage } = useUsage();
 
   return (
-    <header className="sticky top-0 z-50 border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+    <header className="sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 bg-white/95 dark:bg-gray-950/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-gray-950/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-8">
-          <Link href="/" className="text-xl font-bold">
+          <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">
             VoiceProcessor
           </Link>
 
@@ -32,8 +33,8 @@ export function Header() {
                 className={cn(
                   "rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                   pathname === item.href
-                    ? "bg-gray-100 text-gray-900"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    ? "bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-white"
+                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
                 )}
               >
                 {item.label}
@@ -45,21 +46,23 @@ export function Header() {
         <div className="flex items-center gap-4">
           {usage && (
             <div className="hidden sm:flex items-center gap-2 text-sm">
-              <span className="text-gray-500">Characters:</span>
-              <span className="font-semibold tabular-nums">
+              <span className="text-gray-500 dark:text-gray-400">Characters:</span>
+              <span className="font-semibold tabular-nums text-gray-900 dark:text-white">
                 {(usage.charactersLimit - usage.charactersUsed).toLocaleString()}
               </span>
-              <span className="text-gray-400">/ {usage.charactersLimit.toLocaleString()}</span>
+              <span className="text-gray-400 dark:text-gray-500">/ {usage.charactersLimit.toLocaleString()}</span>
             </div>
           )}
+
+          <ThemeToggle />
 
           <Link
             href="/settings"
             className={cn(
               "rounded-lg p-2 transition-colors",
               pathname === "/settings"
-                ? "bg-gray-100 text-gray-900"
-                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                ? "bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-white"
+                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
             )}
             title="Settings"
           >
@@ -79,7 +82,7 @@ export function Header() {
             </svg>
           </Link>
 
-          <div className="h-8 w-8 rounded-full bg-gray-200" title="Profile" />
+          <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700" title="Profile" />
         </div>
       </div>
     </header>

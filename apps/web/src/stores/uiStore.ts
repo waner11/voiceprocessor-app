@@ -2,18 +2,21 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export type RoutingStrategy = "cost" | "quality" | "speed" | "balanced";
+export type Theme = "light" | "dark" | "system";
 
 interface UIState {
   selectedVoice: string | null;
   routingStrategy: RoutingStrategy;
   isGenerating: boolean;
   favoriteVoices: string[];
+  theme: Theme;
 
   setSelectedVoice: (voiceId: string | null) => void;
   setRoutingStrategy: (strategy: RoutingStrategy) => void;
   setIsGenerating: (isGenerating: boolean) => void;
   toggleFavorite: (voiceId: string) => void;
   isFavorite: (voiceId: string) => boolean;
+  setTheme: (theme: Theme) => void;
   reset: () => void;
 }
 
@@ -22,6 +25,7 @@ const initialState = {
   routingStrategy: "balanced" as RoutingStrategy,
   isGenerating: false,
   favoriteVoices: [] as string[],
+  theme: "dark" as Theme,
 };
 
 export const useUIStore = create<UIState>()(
@@ -42,6 +46,8 @@ export const useUIStore = create<UIState>()(
 
       isFavorite: (voiceId) => get().favoriteVoices.includes(voiceId),
 
+      setTheme: (theme) => set({ theme }),
+
       reset: () => set(initialState),
     }),
     {
@@ -50,6 +56,7 @@ export const useUIStore = create<UIState>()(
         selectedVoice: state.selectedVoice,
         routingStrategy: state.routingStrategy,
         favoriteVoices: state.favoriteVoices,
+        theme: state.theme,
       }),
     }
   )

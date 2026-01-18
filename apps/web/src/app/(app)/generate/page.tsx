@@ -53,11 +53,11 @@ export default function GeneratePage() {
   const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Generate Audio</h1>
-          <p className="mt-2 text-gray-600">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Generate Audio</h1>
+          <p className="mt-2 text-gray-600 dark:text-gray-400">
             Convert your text to professional audio using AI voices
           </p>
         </div>
@@ -66,14 +66,14 @@ export default function GeneratePage() {
           {/* Main content area */}
           <div className="lg:col-span-2 space-y-6">
             {/* Text Input */}
-            <div className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-200">
+            <div className="rounded-xl bg-white dark:bg-gray-900 p-6 shadow-sm ring-1 ring-gray-200 dark:ring-gray-800">
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900">Text Input</h2>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Text Input</h2>
                 <div className="flex gap-2">
-                  <button className="rounded-lg bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-200 transition-colors">
+                  <button className="rounded-lg bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
                     Upload File
                   </button>
-                  <button className="rounded-lg bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-200 transition-colors">
+                  <button className="rounded-lg bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
                     Paste
                   </button>
                 </div>
@@ -81,29 +81,29 @@ export default function GeneratePage() {
               <textarea
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                className="w-full h-64 rounded-lg border-gray-200 bg-gray-50 p-4 resize-none text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                className="w-full h-64 rounded-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4 resize-none text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
                 placeholder="Paste your text here or upload a file. Supports books, articles, scripts, and more..."
               />
               <div className="mt-3 flex items-center justify-between text-sm">
-                <div className="flex items-center gap-4 text-gray-500">
+                <div className="flex items-center gap-4 text-gray-500 dark:text-gray-400">
                   <span className="flex items-center gap-1.5">
                     <span className="h-2 w-2 rounded-full bg-green-500"></span>
                     Auto-detected: English
                   </span>
                 </div>
-                <div className="flex gap-4 text-gray-600">
+                <div className="flex gap-4 text-gray-600 dark:text-gray-400">
                   <span>{wordCount.toLocaleString()} words</span>
-                  <span className="text-gray-300">|</span>
+                  <span className="text-gray-300 dark:text-gray-600">|</span>
                   <span>{characterCount.toLocaleString()} characters</span>
                 </div>
               </div>
             </div>
 
             {/* Voice Selection */}
-            <div className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-200">
+            <div className="rounded-xl bg-white dark:bg-gray-900 p-6 shadow-sm ring-1 ring-gray-200 dark:ring-gray-800">
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900">Voice Selection</h2>
-                <button className="text-sm font-medium text-blue-600 hover:text-blue-700">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Voice Selection</h2>
+                <button className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300">
                   Browse All Voices →
                 </button>
               </div>
@@ -115,26 +115,26 @@ export default function GeneratePage() {
                     className={cn(
                       "flex items-center gap-3 rounded-lg p-4 text-left transition-all",
                       selectedVoice === voice.id
-                        ? "bg-blue-50 ring-2 ring-blue-500"
-                        : "bg-gray-50 hover:bg-gray-100 ring-1 ring-gray-200"
+                        ? "bg-blue-50 dark:bg-blue-950 ring-2 ring-blue-500"
+                        : "bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 ring-1 ring-gray-200 dark:ring-gray-700"
                     )}
                   >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-gray-200 to-gray-300 text-lg">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 text-lg">
                       🎙️
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-gray-900">{voice.name}</span>
-                        <span className="rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700">
+                        <span className="font-medium text-gray-900 dark:text-white">{voice.name}</span>
+                        <span className="rounded-full bg-purple-100 dark:bg-purple-900 px-2 py-0.5 text-xs font-medium text-purple-700 dark:text-purple-300">
                           {voice.provider}
                         </span>
                       </div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-gray-500 dark:text-gray-400">
                         {voice.language} · {voice.style}
                       </div>
                     </div>
                     <button
-                      className="rounded-full bg-white p-2 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50"
+                      className="rounded-full bg-white dark:bg-gray-700 p-2 shadow-sm ring-1 ring-gray-200 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
                       onClick={(e) => e.stopPropagation()}
                     >
                       ▶
@@ -148,8 +148,8 @@ export default function GeneratePage() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Routing Strategy */}
-            <div className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-200">
-              <h2 className="mb-4 text-lg font-semibold text-gray-900">Routing Strategy</h2>
+            <div className="rounded-xl bg-white dark:bg-gray-900 p-6 shadow-sm ring-1 ring-gray-200 dark:ring-gray-800">
+              <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Routing Strategy</h2>
               <div className="space-y-2">
                 {routingOptions.map((option) => (
                   <button
@@ -158,17 +158,17 @@ export default function GeneratePage() {
                     className={cn(
                       "w-full flex items-center gap-3 rounded-lg p-3 text-left transition-all",
                       routing === option.value
-                        ? "bg-blue-50 ring-2 ring-blue-500"
-                        : "bg-gray-50 hover:bg-gray-100"
+                        ? "bg-blue-50 dark:bg-blue-950 ring-2 ring-blue-500"
+                        : "bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700"
                     )}
                   >
                     <span className="text-xl">{option.icon}</span>
                     <div className="flex-1">
-                      <div className="font-medium text-gray-900">{option.label}</div>
-                      <div className="text-xs text-gray-500">{option.description}</div>
+                      <div className="font-medium text-gray-900 dark:text-white">{option.label}</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">{option.description}</div>
                     </div>
                     {option.value === "Balanced" && (
-                      <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+                      <span className="rounded-full bg-green-100 dark:bg-green-900 px-2 py-0.5 text-xs font-medium text-green-700 dark:text-green-300">
                         Recommended
                       </span>
                     )}
@@ -178,7 +178,7 @@ export default function GeneratePage() {
             </div>
 
             {/* Cost Estimate */}
-            <div className="rounded-xl bg-gradient-to-br from-gray-800 to-gray-900 p-6 text-white shadow-sm">
+            <div className="rounded-xl bg-gradient-to-br from-gray-800 to-gray-900 dark:from-gray-800 dark:to-gray-950 p-6 text-white shadow-sm ring-1 ring-gray-700">
               <h2 className="mb-4 text-lg font-semibold">Cost Estimate</h2>
               {characterCount > 0 ? (
                 <div className="space-y-4">
@@ -224,16 +224,16 @@ export default function GeneratePage() {
               </button>
               <button
                 disabled={!text || !selectedVoice}
-                className="w-full rounded-xl bg-white px-6 py-3 font-medium text-gray-700 ring-1 ring-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                className="w-full rounded-xl bg-white dark:bg-gray-800 px-6 py-3 font-medium text-gray-700 dark:text-gray-300 ring-1 ring-gray-200 dark:ring-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 Preview First 500 Characters (Free)
               </button>
             </div>
 
             {/* Info */}
-            <div className="rounded-lg bg-blue-50 p-4 text-sm text-blue-800">
+            <div className="rounded-lg bg-blue-50 dark:bg-blue-950 p-4 text-sm text-blue-800 dark:text-blue-200">
               <p className="font-medium">Your remaining quota</p>
-              <p className="mt-1 text-blue-600">10,000 characters this month</p>
+              <p className="mt-1 text-blue-600 dark:text-blue-400">10,000 characters this month</p>
             </div>
           </div>
         </div>
