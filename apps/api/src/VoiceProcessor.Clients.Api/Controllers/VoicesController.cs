@@ -1,15 +1,20 @@
 using Microsoft.AspNetCore.Mvc;
 using VoiceProcessor.Domain.DTOs.Responses;
 using VoiceProcessor.Domain.Enums;
+using VoiceProcessor.Managers.Contracts;
 
 namespace VoiceProcessor.Clients.Api.Controllers;
 
 public class VoicesController : ApiControllerBase
 {
+    private readonly IVoiceManager _voiceManager;
     private readonly ILogger<VoicesController> _logger;
 
-    public VoicesController(ILogger<VoicesController> logger)
+    public VoicesController(
+        IVoiceManager voiceManager,
+        ILogger<VoicesController> logger)
     {
+        _voiceManager = voiceManager;
         _logger = logger;
     }
 
@@ -29,14 +34,8 @@ public class VoicesController : ApiControllerBase
         _logger.LogDebug("Getting voices, provider {Provider}, language {Language}, gender {Gender}",
             provider, language, gender);
 
-        // TODO: Implement via IVoiceManager
-        var response = new PagedResponse<VoiceResponse>
-        {
-            Items = [],
-            TotalCount = 0,
-            Page = page,
-            PageSize = pageSize
-        };
+        var response = await _voiceManager.GetVoicesAsync(
+            page, pageSize, provider, language, gender, cancellationToken);
 
         return Ok(response);
     }
@@ -53,21 +52,11 @@ public class VoicesController : ApiControllerBase
     {
         _logger.LogDebug("Getting voice {VoiceId}", id);
 
-        // TODO: Implement via IVoiceManager
-        var response = new VoiceResponse
+        var response = await _voiceManager.GetVoiceAsync(id, cancellationToken);
+        if (response is null)
         {
-            Id = id,
-            Name = "Sample Voice",
-            Description = "A sample voice for testing",
-            Provider = Provider.ElevenLabs,
-            Language = "en",
-            Accent = "American",
-            Gender = "Female",
-            AgeGroup = "Adult",
-            UseCase = "Narration",
-            PreviewUrl = "https://example.com/preview.mp3",
-            CostPerThousandChars = 0.30m
-        };
+            return NotFound(new ErrorResponse { Code = "VOICE_NOT_FOUND", Message = $"Voice {id} not found" });
+        }
 
         return Ok(response);
     }
@@ -82,9 +71,7 @@ public class VoicesController : ApiControllerBase
     {
         _logger.LogDebug("Getting voices grouped by provider");
 
-        // TODO: Implement via IVoiceManager
-        var response = new Dictionary<Provider, IReadOnlyList<VoiceResponse>>();
-
+        var response = await _voiceManager.GetVoicesByProviderAsync(cancellationToken);
         return Ok(response);
     }
 
@@ -98,7 +85,20 @@ public class VoicesController : ApiControllerBase
     {
         _logger.LogInformation("Voice catalog refresh requested");
 
-        // TODO: Implement via IVoiceManager - trigger background job
+        // Note: In production, this should trigger a background job
+        // For now, we'll do it inline but return 202 Accepted
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await _voiceManager.RefreshVoiceCatalogAsync(CancellationToken.None);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Voice catalog refresh failed");
+            }
+        });
+
         return Accepted();
     }
 }

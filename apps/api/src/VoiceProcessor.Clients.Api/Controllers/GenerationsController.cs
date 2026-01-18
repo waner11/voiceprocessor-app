@@ -2,15 +2,20 @@ using Microsoft.AspNetCore.Mvc;
 using VoiceProcessor.Domain.DTOs.Requests;
 using VoiceProcessor.Domain.DTOs.Responses;
 using VoiceProcessor.Domain.Enums;
+using VoiceProcessor.Managers.Contracts;
 
 namespace VoiceProcessor.Clients.Api.Controllers;
 
 public class GenerationsController : ApiControllerBase
 {
+    private readonly IGenerationManager _generationManager;
     private readonly ILogger<GenerationsController> _logger;
 
-    public GenerationsController(ILogger<GenerationsController> logger)
+    public GenerationsController(
+        IGenerationManager generationManager,
+        ILogger<GenerationsController> logger)
     {
+        _generationManager = generationManager;
         _logger = logger;
     }
 
@@ -27,17 +32,7 @@ public class GenerationsController : ApiControllerBase
         _logger.LogInformation("Cost estimate requested for {CharCount} characters",
             request.Text.Length);
 
-        // TODO: Implement via IGenerationManager
-        var response = new CostEstimateResponse
-        {
-            CharacterCount = request.Text.Length,
-            EstimatedChunks = (int)Math.Ceiling(request.Text.Length / 5000.0),
-            EstimatedCost = request.Text.Length * 0.00001m,
-            Currency = "USD",
-            RecommendedProvider = Provider.ElevenLabs,
-            ProviderEstimates = []
-        };
-
+        var response = await _generationManager.EstimateCostAsync(request, cancellationToken);
         return Ok(response);
     }
 
@@ -52,24 +47,26 @@ public class GenerationsController : ApiControllerBase
         [FromBody] CreateGenerationRequest request,
         CancellationToken cancellationToken)
     {
-        var generationId = Guid.NewGuid();
+        // TODO: Get actual user ID from authentication context
+        var userId = GetCurrentUserId();
 
-        _logger.LogInformation("Generation {GenerationId} started, {CharCount} characters, voice {VoiceId}",
-            generationId, request.Text.Length, request.VoiceId);
+        _logger.LogInformation("Generation requested by user {UserId}, {CharCount} characters, voice {VoiceId}",
+            userId, request.Text.Length, request.VoiceId);
 
-        // TODO: Implement via IGenerationManager
-        var response = new GenerationResponse
+        try
         {
-            Id = generationId,
-            Status = GenerationStatus.Pending,
-            CharacterCount = request.Text.Length,
-            Progress = 0,
-            ChunkCount = 0,
-            ChunksCompleted = 0,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        return AcceptedAtAction(nameof(GetGeneration), new { id = generationId }, response);
+            var response = await _generationManager.CreateGenerationAsync(userId, request, cancellationToken);
+            return AcceptedAtAction(nameof(GetGeneration), new { id = response.Id }, response);
+        }
+        catch (InvalidOperationException ex) when (ex.Message.Contains("Insufficient credits"))
+        {
+            return StatusCode(StatusCodes.Status402PaymentRequired,
+                new ErrorResponse { Code = "INSUFFICIENT_CREDITS", Message = ex.Message });
+        }
+        catch (InvalidOperationException ex) when (ex.Message.Contains("not found"))
+        {
+            return BadRequest(new ErrorResponse { Code = "NOT_FOUND", Message = ex.Message });
+        }
     }
 
     /// <summary>
@@ -84,25 +81,11 @@ public class GenerationsController : ApiControllerBase
     {
         _logger.LogDebug("Getting generation {GenerationId}", id);
 
-        // TODO: Implement via IGenerationManager
-        var response = new GenerationResponse
+        var response = await _generationManager.GetGenerationAsync(id, cancellationToken);
+        if (response is null)
         {
-            Id = id,
-            Status = GenerationStatus.Completed,
-            CharacterCount = 1000,
-            Progress = 100,
-            ChunkCount = 1,
-            ChunksCompleted = 1,
-            Provider = Provider.ElevenLabs,
-            AudioUrl = $"https://storage.example.com/generations/{id}.mp3",
-            AudioFormat = "mp3",
-            AudioDurationMs = 5000,
-            EstimatedCost = 0.01m,
-            ActualCost = 0.01m,
-            CreatedAt = DateTime.UtcNow.AddMinutes(-5),
-            StartedAt = DateTime.UtcNow.AddMinutes(-4),
-            CompletedAt = DateTime.UtcNow.AddMinutes(-3)
-        };
+            return NotFound(new ErrorResponse { Code = "GENERATION_NOT_FOUND", Message = $"Generation {id} not found" });
+        }
 
         return Ok(response);
     }
@@ -118,17 +101,14 @@ public class GenerationsController : ApiControllerBase
         [FromQuery] GenerationStatus? status = null,
         CancellationToken cancellationToken = default)
     {
-        _logger.LogDebug("Getting generations, page {Page}, pageSize {PageSize}, status {Status}",
-            page, pageSize, status);
+        // TODO: Get actual user ID from authentication context
+        var userId = GetCurrentUserId();
 
-        // TODO: Implement via IGenerationManager
-        var response = new PagedResponse<GenerationResponse>
-        {
-            Items = [],
-            TotalCount = 0,
-            Page = page,
-            PageSize = pageSize
-        };
+        _logger.LogDebug("Getting generations for user {UserId}, page {Page}, pageSize {PageSize}, status {Status}",
+            userId, page, pageSize, status);
+
+        var response = await _generationManager.GetGenerationsAsync(
+            userId, page, pageSize, status, cancellationToken);
 
         return Ok(response);
     }
@@ -144,11 +124,25 @@ public class GenerationsController : ApiControllerBase
         [FromBody] SubmitFeedbackRequest request,
         CancellationToken cancellationToken)
     {
+        // TODO: Get actual user ID from authentication context
+        var userId = GetCurrentUserId();
+
         _logger.LogInformation("Feedback submitted for generation {GenerationId}, rating {Rating}",
             id, request.Rating);
 
-        // TODO: Implement via IGenerationManager
-        return NoContent();
+        try
+        {
+            await _generationManager.SubmitFeedbackAsync(id, userId, request, cancellationToken);
+            return NoContent();
+        }
+        catch (InvalidOperationException ex) when (ex.Message.Contains("not found"))
+        {
+            return NotFound(new ErrorResponse { Code = "GENERATION_NOT_FOUND", Message = ex.Message });
+        }
+        catch (InvalidOperationException ex) when (ex.Message.Contains("does not belong"))
+        {
+            return NotFound(new ErrorResponse { Code = "GENERATION_NOT_FOUND", Message = $"Generation {id} not found" });
+        }
     }
 
     /// <summary>
@@ -162,9 +156,35 @@ public class GenerationsController : ApiControllerBase
         Guid id,
         CancellationToken cancellationToken)
     {
+        // TODO: Get actual user ID from authentication context
+        var userId = GetCurrentUserId();
+
         _logger.LogInformation("Cancellation requested for generation {GenerationId}", id);
 
-        // TODO: Implement via IGenerationManager
-        return NoContent();
+        try
+        {
+            var cancelled = await _generationManager.CancelGenerationAsync(id, userId, cancellationToken);
+            if (!cancelled)
+            {
+                return Conflict(new ErrorResponse
+                {
+                    Code = "CANCEL_FAILED",
+                    Message = "Generation cannot be cancelled (already completed, failed, or not found)"
+                });
+            }
+
+            return NoContent();
+        }
+        catch (InvalidOperationException ex) when (ex.Message.Contains("does not belong"))
+        {
+            return NotFound(new ErrorResponse { Code = "GENERATION_NOT_FOUND", Message = $"Generation {id} not found" });
+        }
+    }
+
+    // Temporary placeholder until authentication is implemented
+    private static Guid GetCurrentUserId()
+    {
+        // TODO: Replace with actual user ID from JWT/auth context
+        return Guid.Parse("00000000-0000-0000-0000-000000000001");
     }
 }
