@@ -1,12 +1,20 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useUIStore } from "@/stores";
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [mounted, setMounted] = useState(false);
   const theme = useUIStore((state) => state.theme);
 
+  // Handle hydration
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
     const root = window.document.documentElement;
 
     const applyTheme = (resolvedTheme: "light" | "dark") => {
@@ -27,7 +35,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     } else {
       applyTheme(theme);
     }
-  }, [theme]);
+  }, [theme, mounted]);
 
   return <>{children}</>;
 }
