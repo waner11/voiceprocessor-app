@@ -130,7 +130,7 @@ export default function LandingPage() {
             <div className="mx-auto max-w-3xl">
               <h1 className="mb-6 text-5xl font-bold tracking-tight md:text-6xl">
                 Convert Text to
-                <span className="text-blue-600"> Professional Audio</span>
+                <span className="text-blue-700"> Professional Audio</span>
               </h1>
               <p className="mb-8 text-xl text-gray-600">
                 Multi-provider Text-to-Speech platform. Create audiobooks,
@@ -146,7 +146,7 @@ export default function LandingPage() {
                 </Link>
                 <Link
                   href="/api-docs"
-                  className="rounded-lg border px-8 py-3 text-lg hover:bg-gray-50"
+                  className="rounded-lg border border-gray-300 px-8 py-3 text-lg text-gray-900 hover:bg-gray-50"
                 >
                   View API Docs
                 </Link>
