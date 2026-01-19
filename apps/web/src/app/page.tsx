@@ -1,7 +1,4 @@
-"use client";
-
 import Link from "next/link";
-import { ThemeToggle } from "@/components/ThemeToggle";
 
 const features = [
   {
@@ -116,7 +113,6 @@ export default function LandingPage() {
             <Link href="/login" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
               Sign In
             </Link>
-            <ThemeToggle />
             <Link
               href="/signup"
               className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"

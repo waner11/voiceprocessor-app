@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useUsage } from "@/hooks";
-import { ThemeToggle } from "@/components/ThemeToggle";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard" },
@@ -53,8 +52,6 @@ export function Header() {
               <span className="text-gray-400 dark:text-gray-500">/ {usage.charactersLimit.toLocaleString()}</span>
             </div>
           )}
-
-          <ThemeToggle />
 
           <Link
             href="/settings"
