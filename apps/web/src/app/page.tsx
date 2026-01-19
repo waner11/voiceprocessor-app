@@ -188,7 +188,7 @@ export default function LandingPage() {
                     </button>
                   </div>
                   <Link
-                    href="/generate"
+                    href="/signup"
                     className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
                   >
                     Try with your own text →
