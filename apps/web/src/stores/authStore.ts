@@ -11,12 +11,14 @@ export interface User {
 interface AuthState {
   user: User | null;
   token: string | null;
+  creditsRemaining: number;
   isAuthenticated: boolean;
   isLoading: boolean;
 
   setUser: (user: User | null) => void;
   setToken: (token: string | null) => void;
-  login: (user: User, token: string) => void;
+  setCredits: (credits: number) => void;
+  login: (user: User, token: string, creditsRemaining?: number) => void;
   logout: () => void;
   setLoading: (isLoading: boolean) => void;
 }
@@ -26,6 +28,7 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       user: null,
       token: null,
+      creditsRemaining: 0,
       isAuthenticated: false,
       isLoading: true,
 
@@ -35,11 +38,20 @@ export const useAuthStore = create<AuthState>()(
       setToken: (token) =>
         set({ token }),
 
-      login: (user, token) =>
-        set({ user, token, isAuthenticated: true, isLoading: false }),
+      setCredits: (credits) =>
+        set({ creditsRemaining: credits }),
+
+      login: (user, token, creditsRemaining) =>
+        set({
+          user,
+          token,
+          creditsRemaining: creditsRemaining ?? 0,
+          isAuthenticated: true,
+          isLoading: false
+        }),
 
       logout: () =>
-        set({ user: null, token: null, isAuthenticated: false }),
+        set({ user: null, token: null, creditsRemaining: 0, isAuthenticated: false }),
 
       setLoading: (isLoading) =>
         set({ isLoading }),
@@ -49,6 +61,7 @@ export const useAuthStore = create<AuthState>()(
       partialize: (state) => ({
         user: state.user,
         token: state.token,
+        creditsRemaining: state.creditsRemaining,
         isAuthenticated: state.isAuthenticated,
       }),
       onRehydrateStorage: () => (state) => {

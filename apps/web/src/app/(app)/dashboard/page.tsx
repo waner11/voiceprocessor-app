@@ -67,7 +67,7 @@ export default function DashboardPage() {
           ) : (
             <>
               <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                {((usageData?.charactersLimit || 0) - (usageData?.charactersUsed || 0)).toLocaleString()}
+                {(usageData?.charactersRemaining || 0).toLocaleString()}
               </p>
               <p className="text-sm text-gray-500 dark:text-gray-400">characters remaining</p>
             </>

@@ -25,6 +25,7 @@ interface AuthResponse {
     email: string;
     name: string;
   };
+  creditsRemaining?: number;
   isNewUser?: boolean;
 }
 
@@ -79,7 +80,7 @@ export function useLogin() {
       return response;
     },
     onSuccess: (data) => {
-      login(data.user, data.accessToken);
+      login(data.user, data.accessToken, data.creditsRemaining);
       router.push("/dashboard");
     },
   });
@@ -101,7 +102,7 @@ export function useRegister() {
       return response;
     },
     onSuccess: (data) => {
-      login(data.user, data.accessToken);
+      login(data.user, data.accessToken, data.creditsRemaining);
       router.push("/dashboard");
     },
   });
