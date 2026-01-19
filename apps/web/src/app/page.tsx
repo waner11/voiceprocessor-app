@@ -98,7 +98,7 @@ export default function LandingPage() {
   return (
     <div className="flex min-h-screen flex-col bg-white dark:bg-gray-950">
       {/* Header */}
-      <header className="border-b border-gray-200 dark:border-gray-800">
+      <header className="sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 bg-white/95 dark:bg-gray-950/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-gray-950/60">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">
             VoiceProcessor

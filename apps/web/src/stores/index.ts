@@ -1,2 +1,2 @@
-export { useUIStore, type RoutingStrategy, type Theme } from "./uiStore";
+export { useUIStore, useHydrated, type RoutingStrategy, type Theme } from "./uiStore";
 export { useAuthStore, getAuthToken, type User } from "./authStore";

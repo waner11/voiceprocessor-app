@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
+import { useState, useEffect } from "react";
 
 export type RoutingStrategy = "cost" | "quality" | "speed" | "balanced";
 export type Theme = "light" | "dark" | "system";
@@ -52,6 +53,7 @@ export const useUIStore = create<UIState>()(
     }),
     {
       name: "voiceprocessor-ui",
+      storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         selectedVoice: state.selectedVoice,
         routingStrategy: state.routingStrategy,
@@ -61,3 +63,25 @@ export const useUIStore = create<UIState>()(
     }
   )
 );
+
+// Helper to check if store is hydrated
+export const useHydrated = () => {
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    const unsubFinishHydration = useUIStore.persist.onFinishHydration(() => {
+      setHydrated(true);
+    });
+
+    // Check if already hydrated
+    if (useUIStore.persist.hasHydrated()) {
+      setHydrated(true);
+    }
+
+    return () => {
+      unsubFinishHydration();
+    };
+  }, []);
+
+  return hydrated;
+};

@@ -1,25 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useUIStore } from "@/stores";
+import { useLayoutEffect } from "react";
+import { useUIStore } from "@/stores/uiStore";
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [mounted, setMounted] = useState(false);
   const theme = useUIStore((state) => state.theme);
 
-  // Handle hydration
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-
-    const root = window.document.documentElement;
+  // Apply theme whenever it changes
+  useLayoutEffect(() => {
+    const root = document.documentElement;
 
     const applyTheme = (resolvedTheme: "light" | "dark") => {
       root.classList.remove("light", "dark");
       root.classList.add(resolvedTheme);
+      // Also update color-scheme for native elements
+      root.style.colorScheme = resolvedTheme;
     };
 
     if (theme === "system") {
@@ -35,7 +30,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     } else {
       applyTheme(theme);
     }
-  }, [theme, mounted]);
+  }, [theme]);
 
   return <>{children}</>;
 }
