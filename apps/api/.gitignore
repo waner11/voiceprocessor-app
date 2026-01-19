@@ -60,5 +60,3 @@ Thumbs.db
 # Docker
 docker-compose.override.yml
 
-# Documentation
-/docs/
