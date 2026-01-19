@@ -1,45 +1,84 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuthStore } from "@/stores";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 interface ApiKey {
   id: string;
   name: string;
-  prefix: string;
+  keyPrefix: string;
   createdAt: string;
   lastUsedAt: string | null;
   expiresAt: string | null;
+  isActive: boolean;
+}
+
+interface ApiKeyCreated extends ApiKey {
+  apiKey: string;
 }
 
 export default function ApiKeysSettingsPage() {
+  const token = useAuthStore((state) => state.token);
   const [keys, setKeys] = useState<ApiKey[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
   const [newKeyName, setNewKeyName] = useState("");
   const [newKeyValue, setNewKeyValue] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch existing API keys on mount
+  useEffect(() => {
+    const fetchKeys = async () => {
+      if (!token) return;
+
+      try {
+        const response = await fetch(`${API_URL}/api/v1/Auth/api-keys`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setKeys(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch API keys:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchKeys();
+  }, [token]);
 
   const handleCreateKey = async () => {
-    if (!newKeyName.trim()) return;
+    if (!newKeyName.trim() || !token) return;
 
+    setError(null);
     try {
-      // TODO: Call API to create key
-      // const response = await api.POST("/api/v1/auth/api-keys", { body: { name: newKeyName } });
+      const response = await fetch(`${API_URL}/api/v1/Auth/api-keys`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name: newKeyName }),
+      });
 
-      // Mock response
-      const mockKey = `vp_${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`;
-      setNewKeyValue(mockKey);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to create API key");
+      }
 
-      const newKey: ApiKey = {
-        id: Math.random().toString(),
-        name: newKeyName,
-        prefix: mockKey.substring(0, 10),
-        createdAt: new Date().toISOString(),
-        lastUsedAt: null,
-        expiresAt: null,
-      };
-      setKeys([...keys, newKey]);
-    } catch (error) {
-      console.error("Failed to create API key:", error);
+      const data: ApiKeyCreated = await response.json();
+      setNewKeyValue(data.apiKey);
+      setKeys([...keys, data]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create API key");
     }
   };
 
@@ -56,12 +95,24 @@ export default function ApiKeysSettingsPage() {
       return;
     }
 
+    if (!token) return;
+
     try {
-      // TODO: Call API to revoke key
-      // await api.DELETE(`/api/v1/auth/api-keys/${id}`);
-      setKeys(keys.filter((key) => key.id !== id));
-    } catch (error) {
-      console.error("Failed to revoke API key:", error);
+      const response = await fetch(`${API_URL}/api/v1/Auth/api-keys/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok || response.status === 204) {
+        setKeys(keys.filter((key) => key.id !== id));
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to revoke API key");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to revoke API key");
     }
   };
 
@@ -90,6 +141,13 @@ export default function ApiKeysSettingsPage() {
             </button>
           )}
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-sm text-red-600 dark:text-red-400">
+            {error}
+          </div>
+        )}
 
         {/* New Key Creation Form */}
         {isCreating && !newKeyValue && (
@@ -154,8 +212,15 @@ export default function ApiKeysSettingsPage() {
           </div>
         )}
 
+        {/* Loading State */}
+        {isLoading && (
+          <div className="py-8 text-center text-gray-500 dark:text-gray-400">
+            Loading API keys...
+          </div>
+        )}
+
         {/* Keys List */}
-        {keys.length > 0 ? (
+        {!isLoading && keys.length > 0 ? (
           <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
             <table className="w-full">
               <thead className="bg-gray-50 dark:bg-gray-800">
@@ -184,7 +249,7 @@ export default function ApiKeysSettingsPage() {
                       {key.name}
                     </td>
                     <td className="px-4 py-3 text-sm font-mono text-gray-500 dark:text-gray-400">
-                      {key.prefix}...
+                      {key.keyPrefix}...
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
                       {new Date(key.createdAt).toLocaleDateString()}
@@ -205,12 +270,12 @@ export default function ApiKeysSettingsPage() {
               </tbody>
             </table>
           </div>
-        ) : (
+        ) : !isLoading ? (
           <div className="text-center py-8 text-gray-500 dark:text-gray-400">
             <p>No API keys yet.</p>
             <p className="text-sm mt-1">Create your first API key to get started.</p>
           </div>
-        )}
+        ) : null}
       </section>
 
       {/* Usage Info */}
