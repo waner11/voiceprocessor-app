@@ -15,6 +15,9 @@ public class VoiceProcessorDbContext : Microsoft.EntityFrameworkCore.DbContext
     public DbSet<Generation> Generations => Set<Generation>();
     public DbSet<GenerationChunk> GenerationChunks => Set<GenerationChunk>();
     public DbSet<Feedback> Feedbacks => Set<Feedback>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<ApiKey> ApiKeys => Set<ApiKey>();
+    public DbSet<ExternalLogin> ExternalLogins => Set<ExternalLogin>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -25,6 +28,9 @@ public class VoiceProcessorDbContext : Microsoft.EntityFrameworkCore.DbContext
         ConfigureGeneration(modelBuilder);
         ConfigureGenerationChunk(modelBuilder);
         ConfigureFeedback(modelBuilder);
+        ConfigureRefreshToken(modelBuilder);
+        ConfigureApiKey(modelBuilder);
+        ConfigureExternalLogin(modelBuilder);
     }
 
     private static void ConfigureUser(ModelBuilder modelBuilder)
@@ -44,6 +50,9 @@ public class VoiceProcessorDbContext : Microsoft.EntityFrameworkCore.DbContext
             entity.Property(e => e.Tier)
                 .HasConversion<string>()
                 .HasMaxLength(20);
+
+            entity.Property(e => e.PasswordHash)
+                .HasMaxLength(256);
 
             entity.HasIndex(e => e.Email).IsUnique();
             entity.HasIndex(e => e.CreatedAt);
@@ -177,6 +186,97 @@ public class VoiceProcessorDbContext : Microsoft.EntityFrameworkCore.DbContext
             entity.HasIndex(e => e.GenerationId);
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.Rating);
+        });
+    }
+
+    private static void ConfigureRefreshToken(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<RefreshToken>(entity =>
+        {
+            entity.ToTable("refresh_tokens");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Token)
+                .IsRequired()
+                .HasMaxLength(256);
+
+            entity.Property(e => e.DeviceInfo)
+                .HasMaxLength(256);
+
+            entity.Property(e => e.IpAddress)
+                .HasMaxLength(45);
+
+            entity.Property(e => e.ReplacedByToken)
+                .HasMaxLength(256);
+
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.RefreshTokens)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => e.Token).IsUnique();
+            entity.HasIndex(e => new { e.UserId, e.RevokedAt });
+        });
+    }
+
+    private static void ConfigureApiKey(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<ApiKey>(entity =>
+        {
+            entity.ToTable("api_keys");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Name)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            entity.Property(e => e.KeyHash)
+                .IsRequired()
+                .HasMaxLength(256);
+
+            entity.Property(e => e.KeyPrefix)
+                .IsRequired()
+                .HasMaxLength(20);
+
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.ApiKeys)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => e.KeyPrefix).IsUnique();
+            entity.HasIndex(e => new { e.UserId, e.IsActive });
+        });
+    }
+
+    private static void ConfigureExternalLogin(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<ExternalLogin>(entity =>
+        {
+            entity.ToTable("external_logins");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Provider)
+                .IsRequired()
+                .HasMaxLength(20);
+
+            entity.Property(e => e.ProviderUserId)
+                .IsRequired()
+                .HasMaxLength(256);
+
+            entity.Property(e => e.ProviderEmail)
+                .IsRequired()
+                .HasMaxLength(255);
+
+            entity.Property(e => e.ProviderName)
+                .HasMaxLength(100);
+
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.ExternalLogins)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => new { e.UserId, e.Provider }).IsUnique();
+            entity.HasIndex(e => new { e.Provider, e.ProviderUserId }).IsUnique();
         });
     }
 }

@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 using VoiceProcessor.Accessors.Data.DbContext;
 using VoiceProcessor.Accessors.DependencyInjection;
+using VoiceProcessor.Clients.Api.Authentication;
+using VoiceProcessor.Clients.Api.Services;
 using VoiceProcessor.Engines.DependencyInjection;
 using VoiceProcessor.Managers.DependencyInjection;
 
@@ -29,6 +31,11 @@ builder.Services.AddEngines(builder.Configuration);
 // Managers (user, voice, generation)
 builder.Services.AddManagers(builder.Configuration);
 
+// Authentication
+builder.Services.AddVoiceProcessorAuthentication(builder.Configuration);
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+
 // OpenAPI/Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -42,6 +49,36 @@ builder.Services.AddSwaggerGen(options =>
         {
             Name = "VoiceProcessor Team"
         }
+    });
+
+    // JWT Bearer authentication
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token.",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    // API Key authentication
+    options.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
+    {
+        Description = "API Key authentication. Enter your API key (starts with 'vp_').",
+        Name = "X-API-Key",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey
+    });
+
+    // Security requirements - function that returns the requirement from the document
+    options.AddSecurityRequirement(document =>
+    {
+        var requirement = new OpenApiSecurityRequirement
+        {
+            { new OpenApiSecuritySchemeReference("Bearer", document), new List<string>() },
+            { new OpenApiSecuritySchemeReference("ApiKey", document), new List<string>() }
+        };
+        return requirement;
     });
 
     // Include XML comments for API documentation
@@ -66,6 +103,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 

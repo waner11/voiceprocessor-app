@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VoiceProcessor.Domain.DTOs.Responses;
 using VoiceProcessor.Domain.Enums;
@@ -22,6 +23,7 @@ public class VoicesController : ApiControllerBase
     /// Get all available voices
     /// </summary>
     [HttpGet]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(PagedResponse<VoiceResponse>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedResponse<VoiceResponse>>> GetVoices(
         [FromQuery] int page = 1,
@@ -44,6 +46,7 @@ public class VoicesController : ApiControllerBase
     /// Get a specific voice by ID
     /// </summary>
     [HttpGet("{id:guid}")]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(VoiceResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<VoiceResponse>> GetVoice(
@@ -65,6 +68,7 @@ public class VoicesController : ApiControllerBase
     /// Get voices grouped by provider
     /// </summary>
     [HttpGet("by-provider")]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(Dictionary<Provider, IReadOnlyList<VoiceResponse>>), StatusCodes.Status200OK)]
     public async Task<ActionResult<Dictionary<Provider, IReadOnlyList<VoiceResponse>>>> GetVoicesByProvider(
         CancellationToken cancellationToken)
@@ -76,10 +80,11 @@ public class VoicesController : ApiControllerBase
     }
 
     /// <summary>
-    /// Refresh voice catalog from all providers
+    /// Refresh voice catalog from all providers (requires authentication)
     /// </summary>
     [HttpPost("refresh")]
     [ProducesResponseType(StatusCodes.Status202Accepted)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> RefreshVoices(
         CancellationToken cancellationToken)
     {

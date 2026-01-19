@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using VoiceProcessor.Clients.Api.Services;
 using VoiceProcessor.Domain.DTOs.Requests;
 using VoiceProcessor.Domain.DTOs.Responses;
 using VoiceProcessor.Domain.Enums;
@@ -9,13 +11,16 @@ namespace VoiceProcessor.Clients.Api.Controllers;
 public class GenerationsController : ApiControllerBase
 {
     private readonly IGenerationManager _generationManager;
+    private readonly ICurrentUserService _currentUser;
     private readonly ILogger<GenerationsController> _logger;
 
     public GenerationsController(
         IGenerationManager generationManager,
+        ICurrentUserService currentUser,
         ILogger<GenerationsController> logger)
     {
         _generationManager = generationManager;
+        _currentUser = currentUser;
         _logger = logger;
     }
 
@@ -23,6 +28,7 @@ public class GenerationsController : ApiControllerBase
     /// Estimate the cost of a text-to-speech generation
     /// </summary>
     [HttpPost("estimate")]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(CostEstimateResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<CostEstimateResponse>> EstimateCost(
@@ -47,8 +53,8 @@ public class GenerationsController : ApiControllerBase
         [FromBody] CreateGenerationRequest request,
         CancellationToken cancellationToken)
     {
-        // TODO: Get actual user ID from authentication context
-        var userId = GetCurrentUserId();
+        var userId = _currentUser.UserId
+            ?? throw new UnauthorizedAccessException("User not authenticated");
 
         _logger.LogInformation("Generation requested by user {UserId}, {CharCount} characters, voice {VoiceId}",
             userId, request.Text.Length, request.VoiceId);
@@ -101,8 +107,8 @@ public class GenerationsController : ApiControllerBase
         [FromQuery] GenerationStatus? status = null,
         CancellationToken cancellationToken = default)
     {
-        // TODO: Get actual user ID from authentication context
-        var userId = GetCurrentUserId();
+        var userId = _currentUser.UserId
+            ?? throw new UnauthorizedAccessException("User not authenticated");
 
         _logger.LogDebug("Getting generations for user {UserId}, page {Page}, pageSize {PageSize}, status {Status}",
             userId, page, pageSize, status);
@@ -124,8 +130,8 @@ public class GenerationsController : ApiControllerBase
         [FromBody] SubmitFeedbackRequest request,
         CancellationToken cancellationToken)
     {
-        // TODO: Get actual user ID from authentication context
-        var userId = GetCurrentUserId();
+        var userId = _currentUser.UserId
+            ?? throw new UnauthorizedAccessException("User not authenticated");
 
         _logger.LogInformation("Feedback submitted for generation {GenerationId}, rating {Rating}",
             id, request.Rating);
@@ -156,8 +162,8 @@ public class GenerationsController : ApiControllerBase
         Guid id,
         CancellationToken cancellationToken)
     {
-        // TODO: Get actual user ID from authentication context
-        var userId = GetCurrentUserId();
+        var userId = _currentUser.UserId
+            ?? throw new UnauthorizedAccessException("User not authenticated");
 
         _logger.LogInformation("Cancellation requested for generation {GenerationId}", id);
 
@@ -179,12 +185,5 @@ public class GenerationsController : ApiControllerBase
         {
             return NotFound(new ErrorResponse { Code = "GENERATION_NOT_FOUND", Message = $"Generation {id} not found" });
         }
-    }
-
-    // Temporary placeholder until authentication is implemented
-    private static Guid GetCurrentUserId()
-    {
-        // TODO: Replace with actual user ID from JWT/auth context
-        return Guid.Parse("00000000-0000-0000-0000-000000000001");
     }
 }

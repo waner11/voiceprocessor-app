@@ -43,4 +43,9 @@ public class UserAccessor : IUserAccessor
     {
         return await _dbContext.Users.AnyAsync(u => u.Id == id, cancellationToken);
     }
+
+    public async Task<bool> EmailExistsAsync(string email, CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.Users.AnyAsync(u => u.Email == email, cancellationToken);
+    }
 }

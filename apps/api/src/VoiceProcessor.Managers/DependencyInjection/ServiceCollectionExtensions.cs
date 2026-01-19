@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using VoiceProcessor.Managers.Auth;
 using VoiceProcessor.Managers.Contracts;
 using VoiceProcessor.Managers.Generation;
 using VoiceProcessor.Managers.User;
@@ -13,6 +14,9 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        // Auth Manager
+        services.AddScoped<IAuthManager, AuthManager>();
+
         // User Manager
         services.AddScoped<IUserManager, UserManager>();
 

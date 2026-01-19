@@ -14,7 +14,17 @@ public class User
     public DateTime? LastActiveAt { get; set; }
     public bool IsActive { get; set; } = true;
 
+    // Authentication fields
+    public string? PasswordHash { get; set; }
+    public DateTime? PasswordChangedAt { get; set; }
+    public int FailedLoginAttempts { get; set; }
+    public DateTime? LockoutEndsAt { get; set; }
+    public DateTime? LastLoginAt { get; set; }
+
     // Navigation properties
     public ICollection<Generation> Generations { get; set; } = [];
     public ICollection<Feedback> Feedbacks { get; set; } = [];
+    public ICollection<RefreshToken> RefreshTokens { get; set; } = [];
+    public ICollection<ApiKey> ApiKeys { get; set; } = [];
+    public ICollection<ExternalLogin> ExternalLogins { get; set; } = [];
 }

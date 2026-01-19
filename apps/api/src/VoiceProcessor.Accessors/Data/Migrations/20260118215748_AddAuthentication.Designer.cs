@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using VoiceProcessor.Accessors.Data.DbContext;
@@ -11,9 +12,11 @@ using VoiceProcessor.Accessors.Data.DbContext;
 namespace VoiceProcessor.Accessors.Data.Migrations
 {
     [DbContext(typeof(VoiceProcessorDbContext))]
-    partial class VoiceProcessorDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260118215748_AddAuthentication")]
+    partial class AddAuthentication
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -69,48 +72,6 @@ namespace VoiceProcessor.Accessors.Data.Migrations
                     b.HasIndex("UserId", "IsActive");
 
                     b.ToTable("api_keys", (string)null);
-                });
-
-            modelBuilder.Entity("VoiceProcessor.Domain.Entities.ExternalLogin", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Provider")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.Property<string>("ProviderEmail")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<string>("ProviderName")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("ProviderUserId")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Provider", "ProviderUserId")
-                        .IsUnique();
-
-                    b.HasIndex("UserId", "Provider")
-                        .IsUnique();
-
-                    b.ToTable("external_logins", (string)null);
                 });
 
             modelBuilder.Entity("VoiceProcessor.Domain.Entities.Feedback", b =>
@@ -506,17 +467,6 @@ namespace VoiceProcessor.Accessors.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("VoiceProcessor.Domain.Entities.ExternalLogin", b =>
-                {
-                    b.HasOne("VoiceProcessor.Domain.Entities.User", "User")
-                        .WithMany("ExternalLogins")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("VoiceProcessor.Domain.Entities.Feedback", b =>
                 {
                     b.HasOne("VoiceProcessor.Domain.Entities.Generation", "Generation")
@@ -587,8 +537,6 @@ namespace VoiceProcessor.Accessors.Data.Migrations
             modelBuilder.Entity("VoiceProcessor.Domain.Entities.User", b =>
                 {
                     b.Navigation("ApiKeys");
-
-                    b.Navigation("ExternalLogins");
 
                     b.Navigation("Feedbacks");
 
