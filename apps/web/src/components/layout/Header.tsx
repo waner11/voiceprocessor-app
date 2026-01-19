@@ -21,7 +21,13 @@ export function Header() {
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  // Handle hydration
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -94,9 +100,9 @@ export function Header() {
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="flex items-center justify-center h-9 w-9 rounded-full bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-950"
-              title={user?.name || "Profile"}
+              title={isMounted ? (user?.name || "Profile") : "Profile"}
             >
-              {getInitials(user?.name)}
+              {isMounted ? getInitials(user?.name) : "U"}
             </button>
 
             {isMenuOpen && (
@@ -104,10 +110,10 @@ export function Header() {
                 {/* User Info */}
                 <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
                   <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                    {user?.name || "User"}
+                    {isMounted ? (user?.name || "User") : "User"}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                    {user?.email || "user@example.com"}
+                    {isMounted ? (user?.email || "user@example.com") : "user@example.com"}
                   </p>
                 </div>
 
