@@ -19,13 +19,34 @@ export const metadata: Metadata = {
   description: "Convert text to audiobooks with multi-provider TTS",
 };
 
+// Script to apply theme before React hydration to avoid flash
+const themeScript = `
+  (function() {
+    try {
+      var stored = localStorage.getItem('voiceprocessor-ui');
+      var theme = stored ? JSON.parse(stored).state.theme : 'dark';
+      var resolved = theme;
+      if (theme === 'system') {
+        resolved = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      document.documentElement.classList.remove('light', 'dark');
+      document.documentElement.classList.add(resolved);
+    } catch (e) {
+      document.documentElement.classList.add('dark');
+    }
+  })();
+`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
