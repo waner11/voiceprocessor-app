@@ -2,11 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useAuthStore } from "@/stores";
+import { useRegister } from "@/hooks";
 
 const signupSchema = z
   .object({
@@ -23,13 +22,11 @@ const signupSchema = z
 type SignupForm = z.infer<typeof signupSchema>;
 
 export default function SignupPage() {
-  const router = useRouter();
-  const login = useAuthStore((state) => state.login);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { mutate: register, isPending } = useRegister();
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const {
-    register,
+    register: registerField,
     handleSubmit,
     formState: { errors },
   } = useForm<SignupForm>({
@@ -37,27 +34,19 @@ export default function SignupPage() {
   });
 
   const onSubmit = async (data: SignupForm) => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      // TODO: Replace with actual API call
-      // const response = await api.POST("/api/v1/auth/signup", { body: data });
-
-      // Mock signup for now
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      login(
-        { id: "1", email: data.email, name: data.name },
-        "mock-token-12345"
-      );
-
-      router.push("/dashboard");
-    } catch (err) {
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
+    setApiError(null);
+    register(
+      {
+        name: data.name,
+        email: data.email,
+        password: data.password,
+      },
+      {
+        onError: (err: any) => {
+          setApiError(err?.message || "Something went wrong. Please try again.");
+        },
+      }
+    );
   };
 
   return (
@@ -70,9 +59,9 @@ export default function SignupPage() {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {error && (
+        {apiError && (
           <div className="rounded-lg bg-red-900/50 border border-red-800 p-3 text-sm text-red-400">
-            {error}
+            {apiError}
           </div>
         )}
 
@@ -81,7 +70,7 @@ export default function SignupPage() {
             Name
           </label>
           <input
-            {...register("name")}
+            {...registerField("name")}
             type="text"
             id="name"
             className="w-full rounded-lg border border-gray-700 bg-gray-900 px-4 py-2 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -97,7 +86,7 @@ export default function SignupPage() {
             Email
           </label>
           <input
-            {...register("email")}
+            {...registerField("email")}
             type="email"
             id="email"
             className="w-full rounded-lg border border-gray-700 bg-gray-900 px-4 py-2 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -113,7 +102,7 @@ export default function SignupPage() {
             Password
           </label>
           <input
-            {...register("password")}
+            {...registerField("password")}
             type="password"
             id="password"
             className="w-full rounded-lg border border-gray-700 bg-gray-900 px-4 py-2 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -134,7 +123,7 @@ export default function SignupPage() {
             Confirm Password
           </label>
           <input
-            {...register("confirmPassword")}
+            {...registerField("confirmPassword")}
             type="password"
             id="confirmPassword"
             className="w-full rounded-lg border border-gray-700 bg-gray-900 px-4 py-2 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -149,10 +138,10 @@ export default function SignupPage() {
 
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={isPending}
           className="w-full rounded-lg bg-blue-600 py-2.5 text-white hover:bg-blue-700 disabled:opacity-50"
         >
-          {isLoading ? "Creating account..." : "Create account"}
+          {isPending ? "Creating account..." : "Create account"}
         </button>
       </form>
 

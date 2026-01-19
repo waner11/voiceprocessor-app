@@ -2,11 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useAuthStore } from "@/stores";
+import { useLogin } from "@/hooks";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email"),
@@ -16,10 +15,8 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-  const router = useRouter();
-  const login = useAuthStore((state) => state.login);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { mutate: login, isPending, error } = useLogin();
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const {
     register,
@@ -30,27 +27,12 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (data: LoginForm) => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      // TODO: Replace with actual API call
-      // const response = await api.POST("/api/v1/auth/login", { body: data });
-
-      // Mock login for now
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      login(
-        { id: "1", email: data.email, name: "User" },
-        "mock-token-12345"
-      );
-
-      router.push("/dashboard");
-    } catch (err) {
-      setError("Invalid email or password");
-    } finally {
-      setIsLoading(false);
-    }
+    setApiError(null);
+    login(data, {
+      onError: (err: any) => {
+        setApiError(err?.message || "Invalid email or password");
+      },
+    });
   };
 
   return (
@@ -61,9 +43,9 @@ export default function LoginPage() {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {error && (
+        {apiError && (
           <div className="rounded-lg bg-red-900/50 border border-red-800 p-3 text-sm text-red-400">
-            {error}
+            {apiError}
           </div>
         )}
 
@@ -116,10 +98,10 @@ export default function LoginPage() {
 
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={isPending}
           className="w-full rounded-lg bg-blue-600 py-2.5 text-white hover:bg-blue-700 disabled:opacity-50"
         >
-          {isLoading ? "Signing in..." : "Sign in"}
+          {isPending ? "Signing in..." : "Sign in"}
         </button>
       </form>
 
