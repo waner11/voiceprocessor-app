@@ -36,6 +36,9 @@ builder.Services.AddVoiceProcessorAuthentication(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
+// Background services
+builder.Services.AddHostedService<VoiceSeedingService>();
+
 // CORS
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
     ?? ["http://localhost:3000"];
