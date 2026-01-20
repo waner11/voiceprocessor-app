@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using VoiceProcessor.Engines.Audio;
 using VoiceProcessor.Engines.Chunking;
 using VoiceProcessor.Engines.Contracts;
 using VoiceProcessor.Engines.Pricing;
@@ -16,6 +17,9 @@ public static class ServiceCollectionExtensions
     {
         // Chunking Engine (stateless, can be singleton)
         services.AddSingleton<IChunkingEngine, ChunkingEngine>();
+
+        // Audio Merge Engine (stateless, can be singleton)
+        services.AddSingleton<IAudioMergeEngine, AudioMergeEngine>();
 
         // Pricing Engine
         services.Configure<PricingOptions>(

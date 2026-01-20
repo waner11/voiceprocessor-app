@@ -26,6 +26,9 @@ public static class ServiceCollectionExtensions
         // Generation Manager
         services.AddScoped<IGenerationManager, GenerationManager>();
 
+        // Generation Processor (background job processor)
+        services.AddScoped<IGenerationProcessor, GenerationProcessor>();
+
         return services;
     }
 }

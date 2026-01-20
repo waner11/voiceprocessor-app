@@ -1,3 +1,4 @@
+using Hangfire;
 using Microsoft.Extensions.Logging;
 using VoiceProcessor.Accessors.Contracts;
 using VoiceProcessor.Accessors.Providers;
@@ -19,6 +20,7 @@ public class GenerationManager : IGenerationManager
     private readonly IChunkingEngine _chunkingEngine;
     private readonly IPricingEngine _pricingEngine;
     private readonly IRoutingEngine _routingEngine;
+    private readonly IBackgroundJobClient _backgroundJobClient;
     private readonly ILogger<GenerationManager> _logger;
 
     public GenerationManager(
@@ -29,6 +31,7 @@ public class GenerationManager : IGenerationManager
         IChunkingEngine chunkingEngine,
         IPricingEngine pricingEngine,
         IRoutingEngine routingEngine,
+        IBackgroundJobClient backgroundJobClient,
         ILogger<GenerationManager> logger)
     {
         _generationAccessor = generationAccessor;
@@ -38,6 +41,7 @@ public class GenerationManager : IGenerationManager
         _chunkingEngine = chunkingEngine;
         _pricingEngine = pricingEngine;
         _routingEngine = routingEngine;
+        _backgroundJobClient = backgroundJobClient;
         _logger = logger;
     }
 
@@ -190,7 +194,10 @@ public class GenerationManager : IGenerationManager
         _logger.LogInformation("Generation {GenerationId} created, {ChunkCount} chunks, provider {Provider}",
             generation.Id, chunks.Count, routingDecision.SelectedProvider);
 
-        // TODO: Queue background job to process generation
+        // Queue background job to process generation
+        _backgroundJobClient.Enqueue<IGenerationProcessor>(
+            "generation",
+            processor => processor.ProcessGenerationAsync(generation.Id, CancellationToken.None));
 
         return MapToResponse(generation);
     }

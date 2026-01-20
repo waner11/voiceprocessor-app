@@ -11,9 +11,13 @@ public interface IGenerationChunkAccessor
         Guid generationId,
         CancellationToken cancellationToken = default);
 
+    Task<GenerationChunk> CreateAsync(GenerationChunk chunk, CancellationToken cancellationToken = default);
+
     Task CreateManyAsync(
         IEnumerable<GenerationChunk> chunks,
         CancellationToken cancellationToken = default);
+
+    Task UpdateAsync(GenerationChunk chunk, CancellationToken cancellationToken = default);
 
     Task UpdateStatusAsync(
         Guid id,

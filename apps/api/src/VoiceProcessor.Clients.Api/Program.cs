@@ -1,5 +1,7 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
+using Hangfire;
+using Hangfire.PostgreSql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 using VoiceProcessor.Accessors.Data.DbContext;
@@ -7,6 +9,7 @@ using VoiceProcessor.Accessors.DependencyInjection;
 using VoiceProcessor.Clients.Api.Authentication;
 using VoiceProcessor.Clients.Api.Services;
 using VoiceProcessor.Engines.DependencyInjection;
+using VoiceProcessor.Managers.Contracts;
 using VoiceProcessor.Managers.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -52,6 +55,20 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod()
             .AllowCredentials();
     });
+});
+
+// Hangfire for background jobs
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddHangfire(config => config
+    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UsePostgreSqlStorage(options => options.UseNpgsqlConnection(connectionString)));
+
+builder.Services.AddHangfireServer(options =>
+{
+    options.WorkerCount = Environment.ProcessorCount * 2;
+    options.Queues = ["default", "generation"];
 });
 
 // OpenAPI/Swagger
@@ -128,6 +145,18 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Hangfire dashboard (development only for now)
+if (app.Environment.IsDevelopment())
+{
+    app.MapHangfireDashboard("/hangfire");
+}
+
+// Configure recurring jobs
+RecurringJob.AddOrUpdate<IVoiceManager>(
+    "refresh-voice-catalog",
+    manager => manager.RefreshVoiceCatalogAsync(CancellationToken.None),
+    Cron.Daily(3)); // Run at 3 AM daily
 
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }))
     .WithName("HealthCheck");

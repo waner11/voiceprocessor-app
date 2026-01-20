@@ -1,6 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="Hangfire.Core" Version="1.8.17" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\VoiceProcessor.Domain\VoiceProcessor.Domain.csproj" />
     <ProjectReference Include="..\VoiceProcessor.Utilities\VoiceProcessor.Utilities.csproj" />
     <ProjectReference Include="..\VoiceProcessor.Accessors\VoiceProcessor.Accessors.csproj" />

@@ -31,11 +31,24 @@ public class GenerationChunkAccessor : IGenerationChunkAccessor
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<GenerationChunk> CreateAsync(GenerationChunk chunk, CancellationToken cancellationToken = default)
+    {
+        _dbContext.GenerationChunks.Add(chunk);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        return chunk;
+    }
+
     public async Task CreateManyAsync(
         IEnumerable<GenerationChunk> chunks,
         CancellationToken cancellationToken = default)
     {
         _dbContext.GenerationChunks.AddRange(chunks);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task UpdateAsync(GenerationChunk chunk, CancellationToken cancellationToken = default)
+    {
+        _dbContext.GenerationChunks.Update(chunk);
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
