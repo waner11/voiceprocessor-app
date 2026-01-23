@@ -4,47 +4,59 @@ Last updated: January 22, 2026
 
 ## Progress Overview
 
-```
-================================================================================
-                           VOICEPROCESSOR ROADMAP
-================================================================================
-
-  MVP (Paid Beta)              Beta Polish                 v1.0 Production
-  ----------------             ------------                ---------------
-  [################----]       [--------------------]      [--------------------]
-        66%                           0%                          0%
-
-  +------------------+         +------------------+        +------------------+
-  |   CURRENT PHASE  |         |                  |        |                  |
-  |                  |   -->   |   Monitoring &   |  -->   |   Full Tests &   |
-  |  Core TTS Flow   |         |   Real-time UX   |        |   More Providers |
-  |  + Payments      |         |   + Analytics    |        |   + Scale Ready  |
-  +------------------+         +------------------+        +------------------+
-
-  API:      8/13 done          API:      0/6 done          API:      0/6 done
-  Frontend: 10/14 done         Frontend: 0/6 done          Frontend: 0/5 done
-
-================================================================================
-                              WE ARE HERE ^
-================================================================================
-```
-
-### Milestone Progress
+### Current Phase: MVP (Paid Beta)
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#4f46e5'}}}%%
-gantt
-    title VoiceProcessor Development Timeline
-    dateFormat  YYYY-MM-DD
+pie showData
+    title "MVP Progress (18/27 tasks - 67%)"
+    "Completed" : 18
+    "Remaining" : 9
+```
+
+| Milestone | Status | Progress | Focus Areas |
+|-----------|--------|----------|-------------|
+| **MVP (Paid Beta)** | **In Progress** | 18/27 (67%) | Core TTS + Payments + Deploy |
+| Beta Polish | Planned | 0/12 (0%) | Monitoring + Real-time + Analytics |
+| v1.0 Production | Planned | 0/11 (0%) | Testing + Scale + Launch |
+
+### Milestone Breakdown
+
+```mermaid
+pie showData
+    title "MVP - API Backend (8/13)"
+    "Done" : 8
+    "Remaining" : 5
+```
+
+```mermaid
+pie showData
+    title "MVP - Frontend Web (10/14)"
+    "Done" : 10
+    "Remaining" : 4
+```
+
+### Release Timeline
+
+```mermaid
+timeline
+    title VoiceProcessor Release Plan
     section MVP
-    Core Auth & TTS (Done)     :done,    mvp1, 2026-01-01, 2026-01-19
-    Payments & Deploy          :active,  mvp2, 2026-01-20, 2026-02-15
+        Jan 2026 : Core Foundation
+                 : Auth, TTS Workflow
+                 : ElevenLabs + OpenAI
+        Feb 2026 : Payments & Deploy
+                 : Stripe Integration
+                 : Railway + Cloudflare
     section Beta
-    Monitoring & Real-time     :         beta1, 2026-02-16, 2026-03-15
-    More Providers             :         beta2, 2026-03-01, 2026-03-15
+        Mar 2026 : Polish & Monitor
+                 : Sentry + PostHog
+                 : SignalR Real-time
+                 : More TTS Providers
     section v1.0
-    Testing & Polish           :         v1, 2026-03-16, 2026-04-15
-    Production Launch          :milestone, launch, 2026-04-15, 0d
+        Apr 2026 : Production Ready
+                 : Full Test Coverage
+                 : Performance Tuning
+                 : Public Launch
 ```
 
 ---
