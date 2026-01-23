@@ -4,6 +4,32 @@ Last updated: January 22, 2026
 
 ---
 
+## Product Roadmap
+
+```mermaid
+flowchart LR
+    P1["<b>CORE</b><br/>Basic TTS<br/>2 Providers"]
+    P2["<b>SMART</b><br/>Multi-Provider<br/>Auto-Routing"]
+    P3["<b>PRO</b><br/>Voice Cloning<br/>Dialogue"]
+    P4["<b>SCALE</b><br/>Enterprise<br/>SDKs"]
+
+    P1 --> P2 --> P3 --> P4
+
+    style P1 fill:#22c55e,stroke:#16a34a,color:#fff
+    style P2 fill:#22c55e,stroke:#16a34a,color:#fff
+    style P3 fill:#e2e8f0,stroke:#94a3b8,color:#334155
+    style P4 fill:#e2e8f0,stroke:#94a3b8,color:#334155
+```
+
+| Phase | Name | What You Get | Status |
+|-------|------|--------------|--------|
+| **1** | **Core** | Text-to-speech with ElevenLabs & OpenAI, long-form support | **Available** |
+| **2** | **Smart** | 6+ providers, smart routing (cost/quality/speed), pay-as-you-go | **In Progress** |
+| **3** | **Pro** | Voice cloning, multi-speaker dialogue, pronunciation control | Planned |
+| **4** | **Scale** | Enterprise API, mobile SDKs, webhook integrations, white-label | Future |
+
+---
+
 ## What is VoiceProcessor?
 
 VoiceProcessor is a **multi-provider Text-to-Speech platform** that lets you convert text to natural-sounding audio using the best AI voices from ElevenLabs, OpenAI, Google, Amazon, and more — all through one simple API.
