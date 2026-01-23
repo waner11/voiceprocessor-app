@@ -2,7 +2,107 @@
 
 Last updated: January 22, 2026
 
-## Progress Overview
+---
+
+## What is VoiceProcessor?
+
+VoiceProcessor is a **multi-provider Text-to-Speech platform** that lets you convert text to natural-sounding audio using the best AI voices from ElevenLabs, OpenAI, Google, Amazon, and more — all through one simple API.
+
+### The Problem We Solve
+
+| Problem | Impact |
+|---------|--------|
+| Converting a book to audiobook costs **$5,000-$15,000** with traditional services | Indie authors can't afford professional audiobooks |
+| Existing TTS platforms lock you into **one provider** with prepaid credits that expire | Wasted money, limited voice options |
+| No easy way to **compare quality/cost** across providers | Users overpay or get poor quality |
+| Long content requires **manual chunking** and audio stitching | Hours of tedious work |
+
+### Our Solution
+
+- **Pay-as-you-go pricing** — No subscriptions, no expiring credits. Pay only for what you generate.
+- **Smart routing** — Automatically pick the best provider based on your preference: cost, quality, or speed.
+- **One unified API** — Access all major TTS providers without managing multiple accounts and API keys.
+- **Long-form support** — Automatically chunk books/articles and merge into seamless audio.
+
+---
+
+## Who Is This For?
+
+| User | Use Case | Value |
+|------|----------|-------|
+| **Indie Authors** | Convert books to audiobooks | $25-79 instead of $5,000+ |
+| **Content Creators** | YouTube voiceovers, podcasts, courses | Fast turnaround, consistent quality |
+| **Developers** | Add voice to apps via REST API | Simple integration, multiple providers |
+| **Businesses** | Scale voice content production | No per-seat licensing, predictable costs |
+
+---
+
+## Feature Roadmap
+
+### Available Now
+
+- 100+ AI voices across multiple providers
+- ElevenLabs & OpenAI TTS integration
+- Smart routing (optimize for cost, quality, or speed)
+- Long-form content support (books, articles, scripts)
+- Intelligent text chunking with seamless audio merging
+- REST API with key-based authentication
+- OAuth login (Google, GitHub)
+- Voice catalog with filters (language, gender, provider)
+- Generation history and management
+
+### Coming Soon (MVP)
+
+- Stripe payments & credit system
+- Voice preview before generating
+- Audio download functionality
+- Real-time generation progress
+- User feedback & ratings
+
+### Coming Later (Beta)
+
+- Google Cloud TTS provider (budget-friendly option)
+- Amazon Polly provider (AWS integration)
+- Advanced analytics dashboard
+- Webhook notifications
+
+### Future Vision
+
+| Feature | Description |
+|---------|-------------|
+| **Voice Cloning** | Upload a voice sample to create a custom voice |
+| **Multi-speaker Dialogue** | Auto-detect characters in scripts, assign different voices |
+| **Translation + TTS** | Translate text and generate speech in one step |
+| **Pronunciation Dictionary** | Define custom pronunciations for names, brands, technical terms |
+| **Video Dubbing** | Sync generated audio to video timestamps |
+| **Mobile SDKs** | Native iOS and Android libraries |
+
+---
+
+## Pricing
+
+| Provider | Cost per 1K chars | Quality | Best For |
+|----------|-------------------|---------|----------|
+| Google Cloud TTS | $0.004 - $0.016 | Good | Budget projects, high volume |
+| Amazon Polly | $0.004 - $0.016 | Good | AWS ecosystem integration |
+| OpenAI TTS | $0.015 - $0.030 | Great | Balanced quality and cost |
+| Fish Audio | $0.015 | Great | Alternative voices |
+| Cartesia | $0.010 | Great | High quality, competitive price |
+| ElevenLabs | $0.18 - $0.30 | Premium | Maximum quality, emotional range |
+
+**Example: Converting a 80,000-word novel (~400K characters)**
+
+| Routing Preference | Provider Selected | Estimated Cost |
+|--------------------|-------------------|----------------|
+| Cheapest | Google Cloud TTS | ~$1.60 - $6.40 |
+| Balanced | OpenAI TTS | ~$6 - $12 |
+| Best Quality | ElevenLabs | ~$72 - $120 |
+
+*No subscriptions. No expiring credits. Pay only for what you use.*
+
+---
+
+## Development Progress
 
 ```mermaid
 flowchart LR
@@ -19,34 +119,55 @@ flowchart LR
 
 **Current Phase: MVP (Paid Beta)** — 18/27 tasks complete (67%)
 
-| Milestone | API Progress | Frontend Progress | Target |
-|-----------|--------------|-------------------|--------|
-| **MVP (Paid Beta)** | 8/13 (62%) | 10/14 (71%) | Feb 2026 |
-| Beta Polish | 0/6 (0%) | 0/6 (0%) | Mar 2026 |
-| v1.0 Production | 0/6 (0%) | 0/5 (0%) | Apr 2026 |
+| Milestone | Target | API | Frontend | Focus |
+|-----------|--------|-----|----------|-------|
+| **MVP** | Feb 2026 | 8/13 (62%) | 10/14 (71%) | Core TTS + Payments |
+| **Beta** | Mar 2026 | 0/6 (0%) | 0/6 (0%) | Monitoring + UX Polish |
+| **v1.0** | Apr 2026 | 0/6 (0%) | 0/5 (0%) | Testing + Launch |
 
 ---
 
-## Overview
+## Technical Stack
 
-VoiceProcessor is a multi-provider TTS SaaS platform. This roadmap tracks progress across both repositories:
-- **voiceprocessor-api** - Backend API (.NET 10)
-- **voiceprocessor-web** - Frontend (Next.js 16 + React 19)
+| Component | Technology |
+|-----------|------------|
+| **Backend API** | ASP.NET Core 10 / C# 14 |
+| **Frontend** | Next.js 16 + React 19 + TanStack Query |
+| **Database** | PostgreSQL 16 |
+| **Cache & Jobs** | Redis + Hangfire |
+| **Real-time** | SignalR |
+| **Hosting** | Railway (API) + Cloudflare Pages (Web) |
+
+### Architecture
+
+```
++-------------------------------------------------------------+
+|                    voiceprocessor-web                       |
+|          Next.js 16 + React 19 + TanStack Query            |
++-------------------------------------------------------------+
+                              |
+                              v REST API + SignalR
++-------------------------------------------------------------+
+|                    voiceprocessor-api                       |
+|                  ASP.NET Core 10 / C# 14                    |
+|  +---------+ +---------+ +---------+ +---------------------+
+|  | Managers|>| Engines |>|Accessors|>| PostgreSQL + Redis  |
+|  +---------+ +---------+ +---------+ | Hangfire, SignalR   |
++--------------------------------------+---------------------+
+                              |
+                              v Provider APIs
+         +--------------+--------------+--------------+
+         |  ElevenLabs  |   OpenAI     |  Google TTS  |
+         |    (done)    |   (done)     |  (planned)   |
+         +--------------+--------------+--------------+
+```
 
 ---
 
-## Status Legend
+## Development Milestones
 
-| Symbol | Meaning |
-|--------|---------|
-| Done | Completed |
-| In Progress | In Progress |
-| Planned | Planned |
-| Blocked | Blocked |
-
----
-
-## Milestone 1: MVP (Paid Beta)
+<details>
+<summary><b>Milestone 1: MVP (Paid Beta)</b> — Click to expand</summary>
 
 **Goal:** End-to-end TTS generation with payment processing  
 **Target:** Ready for early adopters
@@ -88,9 +209,10 @@ VoiceProcessor is a multi-provider TTS SaaS platform. This roadmap tracks progre
 | Stripe Checkout | Planned | - | Payment flow integration |
 | Cloudflare Deployment | Planned | `xze` | Production hosting |
 
----
+</details>
 
-## Milestone 2: Beta Polish
+<details>
+<summary><b>Milestone 2: Beta Polish</b> — Click to expand</summary>
 
 **Goal:** Production stability, monitoring, improved UX  
 **Target:** Public beta launch
@@ -117,9 +239,10 @@ VoiceProcessor is a multi-provider TTS SaaS platform. This roadmap tracks progre
 | Token Auto-Refresh | Planned | - | Proactive refresh before expiry |
 | Download Audio | Planned | - | Download generated files |
 
----
+</details>
 
-## Milestone 3: v1.0 Production
+<details>
+<summary><b>Milestone 3: v1.0 Production</b> — Click to expand</summary>
 
 **Goal:** Feature-complete, tested, scalable  
 **Target:** Public launch
@@ -145,57 +268,7 @@ VoiceProcessor is a multi-provider TTS SaaS platform. This roadmap tracks progre
 | Performance Optimization | Planned | - | Bundle size, lazy loading |
 | Accessibility Audit | Planned | - | WCAG compliance |
 
----
-
-## Future (v1.x+)
-
-These features are planned for post-launch:
-
-| Feature | Description |
-|---------|-------------|
-| Voice Cloning | User uploads voice sample |
-| Multi-voice Dialogue | Auto-detect speakers in scripts |
-| Translation + TTS | Translate then generate speech |
-| Pronunciation Dictionary | User-defined word pronunciations |
-| Mobile SDKs | iOS + Android native support |
-| ML-based Routing | Learn from user feedback |
-| Video Dubbing | Sync audio to video timestamps |
-
----
-
-## Architecture Reference
-
-```
-+-------------------------------------------------------------+
-|                    voiceprocessor-web                       |
-|          Next.js 16 + React 19 + TanStack Query            |
-+-------------------------------------------------------------+
-                              |
-                              v REST API + SignalR
-+-------------------------------------------------------------+
-|                    voiceprocessor-api                       |
-|                  ASP.NET Core 10 / C# 14                    |
-|  +---------+ +---------+ +---------+ +---------------------+
-|  | Managers|>| Engines |>|Accessors|>| PostgreSQL + Redis  |
-|  +---------+ +---------+ +---------+ | Hangfire, SignalR   |
-+--------------------------------------+---------------------+
-                              |
-                              v Provider APIs
-         +--------------+--------------+--------------+
-         |  ElevenLabs  |   OpenAI     |  Google TTS  |
-         |    (done)    |   (done)     |  (planned)   |
-         +--------------+--------------+--------------+
-```
-
----
-
-## Progress Summary
-
-| Milestone | API Progress | Frontend Progress |
-|-----------|--------------|-------------------|
-| MVP | 8/13 (62%) | 10/14 (71%) |
-| Beta | 0/6 (0%) | 0/6 (0%) |
-| v1.0 | 0/6 (0%) | 0/5 (0%) |
+</details>
 
 ---
 
@@ -205,3 +278,11 @@ These features are planned for post-launch:
 2. Claim an issue: `bd update <id> --status in_progress`
 3. Complete work: `bd close <id>`
 4. Sync changes: `bd sync`
+
+---
+
+## Links
+
+- **API Repository:** voiceprocessor-api
+- **Frontend Repository:** voiceprocessor-web
+- **Documentation:** Coming soon
