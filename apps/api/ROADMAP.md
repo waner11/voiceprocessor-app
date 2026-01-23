@@ -28,6 +28,30 @@ flowchart LR
 | **3** | **Pro** | Voice cloning, multi-speaker dialogue, pronunciation control | Planned |
 | **4** | **Scale** | Enterprise API, mobile SDKs, webhook integrations, white-label | Future |
 
+### Release Schedule
+
+```mermaid
+flowchart LR
+    A["<b>ALPHA</b><br/>Internal Testing<br/>Jan 2026"]
+    B["<b>CLOSED BETA</b><br/>Early Adopters<br/>Feb 2026"]
+    C["<b>PUBLIC BETA</b><br/>Open Signups<br/>Mar 2026"]
+    D["<b>PRODUCTION</b><br/>General Availability<br/>Apr 2026"]
+
+    A --> B --> C --> D
+
+    style A fill:#22c55e,stroke:#16a34a,color:#fff
+    style B fill:#fbbf24,stroke:#d97706,color:#000
+    style C fill:#e2e8f0,stroke:#94a3b8,color:#334155
+    style D fill:#e2e8f0,stroke:#94a3b8,color:#334155
+```
+
+| Stage | Date | Access | What's Included |
+|-------|------|--------|-----------------|
+| **Alpha** | Jan 2026 | Internal only | Core TTS, basic UI, local testing |
+| **Closed Beta** | Feb 2026 | Invite-only | Payments, deployed to Railway/Cloudflare |
+| **Public Beta** | Mar 2026 | Open signups | Monitoring, real-time progress, feedback |
+| **Production** | Apr 2026 | General availability | Full test coverage, SLA, support |
+
 ---
 
 ## What is VoiceProcessor?
