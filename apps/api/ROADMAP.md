@@ -2,6 +2,53 @@
 
 Last updated: January 22, 2026
 
+## Progress Overview
+
+```
+================================================================================
+                           VOICEPROCESSOR ROADMAP
+================================================================================
+
+  MVP (Paid Beta)              Beta Polish                 v1.0 Production
+  ----------------             ------------                ---------------
+  [################----]       [--------------------]      [--------------------]
+        66%                           0%                          0%
+
+  +------------------+         +------------------+        +------------------+
+  |   CURRENT PHASE  |         |                  |        |                  |
+  |                  |   -->   |   Monitoring &   |  -->   |   Full Tests &   |
+  |  Core TTS Flow   |         |   Real-time UX   |        |   More Providers |
+  |  + Payments      |         |   + Analytics    |        |   + Scale Ready  |
+  +------------------+         +------------------+        +------------------+
+
+  API:      8/13 done          API:      0/6 done          API:      0/6 done
+  Frontend: 10/14 done         Frontend: 0/6 done          Frontend: 0/5 done
+
+================================================================================
+                              WE ARE HERE ^
+================================================================================
+```
+
+### Milestone Progress
+
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#4f46e5'}}}%%
+gantt
+    title VoiceProcessor Development Timeline
+    dateFormat  YYYY-MM-DD
+    section MVP
+    Core Auth & TTS (Done)     :done,    mvp1, 2026-01-01, 2026-01-19
+    Payments & Deploy          :active,  mvp2, 2026-01-20, 2026-02-15
+    section Beta
+    Monitoring & Real-time     :         beta1, 2026-02-16, 2026-03-15
+    More Providers             :         beta2, 2026-03-01, 2026-03-15
+    section v1.0
+    Testing & Polish           :         v1, 2026-03-16, 2026-04-15
+    Production Launch          :milestone, launch, 2026-04-15, 0d
+```
+
+---
+
 ## Overview
 
 VoiceProcessor is a multi-provider TTS SaaS platform. This roadmap tracks progress across both repositories:
