@@ -5,47 +5,16 @@ Last updated: January 22, 2026
 ## Progress Overview
 
 ```mermaid
----
-config:
-  theme: base
-  themeVariables:
-    primaryColor: "#6366f1"
-    primaryTextColor: "#ffffff"
-    primaryBorderColor: "#4f46e5"
-    secondaryColor: "#e0e7ff"
-    tertiaryColor: "#f1f5f9"
----
 flowchart LR
-    subgraph MVP["🚀 MVP (Paid Beta)"]
-        direction TB
-        M1[/"✅ Core Foundation"\]
-        M2[/"✅ Auth System"\]
-        M3[/"✅ TTS Workflow"\]
-        M4[/"⏳ Payments"\]
-        M5[/"⏳ Deploy"\]
-    end
+    MVP["<b>MVP</b><br/>Paid Beta<br/><br/>67%"]
+    BETA["<b>BETA</b><br/>Polish<br/><br/>0%"]
+    V1["<b>v1.0</b><br/>Production<br/><br/>0%"]
 
-    subgraph BETA["🔧 Beta Polish"]
-        direction TB
-        B1[/"📋 Monitoring"\]
-        B2[/"📋 Real-time UX"\]
-        B3[/"📋 Analytics"\]
-        B4[/"📋 More Providers"\]
-    end
+    MVP --> BETA --> V1
 
-    subgraph PROD["🎯 v1.0 Production"]
-        direction TB
-        P1[/"📋 Full Testing"\]
-        P2[/"📋 Performance"\]
-        P3[/"📋 Scale Ready"\]
-        P4[/"📋 Public Launch"\]
-    end
-
-    MVP ==>|"67% Complete"| BETA ==>|"0%"| PROD
-
-    style MVP fill:#dcfce7,stroke:#16a34a,stroke-width:3px
-    style BETA fill:#e0e7ff,stroke:#6366f1,stroke-width:2px
-    style PROD fill:#f1f5f9,stroke:#94a3b8,stroke-width:2px
+    style MVP fill:#22c55e,stroke:#16a34a,color:#fff
+    style BETA fill:#e2e8f0,stroke:#94a3b8,color:#334155
+    style V1 fill:#e2e8f0,stroke:#94a3b8,color:#334155
 ```
 
 **Current Phase: MVP (Paid Beta)** — 18/27 tasks complete (67%)
