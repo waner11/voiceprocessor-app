@@ -4,60 +4,57 @@ Last updated: January 22, 2026
 
 ## Progress Overview
 
-### Current Phase: MVP (Paid Beta)
-
 ```mermaid
-pie showData
-    title "MVP Progress (18/27 tasks - 67%)"
-    "Completed" : 18
-    "Remaining" : 9
+---
+config:
+  theme: base
+  themeVariables:
+    primaryColor: "#6366f1"
+    primaryTextColor: "#ffffff"
+    primaryBorderColor: "#4f46e5"
+    secondaryColor: "#e0e7ff"
+    tertiaryColor: "#f1f5f9"
+---
+flowchart LR
+    subgraph MVP["🚀 MVP (Paid Beta)"]
+        direction TB
+        M1[/"✅ Core Foundation"\]
+        M2[/"✅ Auth System"\]
+        M3[/"✅ TTS Workflow"\]
+        M4[/"⏳ Payments"\]
+        M5[/"⏳ Deploy"\]
+    end
+
+    subgraph BETA["🔧 Beta Polish"]
+        direction TB
+        B1[/"📋 Monitoring"\]
+        B2[/"📋 Real-time UX"\]
+        B3[/"📋 Analytics"\]
+        B4[/"📋 More Providers"\]
+    end
+
+    subgraph PROD["🎯 v1.0 Production"]
+        direction TB
+        P1[/"📋 Full Testing"\]
+        P2[/"📋 Performance"\]
+        P3[/"📋 Scale Ready"\]
+        P4[/"📋 Public Launch"\]
+    end
+
+    MVP ==>|"67% Complete"| BETA ==>|"0%"| PROD
+
+    style MVP fill:#dcfce7,stroke:#16a34a,stroke-width:3px
+    style BETA fill:#e0e7ff,stroke:#6366f1,stroke-width:2px
+    style PROD fill:#f1f5f9,stroke:#94a3b8,stroke-width:2px
 ```
 
-| Milestone | Status | Progress | Focus Areas |
-|-----------|--------|----------|-------------|
-| **MVP (Paid Beta)** | **In Progress** | 18/27 (67%) | Core TTS + Payments + Deploy |
-| Beta Polish | Planned | 0/12 (0%) | Monitoring + Real-time + Analytics |
-| v1.0 Production | Planned | 0/11 (0%) | Testing + Scale + Launch |
+**Current Phase: MVP (Paid Beta)** — 18/27 tasks complete (67%)
 
-### Milestone Breakdown
-
-```mermaid
-pie showData
-    title "MVP - API Backend (8/13)"
-    "Done" : 8
-    "Remaining" : 5
-```
-
-```mermaid
-pie showData
-    title "MVP - Frontend Web (10/14)"
-    "Done" : 10
-    "Remaining" : 4
-```
-
-### Release Timeline
-
-```mermaid
-timeline
-    title VoiceProcessor Release Plan
-    section MVP
-        Jan 2026 : Core Foundation
-                 : Auth, TTS Workflow
-                 : ElevenLabs + OpenAI
-        Feb 2026 : Payments & Deploy
-                 : Stripe Integration
-                 : Railway + Cloudflare
-    section Beta
-        Mar 2026 : Polish & Monitor
-                 : Sentry + PostHog
-                 : SignalR Real-time
-                 : More TTS Providers
-    section v1.0
-        Apr 2026 : Production Ready
-                 : Full Test Coverage
-                 : Performance Tuning
-                 : Public Launch
-```
+| Milestone | API Progress | Frontend Progress | Target |
+|-----------|--------------|-------------------|--------|
+| **MVP (Paid Beta)** | 8/13 (62%) | 10/14 (71%) | Feb 2026 |
+| Beta Polish | 0/6 (0%) | 0/6 (0%) | Mar 2026 |
+| v1.0 Production | 0/6 (0%) | 0/5 (0%) | Apr 2026 |
 
 ---
 
