@@ -1,43 +1,44 @@
-import { useState } from "react";
-import { paymentApi } from "@/lib/api/payment";
+"use client";
+
+import { useMutation } from "@tanstack/react-query";
+import { paymentService } from "@/lib/api";
+import { useAuthStore } from "@/stores";
 
 export function usePayment() {
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const setCredits = useAuthStore((state) => state.setCredits);
+  const creditsRemaining = useAuthStore((state) => state.creditsRemaining);
 
-  const startCheckout = async (packId: string) => {
-    setIsProcessing(true);
-    setError(null);
+  const checkoutMutation = useMutation({
+    mutationFn: (packId: string) => paymentService.createCheckoutSession(packId),
+    onSuccess: (data) => {
+      // Redirect to the checkout URL (Stripe or Mock)
+      window.location.href = data.checkoutUrl;
+    },
+  });
 
-    try {
-      const response = await paymentApi.createCheckoutSession(packId);
-      // In a real app, we would redirect to Stripe here.
-      // For the mock, we redirect to the returned URL (which points back to our billing page).
-      window.location.href = response.checkoutUrl;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to start checkout");
-      setIsProcessing(false);
-    }
-  };
-
-  const verifyTransaction = async (sessionId: string, packId: string) => {
-    setIsProcessing(true);
-    setError(null);
-    try {
-      const result = await paymentApi.verifyPayment(sessionId, packId);
-      return result;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Verification failed");
-      throw err;
-    } finally {
-      setIsProcessing(false);
-    }
-  };
+  const verifyMutation = useMutation({
+    mutationFn: ({
+      sessionId,
+      packId,
+    }: {
+      sessionId: string;
+      packId: string;
+    }) => paymentService.verifyPayment(sessionId, packId),
+    onSuccess: (data) => {
+      // Update local store with new credits
+      // Note: In a real app, we would invalidate the "user" query here.
+      // Since we use Zustand for user state, we update it manually.
+      if (data.success && data.creditsAdded > 0) {
+        setCredits(creditsRemaining + data.creditsAdded);
+      }
+    },
+  });
 
   return {
-    startCheckout,
-    verifyTransaction,
-    isProcessing,
-    error,
+    startCheckout: (packId: string) => checkoutMutation.mutate(packId),
+    verifyTransaction: (sessionId: string, packId: string) =>
+      verifyMutation.mutateAsync({ sessionId, packId }),
+    isProcessing: checkoutMutation.isPending || verifyMutation.isPending,
+    error: checkoutMutation.error || verifyMutation.error,
   };
 }
