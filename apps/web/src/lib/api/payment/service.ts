@@ -26,7 +26,7 @@ export const paymentService = {
         ? window.location.origin
         : process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
-    // In a real app, this would call POST /api/v1/payments/checkout
+    // TODO: In a real app, this would call POST /api/v1/payments/checkout
     // and return the Stripe URL provided by the backend.
     // For now, we simulate a success redirect to our own billing page.
     const mockSessionId = `sess_${Math.random().toString(36).substring(7)}`;
@@ -49,7 +49,7 @@ export const paymentService = {
 
     const pack = CREDIT_PACKS.find((p) => p.id === packId);
 
-    // In a real app, this would call GET /api/v1/payments/verify/{sessionId}
+    // TODO: In a real app, this would call GET /api/v1/payments/verify/{sessionId}
     // The backend would verify with Stripe and update the user's balance.
 
     return {

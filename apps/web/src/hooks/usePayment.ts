@@ -28,6 +28,7 @@ export function usePayment() {
       // Update local store with new credits
       // Note: In a real app, we would invalidate the "user" query here.
       // Since we use Zustand for user state, we update it manually.
+      // TODO: Replace manual calculation with data.newBalance from backend response when API is real.
       if (data.success && data.creditsAdded > 0) {
         setCredits(creditsRemaining + data.creditsAdded);
       }
