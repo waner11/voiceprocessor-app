@@ -105,6 +105,12 @@ bd close <id>         # Complete work
 bd sync --from-main   # Pull beads updates (for ephemeral branches)
 ```
 
+**Workflow Rule:**
+When working on an issue, you MUST:
+1.  Create a new git branch named after the issue ID (e.g., `git checkout -b voiceprocessor-web-123`).
+2.  Work on the issue in that branch.
+3.  Create a Pull Request (PR) to merge into `main` when finished.
+
 ## Related Repositories
 
 - **Backend API:** `/home/wanerpena/Documents/Projects/voiceprocessor-api`
