@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using VoiceProcessor.Managers.Auth;
 using VoiceProcessor.Managers.Contracts;
 using VoiceProcessor.Managers.Generation;
+using VoiceProcessor.Managers.Payment;
 using VoiceProcessor.Managers.User;
 using VoiceProcessor.Managers.Voice;
 
@@ -28,6 +29,9 @@ public static class ServiceCollectionExtensions
 
         // Generation Processor (background job processor)
         services.AddScoped<IGenerationProcessor, GenerationProcessor>();
+
+        // Payment Manager
+        services.AddScoped<IPaymentManager, PaymentManager>();
 
         return services;
     }

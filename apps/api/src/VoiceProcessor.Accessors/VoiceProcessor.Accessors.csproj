@@ -9,6 +9,7 @@
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.0.2" />
     <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="10.0.2" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+    <PackageReference Include="Stripe.net" Version="50.2.0" />
   </ItemGroup>
 
   <PropertyGroup>

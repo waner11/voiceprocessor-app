@@ -27,4 +27,5 @@ public class User
     public ICollection<RefreshToken> RefreshTokens { get; set; } = [];
     public ICollection<ApiKey> ApiKeys { get; set; } = [];
     public ICollection<ExternalLogin> ExternalLogins { get; set; } = [];
+    public ICollection<PaymentHistory> PaymentHistories { get; set; } = [];
 }

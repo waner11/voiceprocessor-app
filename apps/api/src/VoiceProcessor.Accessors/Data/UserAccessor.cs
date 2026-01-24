@@ -58,4 +58,13 @@ public class UserAccessor : IUserAccessor
                 .SetProperty(u => u.CreditsUsedThisMonth, u => u.CreditsUsedThisMonth + credits),
                 cancellationToken);
     }
+
+    public async Task AddCreditsAsync(Guid userId, int credits, CancellationToken cancellationToken = default)
+    {
+        await _dbContext.Users
+            .Where(u => u.Id == userId)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(u => u.CreditsRemaining, u => u.CreditsRemaining + credits),
+                cancellationToken);
+    }
 }

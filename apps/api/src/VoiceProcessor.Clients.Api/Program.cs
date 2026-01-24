@@ -21,6 +21,9 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
+// Memory cache for caching (used by StripeAccessor)
+builder.Services.AddMemoryCache();
+
 // Database
 builder.Services.AddDbContext<VoiceProcessorDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));

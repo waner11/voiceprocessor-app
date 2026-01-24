@@ -18,6 +18,7 @@ public class VoiceProcessorDbContext : Microsoft.EntityFrameworkCore.DbContext
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<ApiKey> ApiKeys => Set<ApiKey>();
     public DbSet<ExternalLogin> ExternalLogins => Set<ExternalLogin>();
+    public DbSet<PaymentHistory> PaymentHistories => Set<PaymentHistory>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -31,6 +32,7 @@ public class VoiceProcessorDbContext : Microsoft.EntityFrameworkCore.DbContext
         ConfigureRefreshToken(modelBuilder);
         ConfigureApiKey(modelBuilder);
         ConfigureExternalLogin(modelBuilder);
+        ConfigurePaymentHistory(modelBuilder);
     }
 
     private static void ConfigureUser(ModelBuilder modelBuilder)
@@ -277,6 +279,50 @@ public class VoiceProcessorDbContext : Microsoft.EntityFrameworkCore.DbContext
 
             entity.HasIndex(e => new { e.UserId, e.Provider }).IsUnique();
             entity.HasIndex(e => new { e.Provider, e.ProviderUserId }).IsUnique();
+        });
+    }
+
+    private static void ConfigurePaymentHistory(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<PaymentHistory>(entity =>
+        {
+            entity.ToTable("payment_histories");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.StripeSessionId)
+                .IsRequired()
+                .HasMaxLength(255);
+
+            entity.Property(e => e.StripePaymentIntentId)
+                .HasMaxLength(255);
+
+            entity.Property(e => e.Amount)
+                .HasPrecision(10, 2);
+
+            entity.Property(e => e.Currency)
+                .IsRequired()
+                .HasMaxLength(3);
+
+            entity.Property(e => e.PackId)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            entity.Property(e => e.PackName)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            entity.Property(e => e.Status)
+                .IsRequired()
+                .HasMaxLength(20);
+
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.PaymentHistories)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => e.StripeSessionId).IsUnique();
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.CreatedAt);
         });
     }
 }

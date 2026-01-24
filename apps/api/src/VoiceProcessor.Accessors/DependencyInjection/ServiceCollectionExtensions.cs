@@ -5,6 +5,7 @@ using Polly;
 using Polly.Extensions.Http;
 using VoiceProcessor.Accessors.Contracts;
 using VoiceProcessor.Accessors.Data;
+using VoiceProcessor.Accessors.Payments;
 using VoiceProcessor.Accessors.Providers;
 using VoiceProcessor.Accessors.Storage;
 
@@ -24,6 +25,12 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IRefreshTokenAccessor, RefreshTokenAccessor>();
         services.AddScoped<IApiKeyAccessor, ApiKeyAccessor>();
         services.AddScoped<IExternalLoginAccessor, ExternalLoginAccessor>();
+        services.AddScoped<IPaymentHistoryAccessor, PaymentHistoryAccessor>();
+
+        // Stripe accessor
+        services.Configure<StripeOptions>(
+            configuration.GetSection(StripeOptions.SectionName));
+        services.AddScoped<IStripeAccessor, StripeAccessor>();
 
         // Storage accessor
         services.Configure<LocalStorageOptions>(
