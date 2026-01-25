@@ -4,7 +4,16 @@ export interface CreditPack {
   name: string;
   credits: number;
   price: number;
+  priceId: string;
   description: string;
+}
+
+export interface CheckoutRequest {
+  priceId: string;
+}
+
+export interface CheckoutResponse {
+  checkoutUrl: string;
 }
 
 export interface CheckoutSessionResponse {

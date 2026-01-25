@@ -6,6 +6,7 @@ export const CREDIT_PACKS: CreditPack[] = [
     name: "Short Story",
     credits: 15000,
     price: 4.99,
+    priceId: "price_short_story",
     description: "Perfect for short stories or testing.",
   },
   {
@@ -13,6 +14,7 @@ export const CREDIT_PACKS: CreditPack[] = [
     name: "Novella",
     credits: 50000,
     price: 19.99,
+    priceId: "price_novella",
     description: "Great for novellas or long chapters.",
   },
   {
@@ -20,6 +22,7 @@ export const CREDIT_PACKS: CreditPack[] = [
     name: "Audiobook",
     credits: 120000,
     price: 39.99,
+    priceId: "price_audiobook",
     description: "Best value for full-length books.",
   },
 ];
