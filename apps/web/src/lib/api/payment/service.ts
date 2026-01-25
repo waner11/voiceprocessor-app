@@ -46,16 +46,10 @@ export const paymentService = {
     return response.packs || CREDIT_PACKS;
   },
 
-  verifyPayment: async (
-    sessionId: string,
-    packId: string
-  ): Promise<PaymentVerificationResponse> => {
-    const pack = CREDIT_PACKS.find((p) => p.id === packId);
-
-    return {
-      success: true,
-      creditsAdded: pack?.credits || 0,
-      newBalance: 0,
-    };
-  },
+   verifyPayment: async (
+     sessionId: string,
+     packId: string
+   ): Promise<PaymentVerificationResponse> => {
+     throw new Error("Payment verification is handled by Stripe webhooks. This function should not be called directly.");
+   },
 };
