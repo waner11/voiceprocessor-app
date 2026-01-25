@@ -11,9 +11,11 @@ export default function BillingSettingsPage() {
   const [packs, setPacks] = useState<CreditPack[]>([]);
   const [isLoadingPacks, setIsLoadingPacks] = useState(true);
   const [packsError, setPacksError] = useState<string | null>(null);
+  const [processingPackId, setProcessingPackId] = useState<string | null>(null);
+  const [packErrors, setPackErrors] = useState<Record<string, string>>({});
   
   const creditsRemaining = useAuthStore((state) => state.creditsRemaining);
-  const { startCheckout, isProcessing } = usePayment();
+  const { startCheckout, isProcessing, error } = usePayment();
 
   const usage = {
     charactersUsed: 45000,
@@ -43,8 +45,29 @@ export default function BillingSettingsPage() {
   }, []);
 
   const handleBuyPack = (packId: string) => {
-    startCheckout(packId);
+    setPackErrors((prev) => ({ ...prev, [packId]: "" }));
+    setProcessingPackId(packId);
+    
+    try {
+      startCheckout(packId);
+    } catch (err) {
+      setProcessingPackId(null);
+      setPackErrors((prev) => ({
+        ...prev,
+        [packId]: err instanceof Error ? err.message : "Checkout failed",
+      }));
+    }
   };
+  
+  useEffect(() => {
+    if (error && processingPackId) {
+      setPackErrors((prev) => ({
+        ...prev,
+        [processingPackId]: error instanceof Error ? error.message : "Checkout failed",
+      }));
+      setProcessingPackId(null);
+    }
+  }, [error, processingPackId]);
 
   return (
     <div className="space-y-6">
@@ -90,7 +113,8 @@ export default function BillingSettingsPage() {
                 key={pack.id}
                 pack={pack}
                 onBuy={handleBuyPack}
-                isLoading={isProcessing}
+                isLoading={isProcessing && processingPackId === pack.id}
+                error={packErrors[pack.id]}
               />
             ))}
           </div>
