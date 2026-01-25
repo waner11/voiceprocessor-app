@@ -16,6 +16,7 @@ export const paymentService = {
       throw new Error("Invalid pack selected");
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error } = await (api.POST as any)(
       "/api/v1/payments/checkout",
       {
@@ -32,8 +33,9 @@ export const paymentService = {
     return data as CheckoutSessionResponse;
   },
 
-  fetchCreditPacks: async (): Promise<CreditPack[]> => {
-    const { data, error } = await (api.GET as any)("/api/v1/payments/packs");
+   fetchCreditPacks: async (): Promise<CreditPack[]> => {
+     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     const { data, error } = await (api.GET as any)("/api/v1/payments/packs");
 
     if (error) {
       console.warn("Failed to fetch credit packs from API, using fallback", error);
