@@ -102,12 +102,14 @@ public class GenerationManager : IGenerationManager
             CharacterCount = characterCount,
             EstimatedChunks = estimatedChunks,
             EstimatedCost = bestEstimate.TotalCost,
+            CreditsRequired = bestEstimate.CreditsRequired,
             Currency = bestEstimate.Currency,
             RecommendedProvider = recommendedProvider,
             ProviderEstimates = providerEstimates.Select(pe => new ProviderEstimate
             {
                 Provider = pe.Provider,
                 Cost = pe.TotalCost,
+                CreditsRequired = pe.CreditsRequired,
                 EstimatedDurationMs = EstimateDuration(characterCount, pe.Provider),
                 QualityTier = GetQualityTier(pe.Provider),
                 IsAvailable = availableProviders.Contains(pe.Provider)
