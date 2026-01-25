@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useLayoutEffect } from "react";
 import Link from "next/link";
 import confetti from "canvas-confetti";
 import { useAuthStore } from "@/stores/authStore";
@@ -16,12 +16,13 @@ export default function PaymentSuccessPage() {
   const [packInfo, setPackInfo] = useState<PackInfo | null>(null);
   const creditsRemaining = useAuthStore((state) => state.creditsRemaining);
 
-  useEffect(() => {
-    // Read pack info from localStorage
+  // Read pack info from localStorage before first render
+  useLayoutEffect(() => {
     try {
       const stored = localStorage.getItem("voiceprocessor_checkout_pack");
       if (stored) {
         const parsed = JSON.parse(stored) as PackInfo;
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setPackInfo(parsed);
         // Clear localStorage after reading
         localStorage.removeItem("voiceprocessor_checkout_pack");
@@ -29,8 +30,10 @@ export default function PaymentSuccessPage() {
     } catch {
       // Silent failure - localStorage not available or invalid JSON
     }
+  }, []);
 
-    // Trigger confetti animation
+  // Trigger confetti animation
+  useEffect(() => {
     const duration = 3000; // 3 seconds
     const end = Date.now() + duration;
 
