@@ -116,27 +116,101 @@ _logger.LogInformation($"Processing chunk {chunkId} for generation {genId}");
 
 ---
 
-## 4. Work Session Workflow ("Landing the Plane")
+## 4. Work Session Workflow
 
-When finishing a task, you **MUST** follow this sequence. Work is not done until it is pushed.
+This section covers the complete git workflow from starting work to finishing and creating a pull request.
 
-1.  **Quality Check**: Run `dotnet build` and `dotnet test`. Fix any errors.
-2.  **Cleanup**: Remove unused usings, temp comments.
-3.  **Commit**:
-    - Use lowercase, imperative mood, no period.
-    - **NO AI attribution** in messages.
-    - Example: `implement routing engine logic`
-4.  **Push Sequence (MANDATORY)**:
-    ```bash
-    git pull --rebase
-    bd sync
-    git push
-    git status # Must be clean and up to date
-    ```
-5.  **Close Issue**:
-    ```bash
-    bd close <id> --reason="Completed implementation"
-    ```
+### 4.1 Starting Work
+
+Before you begin coding, follow these steps to set up your feature branch:
+
+1. **Check for clean working directory**:
+   ```bash
+   git status
+   ```
+   If you have uncommitted changes, commit or stash them before proceeding.
+
+2. **Switch to main and sync**:
+   ```bash
+   git checkout main
+   git pull --rebase origin main
+   ```
+
+3. **Create feature branch from issue ID**:
+   ```bash
+   git checkout -b beads-xxx-short-description
+   ```
+   Example: `git checkout -b beads-p71-add-credits-field`
+   
+   **Edge case**: If the branch already exists locally, delete it first:
+   ```bash
+   git branch -D beads-xxx-short-description
+   git checkout -b beads-xxx-short-description
+   ```
+
+4. **Claim the issue**:
+   ```bash
+   bd update <id> --status in_progress
+   ```
+
+### 4.2 During Work
+
+While working on your feature:
+
+- **Commit frequently** with meaningful messages
+- **Follow commit conventions**:
+  - Use lowercase, imperative mood, no period
+  - **NO AI attribution** in messages
+  - Examples:
+    - `implement routing engine logic`
+    - `add elevenlabs provider implementation`
+    - `fix null check in chunking service`
+
+### 4.3 Finishing Work ("Landing the Plane")
+
+When your work is complete, you **MUST** follow this sequence. Work is not done until it is pushed and a PR is created.
+
+1. **Quality Check**: Run `dotnet build` and `dotnet test`. Fix any errors.
+
+2. **Cleanup**: Remove unused usings, temp comments.
+
+3. **Commit final changes**:
+   ```bash
+   git add -A
+   git commit -m "implement feature description"
+   ```
+
+4. **Sync main and rebase**:
+   ```bash
+   git checkout main
+   git pull --rebase origin main
+   git checkout beads-xxx-short-description
+   git rebase main
+   ```
+   
+   **If conflicts occur during rebase**:
+   - Open the conflicted files and resolve conflicts manually
+   - Stage the resolved files: `git add <file>`
+   - Continue the rebase: `git rebase --continue`
+   - Repeat until rebase completes
+   - If you need to abort: `git rebase --abort`
+
+5. **Push and create PR**:
+   ```bash
+   git push -u origin beads-xxx-short-description
+   gh pr create --base main --fill
+   ```
+   
+   **Edge case**: If PR already exists, check with:
+   ```bash
+   gh pr list
+   ```
+
+6. **Sync beads and close issue**:
+   ```bash
+   bd sync
+   bd close <id> --reason="PR created"
+   ```
 
 ---
 
