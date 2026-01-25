@@ -42,12 +42,12 @@ Restructure AGENTS.md Section 4 into a complete three-phase workflow (Starting �
 - All commands with examples
 
 ### Definition of Done
-- [ ] AGENTS.md Section 4 has all three workflow phases
-- [ ] `bd update --status in_progress` integrated after branch creation
-- [ ] Rebase step with conflict resolution guidance included
-- [ ] `gh pr create` command documented
-- [ ] CLAUDE.md branching section references AGENTS.md
-- [ ] No existing content from other sections modified
+- [x] AGENTS.md Section 4 has all three workflow phases
+- [x] `bd update --status in_progress` integrated after branch creation
+- [x] Rebase step with conflict resolution guidance included
+- [x] `gh pr create` command documented
+- [x] CLAUDE.md branching section references AGENTS.md
+- [x] No existing content from other sections modified
 
 ### Must Have
 - Clean working directory check with warning
@@ -177,21 +177,21 @@ Task 1 (AGENTS.md Section 4) → Task 2 (CLAUDE.md simplify) → Task 3 (Verify)
   **Acceptance Criteria**:
 
   **Structure Verification**:
-  - [ ] Section 4 has "4.1 Starting Work" subsection
-  - [ ] Section 4 has "4.2 During Work" subsection
-  - [ ] Section 4 has "4.3 Finishing Work" subsection
-  - [ ] Each subsection has numbered steps with commands
-  - [ ] Edge cases documented (branch exists, conflicts)
+  - [x] Section 4 has "4.1 Starting Work" subsection
+  - [x] Section 4 has "4.2 During Work" subsection
+  - [x] Section 4 has "4.3 Finishing Work" subsection
+  - [x] Each subsection has numbered steps with commands
+  - [x] Edge cases documented (branch exists, conflicts)
 
   **Content Verification**:
-  - [ ] `git status` check at start
-  - [ ] `git checkout main && git pull --rebase` present
-  - [ ] `git checkout -b beads-xxx-...` present
-  - [ ] `bd update --status in_progress` present
-  - [ ] `git rebase main` before push
-  - [ ] Conflict resolution steps included
-  - [ ] `gh pr create --base main --fill` present
-  - [ ] `bd close` at end
+  - [x] `git status` check at start
+  - [x] `git checkout main && git pull --rebase` present
+  - [x] `git checkout -b beads-xxx-...` present
+  - [x] `bd update --status in_progress` present
+  - [x] `git rebase main` before push
+  - [x] Conflict resolution steps included
+  - [x] `gh pr create --base main --fill` present
+  - [x] `bd close` at end
 
   **Commit**: YES
   - Message: `docs: add complete git workflow to AGENTS.md`
@@ -229,9 +229,9 @@ Task 1 (AGENTS.md Section 4) → Task 2 (CLAUDE.md simplify) → Task 3 (Verify)
   **Acceptance Criteria**:
 
   **Content Verification**:
-  - [ ] Lines 78-99 (Git Guidelines) unchanged
-  - [ ] Lines 100-123 replaced with reference to AGENTS.md Section 4
-  - [ ] Reference mentions the three phases (Starting, During, Finishing)
+  - [x] Lines 78-99 (Git Guidelines) unchanged
+  - [x] Lines 100-123 replaced with reference to AGENTS.md Section 4
+  - [x] Reference mentions the three phases (Starting, During, Finishing)
 
   **Commit**: YES
   - Message: `docs: simplify CLAUDE.md to reference AGENTS.md workflow`
@@ -260,11 +260,11 @@ Task 1 (AGENTS.md Section 4) → Task 2 (CLAUDE.md simplify) → Task 3 (Verify)
   **Acceptance Criteria**:
 
   **Manual Verification**:
-  - [ ] All bash commands have correct syntax
-  - [ ] Branch naming example matches convention: `beads-xxx-short-description`
-  - [ ] CLAUDE.md reference points to correct section
-  - [ ] No broken cross-references
-  - [ ] Flow makes logical sense: start → work → finish
+  - [x] All bash commands have correct syntax
+  - [x] Branch naming example matches convention: `beads-xxx-short-description`
+  - [x] CLAUDE.md reference points to correct section
+  - [x] No broken cross-references
+  - [x] Flow makes logical sense: start → work → finish
 
   **Commit**: NO (verification only)
 
@@ -291,12 +291,12 @@ grep -A 10 "Branching Workflow" CLAUDE.md
 ```
 
 ### Final Checklist
-- [ ] AGENTS.md Section 4 has three phases (Starting, During, Finishing)
-- [ ] Git workflow integrates with beads (`bd update`, `bd close`)
-- [ ] Rebase step documented with conflict resolution
-- [ ] PR creation via `gh pr create` documented
-- [ ] CLAUDE.md references AGENTS.md (no duplication)
-- [ ] No existing sections 1-3, 5-6 modified
+- [x] AGENTS.md Section 4 has three phases (Starting, During, Finishing)
+- [x] Git workflow integrates with beads (`bd update`, `bd close`)
+- [x] Rebase step documented with conflict resolution
+- [x] PR creation via `gh pr create` documented
+- [x] CLAUDE.md references AGENTS.md (no duplication)
+- [x] No existing sections 1-3, 5-6 modified
 
 ---
 
