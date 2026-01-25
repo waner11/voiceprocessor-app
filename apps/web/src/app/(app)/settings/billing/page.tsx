@@ -15,6 +15,7 @@ export default function BillingSettingsPage() {
   const [packErrors, setPackErrors] = useState<Record<string, string>>({});
   const [payments, setPayments] = useState<Payment[]>([]);
   const [isLoadingPayments, setIsLoadingPayments] = useState(true);
+  const [paymentsError, setPaymentsError] = useState<string | null>(null);
   
   const creditsRemaining = useAuthStore((state) => state.creditsRemaining);
   const { startCheckout, isProcessing, error } = usePayment();
@@ -46,19 +47,21 @@ export default function BillingSettingsPage() {
     fetchPacks();
   }, []);
 
-  useEffect(() => {
-    async function fetchPaymentHistory() {
-      try {
-        setIsLoadingPayments(true);
-        const history = await paymentService.fetchPaymentHistory();
-        setPayments(history);
-      } catch (err) {
-        console.error("Error fetching payment history:", err);
-      } finally {
-        setIsLoadingPayments(false);
-      }
+  async function fetchPaymentHistory() {
+    try {
+      setIsLoadingPayments(true);
+      setPaymentsError(null);
+      const history = await paymentService.fetchPaymentHistory();
+      setPayments(history);
+    } catch (err) {
+      console.error("Error fetching payment history:", err);
+      setPaymentsError("Failed to load payment history");
+    } finally {
+      setIsLoadingPayments(false);
     }
+  }
 
+  useEffect(() => {
     fetchPaymentHistory();
   }, []);
 
@@ -239,6 +242,16 @@ export default function BillingSettingsPage() {
             {[1, 2, 3].map((i) => (
               <div key={i} className="h-12 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
             ))}
+          </div>
+        ) : paymentsError ? (
+          <div className="text-center py-8">
+            <p className="text-red-600 dark:text-red-400 mb-4">{paymentsError}</p>
+            <button
+              onClick={() => fetchPaymentHistory()}
+              className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition-colors"
+            >
+              Try Again
+            </button>
           </div>
         ) : payments.length === 0 ? (
           <div className="text-center py-8">
