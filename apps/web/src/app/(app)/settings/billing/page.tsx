@@ -100,9 +100,27 @@ export default function BillingSettingsPage() {
         ) : packsError ? (
           <div className="text-center py-8">
             <p className="text-red-600 dark:text-red-400 mb-4">{packsError}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Using fallback pricing
-            </p>
+            <button
+              onClick={() => {
+                setPacksError(null);
+                setIsLoadingPacks(true);
+                paymentService.fetchCreditPacks()
+                  .then((fetchedPacks) => {
+                    setPacks(fetchedPacks);
+                    setPacksError(null);
+                  })
+                  .catch((error) => {
+                    setPacksError("Failed to load credit packs");
+                    console.error("Error fetching packs:", error);
+                  })
+                  .finally(() => {
+                    setIsLoadingPacks(false);
+                  });
+              }}
+              className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition-colors"
+            >
+              Try Again
+            </button>
           </div>
         ) : null}
 
