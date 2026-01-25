@@ -178,7 +178,7 @@ export function useCurrentUser() {
     },
     onSuccess: (user) => {
       if (token) {
-        login(user, token);
+        login(user, token, user.creditsRemaining);
       }
     },
   });
