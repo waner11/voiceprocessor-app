@@ -1,61 +1,49 @@
+import { api } from "@/lib/api/client";
 import { CREDIT_PACKS } from "./constants";
-import { CheckoutSessionResponse, PaymentVerificationResponse } from "./types";
+import {
+  CheckoutSessionResponse,
+  PaymentVerificationResponse,
+  CheckoutRequest,
+  CreditPack,
+} from "./types";
 
-/**
- * Mock Payment Service
- * simulating interaction with Stripe backend
- */
 export const paymentService = {
-  /**
-   * Creates a checkout session for a specific pack
-   */
   createCheckoutSession: async (
     packId: string
   ): Promise<CheckoutSessionResponse> => {
-    // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
     const pack = CREDIT_PACKS.find((p) => p.id === packId);
     if (!pack) {
       throw new Error("Invalid pack selected");
     }
 
-    // Handle SSR safety for window usage
-    const origin =
-      typeof window !== "undefined"
-        ? window.location.origin
-        : process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const { data, error } = await api.POST("/api/v1/payments/checkout", {
+      body: {
+        priceId: pack.priceId,
+      },
+    });
 
-    // TODO: In a real app, this would call POST /api/v1/payments/checkout
-    // and return the Stripe URL provided by the backend.
-    // For now, we simulate a success redirect to our own billing page.
-    const mockSessionId = `sess_${Math.random().toString(36).substring(7)}`;
-    const successUrl = `${origin}/settings/billing?success=true&session_id=${mockSessionId}&pack_id=${packId}`;
+    if (error) {
+      throw error;
+    }
 
-    return {
-      checkoutUrl: successUrl,
-    };
+    return data;
   },
 
-  /**
-   * Verifies a payment session and returns the result
-   */
+  fetchCreditPacks: async (): Promise<CreditPack[]> => {
+    const { data, error } = await api.GET("/api/v1/payments/packs");
+
+    if (error) {
+      console.warn("Failed to fetch credit packs from API, using fallback", error);
+      return CREDIT_PACKS;
+    }
+
+    return data.packs || CREDIT_PACKS;
+  },
+
   verifyPayment: async (
     sessionId: string,
     packId: string
   ): Promise<PaymentVerificationResponse> => {
-    // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 800));
-
-    const pack = CREDIT_PACKS.find((p) => p.id === packId);
-
-    // TODO: In a real app, this would call GET /api/v1/payments/verify/{sessionId}
-    // The backend would verify with Stripe and update the user's balance.
-
-    return {
-      success: true,
-      creditsAdded: pack?.credits || 0,
-      newBalance: 0, // This would normally come from the backend response
-    };
+    throw new Error("Payment verification is handled by Stripe webhooks. This function should not be called directly.");
   },
 };

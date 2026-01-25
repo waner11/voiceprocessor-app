@@ -1,9 +1,22 @@
 "use client";
 
-import Link from "next/link";
+import { useEffect, useState } from "react";
+import { CreditPackCard } from "@/components/CreditPackCard";
+import { paymentService } from "@/lib/api/payment/service";
+import { usePayment } from "@/hooks/usePayment";
+import { useAuthStore } from "@/stores/authStore";
+import { CreditPack } from "@/lib/api/payment/types";
 
 export default function BillingSettingsPage() {
-  // Mock data - replace with actual API calls
+  const [packs, setPacks] = useState<CreditPack[]>([]);
+  const [isLoadingPacks, setIsLoadingPacks] = useState(true);
+  const [packsError, setPacksError] = useState<string | null>(null);
+  const [processingPackId, setProcessingPackId] = useState<string | null>(null);
+  const [packErrors, setPackErrors] = useState<Record<string, string>>({});
+  
+  const creditsRemaining = useAuthStore((state) => state.creditsRemaining);
+  const { startCheckout, isProcessing, error } = usePayment();
+
   const usage = {
     charactersUsed: 45000,
     charactersLimit: 100000,
@@ -11,59 +24,125 @@ export default function BillingSettingsPage() {
     totalAudioMinutes: 156,
   };
 
-  const currentPlan = {
-    name: "Pro",
-    price: "$29",
-    period: "month",
-    renewsAt: "2026-02-18",
-  };
-
   const usagePercentage = (usage.charactersUsed / usage.charactersLimit) * 100;
+
+  useEffect(() => {
+    async function fetchPacks() {
+      try {
+        setIsLoadingPacks(true);
+        const fetchedPacks = await paymentService.fetchCreditPacks();
+        setPacks(fetchedPacks);
+        setPacksError(null);
+      } catch (error) {
+        setPacksError("Failed to load credit packs");
+        console.error("Error fetching packs:", error);
+      } finally {
+        setIsLoadingPacks(false);
+      }
+    }
+
+    fetchPacks();
+  }, []);
+
+  const handleBuyPack = (packId: string) => {
+    setPackErrors((prev) => ({ ...prev, [packId]: "" }));
+    setProcessingPackId(packId);
+    
+    try {
+      startCheckout(packId);
+    } catch (err) {
+      setProcessingPackId(null);
+      setPackErrors((prev) => ({
+        ...prev,
+        [packId]: err instanceof Error ? err.message : "Checkout failed",
+      }));
+    }
+  };
+  
+  useEffect(() => {
+    if (error && processingPackId) {
+      setPackErrors((prev) => ({
+        ...prev,
+        [processingPackId]: error instanceof Error ? error.message : "Checkout failed",
+      }));
+      setProcessingPackId(null);
+    }
+  }, [error, processingPackId]);
 
   return (
     <div className="space-y-6">
-      {/* Current Plan */}
       <section className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
-        <div className="flex items-start justify-between mb-6">
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Current Plan</h2>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              Manage your subscription and billing
-            </p>
-          </div>
-          <span className="rounded-full bg-blue-100 dark:bg-blue-900 px-3 py-1 text-sm font-medium text-blue-700 dark:text-blue-300">
-            {currentPlan.name}
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+          Credit Balance
+        </h2>
+        <div className="flex items-baseline gap-2">
+          <span className="text-4xl font-bold text-gray-900 dark:text-white">
+            {creditsRemaining.toLocaleString()}
           </span>
-        </div>
-
-        <div className="flex items-baseline gap-1 mb-4">
-          <span className="text-4xl font-bold text-gray-900 dark:text-white">{currentPlan.price}</span>
-          <span className="text-gray-500 dark:text-gray-400">/{currentPlan.period}</span>
-        </div>
-
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-          Your plan renews on {new Date(currentPlan.renewsAt).toLocaleDateString()}
-        </p>
-
-        <div className="flex gap-3">
-          <Link
-            href="/#pricing"
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
-          >
-            Change Plan
-          </Link>
-          <button className="rounded-lg border border-gray-200 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
-            Cancel Subscription
-          </button>
+          <span className="text-gray-500 dark:text-gray-400">credits</span>
         </div>
       </section>
 
-      {/* Usage */}
+      <section className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+          Buy Credits
+        </h2>
+
+        {isLoadingPacks ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-6 h-64 animate-pulse"
+              />
+            ))}
+          </div>
+        ) : packsError ? (
+          <div className="text-center py-8">
+            <p className="text-red-600 dark:text-red-400 mb-4">{packsError}</p>
+            <button
+              onClick={() => {
+                setPacksError(null);
+                setIsLoadingPacks(true);
+                paymentService.fetchCreditPacks()
+                  .then((fetchedPacks) => {
+                    setPacks(fetchedPacks);
+                    setPacksError(null);
+                  })
+                  .catch((error) => {
+                    setPacksError("Failed to load credit packs");
+                    console.error("Error fetching packs:", error);
+                  })
+                  .finally(() => {
+                    setIsLoadingPacks(false);
+                  });
+              }}
+              className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        ) : null}
+
+        {!isLoadingPacks && packs.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {packs.map((pack) => (
+              <CreditPackCard
+                key={pack.id}
+                pack={pack}
+                onBuy={handleBuyPack}
+                isLoading={isProcessing && processingPackId === pack.id}
+                error={packErrors[pack.id]}
+              />
+            ))}
+          </div>
+        )}
+      </section>
+
       <section className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Usage This Month</h2>
 
         <div className="space-y-6">
-          {/* Characters Usage */}
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Characters</span>
@@ -88,7 +167,6 @@ export default function BillingSettingsPage() {
             </p>
           </div>
 
-          {/* Stats Grid */}
           <div className="grid grid-cols-2 gap-4">
             <div className="rounded-lg bg-gray-50 dark:bg-gray-800 p-4">
               <p className="text-2xl font-bold text-gray-900 dark:text-white">{usage.generationsCount}</p>
@@ -102,7 +180,6 @@ export default function BillingSettingsPage() {
         </div>
       </section>
 
-      {/* Payment Method */}
       <section className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Payment Method</h2>
 
@@ -122,61 +199,12 @@ export default function BillingSettingsPage() {
         </div>
       </section>
 
-      {/* Billing History */}
       <section className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Billing History</h2>
-
-        <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-gray-50 dark:bg-gray-800">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Date
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Description
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Amount
-                </th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Invoice
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-              <tr>
-                <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">Jan 18, 2026</td>
-                <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">Pro Plan - Monthly</td>
-                <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">$29.00</td>
-                <td className="px-4 py-3 text-right">
-                  <button className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
-                    Download
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">Dec 18, 2025</td>
-                <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">Pro Plan - Monthly</td>
-                <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">$29.00</td>
-                <td className="px-4 py-3 text-right">
-                  <button className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
-                    Download
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">Nov 18, 2025</td>
-                <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">Pro Plan - Monthly</td>
-                <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">$29.00</td>
-                <td className="px-4 py-3 text-right">
-                  <button className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
-                    Download
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <div className="text-center py-8">
+          <p className="text-gray-500 dark:text-gray-400">
+            Payment history coming soon
+          </p>
         </div>
       </section>
     </div>

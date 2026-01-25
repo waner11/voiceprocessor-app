@@ -11,8 +11,10 @@ export function usePayment() {
   const checkoutMutation = useMutation({
     mutationFn: (packId: string) => paymentService.createCheckoutSession(packId),
     onSuccess: (data) => {
-      // Redirect to the checkout URL (Stripe or Mock)
       window.location.href = data.checkoutUrl;
+    },
+    onError: (error) => {
+      console.error("Checkout failed:", error);
     },
   });
 
