@@ -16,14 +16,14 @@ Add "Starting Work on an Issue" section to AGENTS.md to enforce consistent git b
 - Updated `AGENTS.md` with new section
 
 ### Definition of Done
-- [ ] New section exists between "Quick Reference" and "Landing the Plane"
-- [ ] Git commands are correct and copy-pasteable
+- [x] New section exists between "Quick Reference" and "Landing the Plane"
+- [x] Git commands are correct and copy-pasteable
 
 ---
 
 ## TODOs
 
-- [ ] 1. Add "Starting Work on an Issue" section to AGENTS.md
+- [x] 1. Add "Starting Work on an Issue" section to AGENTS.md
 
   **What to do**:
   Insert the following after line 13 (after the Quick Reference code block closing), before "## Landing the Plane":
@@ -51,8 +51,8 @@ Add "Starting Work on an Issue" section to AGENTS.md to enforce consistent git b
   - `AGENTS.md:15-41` - Landing the Plane section (insert before this)
 
   **Acceptance Criteria**:
-  - [ ] Section appears between Quick Reference and Landing the Plane
-  - [ ] Code block renders correctly in markdown
+  - [x] Section appears between Quick Reference and Landing the Plane
+  - [x] Code block renders correctly in markdown
 
   **Commit**: YES
   - Message: `docs(agents): add mandatory git workflow for starting issue work`
@@ -63,5 +63,5 @@ Add "Starting Work on an Issue" section to AGENTS.md to enforce consistent git b
 ## Success Criteria
 
 ### Final Checklist
-- [ ] AGENTS.md contains "Starting Work on an Issue" section
-- [ ] Commands are correct: checkout main → pull --rebase → checkout -b {issue-id} → bd update
+- [x] AGENTS.md contains "Starting Work on an Issue" section
+- [x] Commands are correct: checkout main → pull --rebase → checkout -b {issue-id} → bd update
