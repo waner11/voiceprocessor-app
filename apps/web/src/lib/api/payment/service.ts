@@ -3,7 +3,6 @@ import { CREDIT_PACKS } from "./constants";
 import {
   CheckoutSessionResponse,
   PaymentVerificationResponse,
-  CheckoutRequest,
   CreditPack,
 } from "./types";
 

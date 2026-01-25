@@ -49,7 +49,6 @@ export default function BillingSettingsPage() {
      setProcessingPackId(packId);
      
      try {
-       // Store pack info in localStorage before checkout
        const pack = packs.find((p) => p.id === packId);
        if (pack) {
          try {
@@ -61,7 +60,6 @@ export default function BillingSettingsPage() {
            };
            localStorage.setItem("voiceprocessor_checkout_pack", JSON.stringify(packInfo));
          } catch {
-           // Silent failure - localStorage not available
          }
        }
        
@@ -142,9 +140,9 @@ export default function BillingSettingsPage() {
 
         {!isLoadingPacks && packs.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {packs.map((pack, index) => (
+            {packs.map((pack) => (
               <CreditPackCard
-                key={pack.id || pack.priceId || `pack-${index}`}
+                key={pack.id}
                 pack={pack}
                 onBuy={handleBuyPack}
                 isLoading={isProcessing && processingPackId === pack.id}
