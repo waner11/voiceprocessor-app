@@ -99,28 +99,10 @@ Refactor and enhance the routing logic for improved cost optimization
 
 ### Branching Workflow
 
-**Always work on feature branches, never commit directly to main.**
-
-1. **Start work** - Create a branch from the ticket ID:
-   ```bash
-   git checkout -b beads-xxx-short-description
-   ```
-   Example: `beads-042-add-elevenlabs-provider`
-
-2. **During work** - Commit frequently with meaningful messages
-
-3. **Complete work** - Create a PR to main:
-   ```bash
-   git push -u origin beads-xxx-short-description
-   gh pr create --base main --title "beads-xxx: short description"
-   ```
-
-4. **After merge** - Clean up the branch:
-   ```bash
-   git checkout main
-   git pull
-   git branch -d beads-xxx-short-description
-   ```
+See **AGENTS.md Section 4** for the complete git workflow including:
+- Starting work (sync main, create branch, claim issue)
+- During work (commit conventions)
+- Finishing work (rebase, PR creation, close issue)
 
 ## Technology Stack
 
