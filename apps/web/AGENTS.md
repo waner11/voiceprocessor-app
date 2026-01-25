@@ -12,6 +12,22 @@ bd close <id>         # Complete work
 bd sync               # Sync with git
 ```
 
+## Starting Work on an Issue
+
+**MANDATORY WORKFLOW** - Before working on ANY issue:
+
+```bash
+git checkout main              # Switch to main branch
+git pull --rebase              # Get latest changes
+git checkout -b {issue-id}     # Create branch from issue ID
+bd update {issue-id} --status in_progress  # Claim the work
+```
+
+**NEVER:**
+- Work directly on `main` branch
+- Create a branch without pulling latest first
+- Skip the branch creation step
+
 ## Landing the Plane (Session Completion)
 
 **When ending a work session**, you MUST complete ALL steps below. Work is NOT complete until `git push` succeeds.
