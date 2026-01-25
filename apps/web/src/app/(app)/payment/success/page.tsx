@@ -3,7 +3,9 @@
 import { useEffect, useState, useLayoutEffect } from "react";
 import Link from "next/link";
 import confetti from "canvas-confetti";
+import toast from "react-hot-toast";
 import { useAuthStore } from "@/stores/authStore";
+import { useCurrentUser } from "@/hooks/useAuth";
 
 interface PackInfo {
   packId: string;
@@ -14,7 +16,9 @@ interface PackInfo {
 
 export default function PaymentSuccessPage() {
   const [packInfo, setPackInfo] = useState<PackInfo | null>(null);
+  const [hasRefreshed, setHasRefreshed] = useState(false);
   const creditsRemaining = useAuthStore((state) => state.creditsRemaining);
+  const { mutate: refreshUser } = useCurrentUser();
 
   // Read pack info from localStorage before first render
   useLayoutEffect(() => {
@@ -31,6 +35,30 @@ export default function PaymentSuccessPage() {
       // Silent failure - localStorage not available or invalid JSON
     }
   }, []);
+
+  // Refresh credits from API on mount
+  useEffect(() => {
+    if (!hasRefreshed) {
+      refreshUser(undefined, {
+        onSuccess: () => {
+          setHasRefreshed(true);
+        },
+        onError: (error) => {
+          console.error("Failed to refresh credits:", error);
+        },
+      });
+    }
+  }, [hasRefreshed, refreshUser]);
+
+  // Show toast when pack info is available and credits refreshed
+  useEffect(() => {
+    if (packInfo && hasRefreshed) {
+      toast.success(
+        `Added ${packInfo.credits.toLocaleString()} credits to your account!`,
+        { id: "credits-added" } // Prevent duplicate toasts
+      );
+    }
+  }, [packInfo, hasRefreshed]);
 
   // Trigger confetti animation
   useEffect(() => {
