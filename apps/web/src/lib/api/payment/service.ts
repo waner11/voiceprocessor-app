@@ -62,7 +62,7 @@ export const paymentService = {
   },
 
   fetchPaymentHistory: async (): Promise<Payment[]> => {
-    const { data, error } = await (api.GET as (path: string) => Promise<{ data: { payments?: Payment[] }; error: unknown }>)("/api/v1/payments/history");
+    const { data, error } = await api.GET("/api/v1/payments/history");
 
     if (error) {
       console.warn("Failed to fetch payment history", error);
