@@ -16,35 +16,29 @@ export const paymentService = {
       throw new Error("Invalid pack selected");
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (api.POST as any)(
-      "/api/v1/payments/checkout",
-      {
-        body: {
-          priceId: pack.priceId,
-        } as CheckoutRequest,
-      }
-    );
+    const { data, error } = await api.POST("/api/v1/payments/checkout", {
+      body: {
+        priceId: pack.priceId,
+      },
+    });
 
     if (error) {
       throw error;
     }
 
-    return data as CheckoutSessionResponse;
+    return data;
   },
 
-   fetchCreditPacks: async (): Promise<CreditPack[]> => {
-     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-     const { data, error } = await (api.GET as any)("/api/v1/payments/packs");
+    fetchCreditPacks: async (): Promise<CreditPack[]> => {
+      const { data, error } = await api.GET("/api/v1/payments/packs");
 
-    if (error) {
-      console.warn("Failed to fetch credit packs from API, using fallback", error);
-      return CREDIT_PACKS;
-    }
+      if (error) {
+        console.warn("Failed to fetch credit packs from API, using fallback", error);
+        return CREDIT_PACKS;
+      }
 
-    const response = data as { packs: CreditPack[] };
-    return response.packs || CREDIT_PACKS;
-  },
+      return data.packs || CREDIT_PACKS;
+    },
 
    verifyPayment: async (
      sessionId: string,
