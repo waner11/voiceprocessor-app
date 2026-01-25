@@ -28,11 +28,11 @@ Fix all critical and high-priority issues identified in PR #2 review before merg
 - Clean code (no duplicate types, consistent formatting)
 
 ### Definition of Done
-- [ ] `pnpm build` succeeds
-- [ ] `pnpm exec tsc --noEmit` passes with no errors
-- [ ] No `eslint-disable` comments for `any` types
-- [ ] All buttons work correctly (only clicked button shows loading)
-- [ ] Error states display properly
+- [x] `pnpm build` succeeds
+- [x] `pnpm exec tsc --noEmit` passes with no errors
+- [x] No `eslint-disable` comments for `any` types
+- [x] All buttons work correctly (only clicked button shows loading)
+- [x] Error states display properly
 
 ### Must Have
 - Remove or secure the mock `verifyPayment` function
@@ -104,7 +104,7 @@ Task 1 (Types) → Task 2 (Service) → Task 3 (Loading State) → Task 4 (Error
 
 ---
 
-- [ ] 2. Add Payment Types to OpenAPI and Remove `any` Casts
+- [x] 2. Add Payment Types to OpenAPI and Remove `any` Casts
 
   **What to do**:
   - Check if payment endpoints exist in OpenAPI spec
@@ -136,7 +136,7 @@ Task 1 (Types) → Task 2 (Service) → Task 3 (Loading State) → Task 4 (Error
 
 ### HIGH PRIORITY FIXES
 
-- [ ] 3. Fix Loading State to Track Per-Pack
+- [x] 3. Fix Loading State to Track Per-Pack
 
   **What to do**:
   - Add state to track which pack ID is being processed
@@ -172,7 +172,7 @@ Task 1 (Types) → Task 2 (Service) → Task 3 (Loading State) → Task 4 (Error
 
 ---
 
-- [ ] 4. Wire Up Error Prop in CreditPackCard
+- [x] 4. Wire Up Error Prop in CreditPackCard
 
   **What to do**:
   - Track checkout errors per pack in billing page state
@@ -202,7 +202,7 @@ Task 1 (Types) → Task 2 (Service) → Task 3 (Loading State) → Task 4 (Error
 
 ### MEDIUM PRIORITY FIXES
 
-- [ ] 5. Code Cleanup: Remove Duplicate Types and Fix Formatting
+- [x] 5. Code Cleanup: Remove Duplicate Types and Fix Formatting
 
   **What to do**:
   - Remove duplicate `CheckoutResponse` interface (keep `CheckoutSessionResponse`)
@@ -231,7 +231,7 @@ Task 1 (Types) → Task 2 (Service) → Task 3 (Loading State) → Task 4 (Error
 
 ### LOW PRIORITY (OPTIONAL)
 
-- [ ] 6. Add Error Toast for Checkout Failures
+- [x] 6. Add Error Toast for Checkout Failures
 
   **What to do**:
   - Add `onError` handler to checkout mutation in usePayment hook
@@ -253,7 +253,7 @@ Task 1 (Types) → Task 2 (Service) → Task 3 (Loading State) → Task 4 (Error
 
 ---
 
-- [ ] 7. Add Retry Button for Failed Pack Fetch
+- [x] 7. Add Retry Button for Failed Pack Fetch
 
   **What to do**:
   - Add "Try Again" button in error state UI
@@ -298,9 +298,9 @@ pnpm lint               # Expected: no errors (or only unrelated warnings)
 ```
 
 ### Final Checklist
-- [ ] No `any` type assertions in payment code
-- [ ] `verifyPayment` doesn't return hardcoded success
-- [ ] Loading states work per-pack
-- [ ] Errors display correctly
-- [ ] All commits follow conventional commit format
-- [ ] PR ready for re-review
+- [x] No `any` type assertions in payment code
+- [x] `verifyPayment` doesn't return hardcoded success
+- [x] Loading states work per-pack
+- [x] Errors display correctly
+- [x] All commits follow conventional commit format
+- [x] PR ready for re-review
