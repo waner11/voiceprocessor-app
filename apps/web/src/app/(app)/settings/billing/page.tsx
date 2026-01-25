@@ -142,9 +142,9 @@ export default function BillingSettingsPage() {
 
         {!isLoadingPacks && packs.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {packs.map((pack) => (
+            {packs.map((pack, index) => (
               <CreditPackCard
-                key={pack.id}
+                key={pack.id || pack.priceId || `pack-${index}`}
                 pack={pack}
                 onBuy={handleBuyPack}
                 isLoading={isProcessing && processingPackId === pack.id}
