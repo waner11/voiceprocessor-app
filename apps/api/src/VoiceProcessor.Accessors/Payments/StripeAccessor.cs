@@ -200,7 +200,8 @@ public class StripeAccessor : IStripeAccessor
             var stripeEvent = EventUtility.ConstructEvent(
                 json,
                 signature,
-                _options.WebhookSecret);
+                _options.WebhookSecret,
+                throwOnApiVersionMismatch: false);
 
             _logger.LogInformation(
                 "Received Stripe webhook event {EventType} ({EventId})",
