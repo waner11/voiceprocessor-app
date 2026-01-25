@@ -144,3 +144,152 @@ export default function PaymentLayout({
 - Build verification: No TypeScript or compilation errors
 - Page structure matches success page pattern
 - Ready for browser testing with Playwright when environment available
+
+## Component Tests for Payment Pages
+
+### Test Setup & Dependencies
+
+#### New Dependency: @testing-library/jest-dom
+- **Package**: @testing-library/jest-dom v6.9.1
+- **Installation**: Added via `pnpm add -D @testing-library/jest-dom`
+- **Purpose**: Provides custom matchers like `toBeInTheDocument()`, `toHaveAttribute()` for testing-library
+- **Integration**: Imported in `tests/setup.ts` to make matchers available globally
+
+#### Test Configuration
+- **Vitest Config**: Already configured with jsdom environment and setupFiles pointing to `tests/setup.ts`
+- **Test Pattern**: Files matching `src/**/*.test.{ts,tsx}` are automatically discovered
+- **Globals**: Vitest globals enabled (describe, it, expect, beforeEach, afterEach, vi)
+
+### Success Page Tests (success.test.tsx)
+
+#### File Location
+- **Path**: `src/app/(app)/payment/__tests__/success.test.tsx`
+- **Test Count**: 8 tests (exceeds 4+ requirement)
+
+#### Test Cases
+1. **Renders success message and triggers confetti**
+   - Verifies "Payment Successful!" headline appears
+   - Verifies fallback message when no pack info in localStorage
+   
+2. **Displays pack details when localStorage has data**
+   - Stores pack info in localStorage before render
+   - Verifies pack name and credits display correctly
+   - Uses `waitFor()` to handle async state updates
+
+3. **Shows fallback message when localStorage is empty**
+   - Verifies generic success message displays
+   - Tests behavior when no pack data available
+
+4. **Clears localStorage after render**
+   - Stores pack info before render
+   - Verifies localStorage is cleared after component mounts
+   - Uses `waitFor()` for async cleanup
+
+5. **Displays current credit balance from auth store**
+   - Verifies balance from mocked useAuthStore displays
+   - Tests integration with auth store
+
+6. **Renders dashboard button with correct href**
+   - Verifies "Go to Dashboard" link points to `/dashboard`
+   - Tests navigation button functionality
+
+7. **Renders billing button with correct href**
+   - Verifies "View Billing" link points to `/settings/billing`
+   - Tests secondary navigation button
+
+8. **Renders success icon**
+   - Verifies SVG icon is present in DOM
+   - Uses `container.querySelectorAll("svg")` to find SVG elements
+
+#### Mocking Strategy
+- **canvas-confetti**: Mocked as `vi.fn()` to prevent actual animation in tests
+- **next/link**: Mocked to render as `<a>` tag for testing
+- **useAuthStore**: Mocked to return fixed `creditsRemaining: 1500`
+
+### Cancel Page Tests (cancel.test.tsx)
+
+#### File Location
+- **Path**: `src/app/(app)/payment/__tests__/cancel.test.tsx`
+- **Test Count**: 6 tests (exceeds 3+ requirement)
+
+#### Test Cases
+1. **Renders cancel message**
+   - Verifies "Payment Cancelled" headline appears
+   
+2. **Shows friendly not charged message**
+   - Verifies reassuring message: "No worries! Your card was not charged. You can try again anytime."
+   - Tests user-friendly messaging
+
+3. **Renders return to billing button with correct href**
+   - Verifies "Return to Billing" link points to `/settings/billing`
+   - Tests primary action button
+
+4. **Renders contact support link**
+   - Verifies "Contact Support" link points to `mailto:support@voiceprocessor.com`
+   - Tests secondary action (email link)
+
+5. **Clears localStorage on mount**
+   - Stores pack info before render
+   - Verifies localStorage is cleared after component mounts
+   - Uses `waitFor()` for async cleanup
+
+6. **Renders cancel icon**
+   - Verifies SVG icon is present in DOM
+   - Uses `container.querySelectorAll("svg")` to find SVG elements
+
+#### Mocking Strategy
+- **next/link**: Mocked to render as `<a>` tag for testing
+- No other external dependencies to mock (no confetti, no auth store)
+
+### Key Testing Patterns
+
+#### SVG Icon Testing
+- **Issue**: SVG elements don't have "img" role in jsdom
+- **Solution**: Use `container.querySelectorAll("svg")` instead of `screen.getAllByRole("img")`
+- **Lesson**: SVGs are rendered as SVG elements, not images, so role-based queries don't work
+
+#### localStorage Testing
+- **Pattern**: Use `beforeEach()` to clear localStorage before each test
+- **Pattern**: Use `afterEach()` to clean up after each test
+- **Pattern**: Use `waitFor()` when testing async state updates from localStorage reads
+
+#### Mock Setup
+- **Pattern**: Use `vi.mock()` at module level (before describe block)
+- **Pattern**: Use `vi.clearAllMocks()` in `beforeEach()` to reset mocks between tests
+- **Pattern**: Mock selector functions for Zustand stores to return fixed values
+
+### Test Results
+
+#### Final Test Run
+```
+✓ src/app/(app)/payment/__tests__/cancel.test.tsx (6 tests) 138ms
+✓ src/app/(app)/payment/__tests__/success.test.tsx (8 tests) 186ms
+
+Test Files  2 passed (2)
+     Tests  14 passed (14)
+```
+
+#### Build Status
+- ✅ All tests pass
+- ✅ No console errors during test run
+- ✅ Test coverage meets requirements (8 success tests, 6 cancel tests)
+
+### Commit Information
+- **Message**: `test(payment): add component tests for success and cancel pages`
+- **Files Changed**: 
+  - Created: `src/app/(app)/payment/__tests__/success.test.tsx`
+  - Created: `src/app/(app)/payment/__tests__/cancel.test.tsx`
+  - Modified: `tests/setup.ts` (added @testing-library/jest-dom import)
+  - Modified: `package.json` (added @testing-library/jest-dom dependency)
+
+### Lessons Learned
+
+1. **Testing-library Matchers**: Must import `@testing-library/jest-dom` in setup file to use custom matchers
+2. **SVG Testing**: SVGs don't have "img" role; use DOM queries instead of role-based queries
+3. **Zustand Mocking**: Mock selector functions to return fixed store values
+4. **localStorage Testing**: Always clean up in beforeEach/afterEach to avoid test pollution
+5. **Async State**: Use `waitFor()` when testing effects that update state asynchronously
+6. **Next.js Link Mocking**: Mock as simple `<a>` tag for unit tests (no routing needed)
+
+### Next Steps
+- Task 6: Final verification and cleanup (linting, full test suite, documentation)
