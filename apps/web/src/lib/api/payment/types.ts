@@ -21,3 +21,18 @@ export interface PaymentVerificationResponse {
   creditsAdded: number;
   newBalance: number;
 }
+
+// Payment History Types
+export interface Payment {
+  id: string;
+  packName: string;
+  creditsAdded: number;
+  amountPaid: number;
+  currency: string;
+  status: 'completed' | 'pending' | 'failed' | 'refunded';
+  createdAt: string;
+}
+
+export interface PaymentHistoryResponse {
+  payments: Payment[];
+}

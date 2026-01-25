@@ -4,6 +4,7 @@ import {
   CheckoutSessionResponse,
   PaymentVerificationResponse,
   CreditPack,
+  Payment,
 } from "./types";
 
 function normalizePacksData(packs: unknown[]): CreditPack[] {
@@ -58,6 +59,17 @@ export const paymentService = {
 
     const normalizedPacks = normalizePacksData(data.packs || []);
     return normalizedPacks.length > 0 ? normalizedPacks : CREDIT_PACKS;
+  },
+
+  fetchPaymentHistory: async (): Promise<Payment[]> => {
+    const { data, error } = await api.GET("/api/v1/payments/history");
+
+    if (error) {
+      console.warn("Failed to fetch payment history", error);
+      return [];
+    }
+
+    return data?.payments || [];
   },
 
   verifyPayment: async (

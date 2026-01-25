@@ -5,7 +5,7 @@ import { CreditPackCard } from "@/components/CreditPackCard";
 import { paymentService } from "@/lib/api/payment/service";
 import { usePayment } from "@/hooks/usePayment";
 import { useAuthStore } from "@/stores/authStore";
-import { CreditPack } from "@/lib/api/payment/types";
+import { CreditPack, Payment } from "@/lib/api/payment/types";
 
 export default function BillingSettingsPage() {
   const [packs, setPacks] = useState<CreditPack[]>([]);
@@ -13,6 +13,9 @@ export default function BillingSettingsPage() {
   const [packsError, setPacksError] = useState<string | null>(null);
   const [processingPackId, setProcessingPackId] = useState<string | null>(null);
   const [packErrors, setPackErrors] = useState<Record<string, string>>({});
+  const [payments, setPayments] = useState<Payment[]>([]);
+  const [isLoadingPayments, setIsLoadingPayments] = useState(true);
+  const [paymentsError, setPaymentsError] = useState<string | null>(null);
   
   const creditsRemaining = useAuthStore((state) => state.creditsRemaining);
   const { startCheckout, isProcessing, error } = usePayment();
@@ -42,6 +45,24 @@ export default function BillingSettingsPage() {
     }
 
     fetchPacks();
+  }, []);
+
+  async function fetchPaymentHistory() {
+    try {
+      setIsLoadingPayments(true);
+      setPaymentsError(null);
+      const history = await paymentService.fetchPaymentHistory();
+      setPayments(history);
+    } catch (err) {
+      console.error("Error fetching payment history:", err);
+      setPaymentsError("Failed to load payment history");
+    } finally {
+      setIsLoadingPayments(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchPaymentHistory();
   }, []);
 
    const handleBuyPack = (packId: string) => {
@@ -215,11 +236,83 @@ export default function BillingSettingsPage() {
 
       <section className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Billing History</h2>
-        <div className="text-center py-8">
-          <p className="text-gray-500 dark:text-gray-400">
-            Payment history coming soon
-          </p>
-        </div>
+        
+        {isLoadingPayments ? (
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-12 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
+            ))}
+          </div>
+        ) : paymentsError ? (
+          <div className="text-center py-8">
+            <p className="text-red-600 dark:text-red-400 mb-4">{paymentsError}</p>
+            <button
+              onClick={() => fetchPaymentHistory()}
+              className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        ) : payments.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-gray-500 dark:text-gray-400">No payment history yet</p>
+            <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
+              Your purchases will appear here
+            </p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-200 dark:border-gray-700">
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">Date</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">Pack</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">Credits</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">Amount</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {payments.map((payment) => (
+                  <tr key={payment.id} className="border-b border-gray-100 dark:border-gray-800">
+                    <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">
+                      {new Date(payment.createdAt).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                      })}
+                    </td>
+                    <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">
+                      {payment.packName}
+                    </td>
+                    <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">
+                      +{payment.creditsAdded.toLocaleString()}
+                    </td>
+                    <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">
+                      {new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: payment.currency.toUpperCase()
+                      }).format(payment.amountPaid)}
+                    </td>
+                    <td className="py-3 px-4">
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                        payment.status === 'completed' 
+                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                          : payment.status === 'pending'
+                          ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                          : payment.status === 'refunded'
+                          ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+                          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                      }`}>
+                        {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
     </div>
   );
