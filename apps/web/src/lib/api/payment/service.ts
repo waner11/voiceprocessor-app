@@ -3,9 +3,28 @@ import { CREDIT_PACKS } from "./constants";
 import {
   CheckoutSessionResponse,
   PaymentVerificationResponse,
-  CheckoutRequest,
   CreditPack,
 } from "./types";
+
+function normalizePacksData(packs: unknown[]): CreditPack[] {
+  const isValidObject = (pack: unknown): pack is Record<string, unknown> =>
+    pack !== null && typeof pack === 'object';
+
+  const hasCheckoutIdentifier = (pack: CreditPack): boolean =>
+    pack.priceId !== '';
+
+  return packs
+    .filter(isValidObject)
+    .map((pack, index) => ({
+      id: String(pack.id || pack.priceId || `pack-${index}`),
+      name: String(pack.name || 'Credit Pack'),
+      credits: Number(pack.credits) || 0,
+      price: Number(pack.price) || 0,
+      priceId: String(pack.priceId || pack.id || ''),
+      description: String(pack.description || ''),
+    }))
+    .filter(hasCheckoutIdentifier);
+}
 
 export const paymentService = {
   createCheckoutSession: async (
@@ -37,7 +56,8 @@ export const paymentService = {
       return CREDIT_PACKS;
     }
 
-    return data.packs || CREDIT_PACKS;
+    const normalizedPacks = normalizePacksData(data.packs || []);
+    return normalizedPacks.length > 0 ? normalizedPacks : CREDIT_PACKS;
   },
 
   verifyPayment: async (

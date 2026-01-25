@@ -51,3 +51,6 @@ next-env.d.ts
 .cache/
 *.log
 *.pem
+
+# Internal planning
+.sisyphus/

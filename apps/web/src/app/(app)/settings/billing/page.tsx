@@ -49,7 +49,6 @@ export default function BillingSettingsPage() {
      setProcessingPackId(packId);
      
      try {
-       // Store pack info in localStorage before checkout
        const pack = packs.find((p) => p.id === packId);
        if (pack) {
          try {
@@ -61,7 +60,6 @@ export default function BillingSettingsPage() {
            };
            localStorage.setItem("voiceprocessor_checkout_pack", JSON.stringify(packInfo));
          } catch {
-           // Silent failure - localStorage not available
          }
        }
        

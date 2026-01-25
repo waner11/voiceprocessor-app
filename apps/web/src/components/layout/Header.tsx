@@ -62,7 +62,7 @@ export function Header() {
     <header className="sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 bg-white/95 dark:bg-gray-950/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-gray-950/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-8">
-          <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">
+          <Link href="/dashboard" className="text-xl font-bold text-gray-900 dark:text-white">
             VoiceProcessor
           </Link>
 
