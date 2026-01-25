@@ -124,7 +124,7 @@ Task 6 (Final verification)
 
 ## TODOs
 
-- [ ] 0. Install canvas-confetti dependency
+- [x] 0. Install canvas-confetti dependency
 
   **What to do**:
   - Install canvas-confetti package: `pnpm add canvas-confetti`
@@ -140,9 +140,9 @@ Task 6 (Final verification)
   - NPM: `https://www.npmjs.com/package/canvas-confetti`
 
   **Acceptance Criteria**:
-  - [ ] `pnpm add canvas-confetti @types/canvas-confetti` → Success
-  - [ ] `pnpm build` → No errors
-  - [ ] Package appears in package.json dependencies
+  - [x] `pnpm add canvas-confetti @types/canvas-confetti` → Success
+  - [x] `pnpm build` → No errors
+  - [x] Package appears in package.json dependencies
 
   **Commit**: YES
   - Message: `feat(payment): add canvas-confetti dependency for success page animation`
@@ -150,7 +150,7 @@ Task 6 (Final verification)
 
 ---
 
-- [ ] 1. Update billing page to store pack info in localStorage before checkout
+- [x] 1. Update billing page to store pack info in localStorage before checkout
 
   **What to do**:
   - In `handleBuyPack` function, before calling `startCheckout(packId)`:
@@ -176,9 +176,9 @@ Task 6 (Final verification)
     - Before redirect, verify in DevTools → Application → Local Storage:
       - Key: `voiceprocessor_checkout_pack`
       - Value contains: `packId`, `name`, `credits`, `price`
-  - [ ] Existing checkout flow still works (redirects to Stripe)
-  - [ ] `pnpm build` → No errors
-  - [ ] `pnpm lint` → No errors
+  - [x] Existing checkout flow still works (redirects to Stripe)
+  - [x] `pnpm build` → No errors
+  - [x] `pnpm lint` → No errors
 
   **Commit**: YES
   - Message: `feat(billing): store selected pack in localStorage before checkout`
@@ -186,7 +186,7 @@ Task 6 (Final verification)
 
 ---
 
-- [ ] 2. Create payment pages layout
+- [x] 2. Create payment pages layout
 
   **What to do**:
   - Create `src/app/(app)/payment/layout.tsx`
@@ -204,15 +204,15 @@ Task 6 (Final verification)
   - `src/app/(app)/layout.tsx:1-20` - App layout structure
 
   **Acceptance Criteria**:
-  - [ ] File exists at correct path
-  - [ ] Exports default function accepting `children`
-  - [ ] `pnpm build` → No errors
+  - [x] File exists at correct path
+  - [x] Exports default function accepting `children`
+  - [x] `pnpm build` → No errors
 
   **Commit**: NO (groups with Task 3)
 
 ---
 
-- [ ] 3. Create success page with confetti
+- [x] 3. Create success page with confetti
 
   **What to do**:
   - Create `src/app/(app)/payment/success/page.tsx`
@@ -272,7 +272,7 @@ Task 6 (Final verification)
 
 ---
 
-- [ ] 4. Create cancel page
+- [x] 4. Create cancel page
 
   **What to do**:
   - Create `src/app/(app)/payment/cancel/page.tsx`

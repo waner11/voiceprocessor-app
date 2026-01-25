@@ -44,20 +44,36 @@ export default function BillingSettingsPage() {
     fetchPacks();
   }, []);
 
-  const handleBuyPack = (packId: string) => {
-    setPackErrors((prev) => ({ ...prev, [packId]: "" }));
-    setProcessingPackId(packId);
-    
-    try {
-      startCheckout(packId);
-    } catch (err) {
-      setProcessingPackId(null);
-      setPackErrors((prev) => ({
-        ...prev,
-        [packId]: err instanceof Error ? err.message : "Checkout failed",
-      }));
-    }
-  };
+   const handleBuyPack = (packId: string) => {
+     setPackErrors((prev) => ({ ...prev, [packId]: "" }));
+     setProcessingPackId(packId);
+     
+     try {
+       // Store pack info in localStorage before checkout
+       const pack = packs.find((p) => p.id === packId);
+       if (pack) {
+         try {
+           const packInfo = {
+             packId: pack.id,
+             name: pack.name,
+             credits: pack.credits,
+             price: pack.price,
+           };
+           localStorage.setItem("voiceprocessor_checkout_pack", JSON.stringify(packInfo));
+         } catch {
+           // Silent failure - localStorage not available
+         }
+       }
+       
+       startCheckout(packId);
+     } catch (err) {
+       setProcessingPackId(null);
+       setPackErrors((prev) => ({
+         ...prev,
+         [packId]: err instanceof Error ? err.message : "Checkout failed",
+       }));
+     }
+   };
   
   useEffect(() => {
     if (error && processingPackId) {
