@@ -29,21 +29,21 @@ export const paymentService = {
     return data;
   },
 
-    fetchCreditPacks: async (): Promise<CreditPack[]> => {
-      const { data, error } = await api.GET("/api/v1/payments/packs");
+  fetchCreditPacks: async (): Promise<CreditPack[]> => {
+    const { data, error } = await api.GET("/api/v1/payments/packs");
 
-      if (error) {
-        console.warn("Failed to fetch credit packs from API, using fallback", error);
-        return CREDIT_PACKS;
-      }
+    if (error) {
+      console.warn("Failed to fetch credit packs from API, using fallback", error);
+      return CREDIT_PACKS;
+    }
 
-      return data.packs || CREDIT_PACKS;
-    },
+    return data.packs || CREDIT_PACKS;
+  },
 
-   verifyPayment: async (
-     sessionId: string,
-     packId: string
-   ): Promise<PaymentVerificationResponse> => {
-     throw new Error("Payment verification is handled by Stripe webhooks. This function should not be called directly.");
-   },
+  verifyPayment: async (
+    sessionId: string,
+    packId: string
+  ): Promise<PaymentVerificationResponse> => {
+    throw new Error("Payment verification is handled by Stripe webhooks. This function should not be called directly.");
+  },
 };

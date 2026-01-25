@@ -12,10 +12,6 @@ export interface CheckoutRequest {
   priceId: string;
 }
 
-export interface CheckoutResponse {
-  checkoutUrl: string;
-}
-
 export interface CheckoutSessionResponse {
   checkoutUrl: string;
 }
