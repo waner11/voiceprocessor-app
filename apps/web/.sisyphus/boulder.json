@@ -1,6 +1,8 @@
 {
-  "active_plan": "/home/wanerpena/Documents/Projects/voiceprocessor-web/.sisyphus/plans/git-workflow-rule.md",
-  "started_at": "2026-01-25T06:13:57.570Z",
-  "session_ids": ["ses_40c3e2de8ffe09n2olZPmI5QRD"],
-  "plan_name": "git-workflow-rule"
+  "active_plan": "/home/wanerpena/Documents/Projects/voiceprocessor-web/.sisyphus/plans/payment-callback-pages.md",
+  "started_at": "2026-01-25T06:20:07.544Z",
+  "session_ids": [
+    "ses_40c509ddbffe5XwRNT1PRsSzxB"
+  ],
+  "plan_name": "payment-callback-pages"
 }
