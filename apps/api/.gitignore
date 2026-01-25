@@ -60,3 +60,5 @@ Thumbs.db
 # Docker
 docker-compose.override.yml
 
+# Script files (may contain test secrets)
+*.csx
