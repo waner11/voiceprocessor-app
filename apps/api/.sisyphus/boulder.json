@@ -1,28 +1,6 @@
 {
-  "session_id": "ses_40d954686ffe4PYTCqWKLU3bKh",
-  "started_at": "2026-01-24T23:50:39.343Z",
-  "completed_at": "2026-01-25T00:30:00.000Z",
-  "plans_completed": [
-    {
-      "name": "stripe-testing",
-      "path": "/home/wanerpena/Documents/Projects/voiceprocessor-api/.sisyphus/plans/stripe-testing.md",
-      "status": "complete",
-      "progress": "7/7 tasks (100%)",
-      "completed_at": "2026-01-25T00:30:00.000Z"
-    },
-    {
-      "name": "pm-skill",
-      "path": "/home/wanerpena/Documents/Projects/voiceprocessor-api/.sisyphus/plans/pm-skill.md",
-      "status": "complete",
-      "progress": "4/4 tasks (100%)",
-      "completed_at": "2026-01-24T18:17:00.000Z"
-    }
-  ],
-  "summary": {
-    "total_plans": 2,
-    "complete": 2,
-    "blocked": 0,
-    "all_work_complete": true
-  },
-  "last_updated": "2026-01-25T00:30:00.000Z"
+  "active_plan": "/home/wanerpena/Documents/Projects/voiceprocessor-api/.sisyphus/plans/git-workflow.md",
+  "started_at": "2026-01-25T18:52:26.952Z",
+  "session_ids": ["ses_4097feee0ffe3lOcYk3UZth492"],
+  "plan_name": "git-workflow"
 }
