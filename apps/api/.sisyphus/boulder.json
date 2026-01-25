@@ -1,6 +1,21 @@
 {
-  "active_plan": "/home/wanerpena/Documents/Projects/voiceprocessor-api/.sisyphus/plans/git-workflow.md",
+  "session_id": "ses_4097feee0ffe3lOcYk3UZth492",
   "started_at": "2026-01-25T18:52:26.952Z",
-  "session_ids": ["ses_4097feee0ffe3lOcYk3UZth492"],
-  "plan_name": "git-workflow"
+  "completed_at": "2026-01-25T18:59:00.000Z",
+  "plans_completed": [
+    {
+      "name": "git-workflow",
+      "path": "/home/wanerpena/Documents/Projects/voiceprocessor-api/.sisyphus/plans/git-workflow.md",
+      "status": "complete",
+      "progress": "3/3 tasks (100%)",
+      "completed_at": "2026-01-25T18:59:00.000Z"
+    }
+  ],
+  "summary": {
+    "total_plans": 1,
+    "complete": 1,
+    "blocked": 0,
+    "all_work_complete": true
+  },
+  "last_updated": "2026-01-25T18:59:00.000Z"
 }

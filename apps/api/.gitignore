@@ -62,3 +62,6 @@ docker-compose.override.yml
 
 # Script files (may contain test secrets)
 *.csx
+
+# Sisyphus - Internal planning
+.sisyphus/
