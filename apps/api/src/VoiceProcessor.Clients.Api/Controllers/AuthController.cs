@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using VoiceProcessor.Clients.Api.Extensions;
 using VoiceProcessor.Clients.Api.Services;
 using VoiceProcessor.Domain.DTOs.Requests.Auth;
 using VoiceProcessor.Domain.DTOs.Responses.Auth;
@@ -14,15 +15,18 @@ public class AuthController : ControllerBase
     private readonly IAuthManager _authManager;
     private readonly ICurrentUserService _currentUser;
     private readonly ILogger<AuthController> _logger;
+    private readonly IWebHostEnvironment _environment;
 
     public AuthController(
         IAuthManager authManager,
         ICurrentUserService currentUser,
-        ILogger<AuthController> logger)
+        ILogger<AuthController> logger,
+        IWebHostEnvironment environment)
     {
         _authManager = authManager;
         _currentUser = currentUser;
         _logger = logger;
+        _environment = environment;
     }
 
     /// <summary>
@@ -40,6 +44,15 @@ public class AuthController : ControllerBase
         try
         {
             var response = await _authManager.RegisterAsync(request, cancellationToken);
+            
+            Response.SetAuthCookies(
+                response.AccessToken,
+                response.RefreshToken,
+                15,
+                7,
+                _environment.IsDevelopment()
+            );
+            
             return CreatedAtAction(nameof(GetCurrentUser), response);
         }
         catch (InvalidOperationException ex) when (ex.Message.Contains("already registered"))
@@ -63,6 +76,15 @@ public class AuthController : ControllerBase
         {
             var ipAddress = GetClientIpAddress();
             var response = await _authManager.LoginAsync(request, ipAddress, cancellationToken);
+            
+            Response.SetAuthCookies(
+                response.AccessToken,
+                response.RefreshToken,
+                15,
+                7,
+                _environment.IsDevelopment()
+            );
+            
             return Ok(response);
         }
         catch (InvalidOperationException ex)
@@ -87,6 +109,15 @@ public class AuthController : ControllerBase
             var ipAddress = GetClientIpAddress();
             var response = await _authManager.RefreshTokenAsync(
                 request.RefreshToken, ipAddress, cancellationToken);
+            
+            Response.SetAuthCookies(
+                response.AccessToken,
+                response.RefreshToken,
+                15,
+                7,
+                _environment.IsDevelopment()
+            );
+            
             return Ok(response);
         }
         catch (InvalidOperationException ex)
@@ -110,6 +141,9 @@ public class AuthController : ControllerBase
             ?? throw new UnauthorizedAccessException("User not authenticated");
 
         await _authManager.LogoutAsync(userId, request?.RefreshToken, cancellationToken);
+        
+        Response.ClearAuthCookies();
+        
         return NoContent();
     }
 
@@ -247,6 +281,15 @@ public class AuthController : ControllerBase
             var ipAddress = GetClientIpAddress();
             var response = await _authManager.OAuthLoginAsync(
                 provider, request.Code, request.RedirectUri, ipAddress, cancellationToken);
+            
+            Response.SetAuthCookies(
+                response.AccessToken,
+                response.RefreshToken,
+                15,
+                7,
+                _environment.IsDevelopment()
+            );
+            
             return Ok(response);
         }
         catch (InvalidOperationException ex)
