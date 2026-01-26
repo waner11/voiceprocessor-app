@@ -37,6 +37,20 @@ public static class AuthenticationExtensions
 
             options.Events = new JwtBearerEvents
             {
+                OnMessageReceived = context =>
+                {
+                    // Only use cookie if no Authorization header present
+                    if (!context.Request.Headers.ContainsKey("Authorization"))
+                    {
+                        if (context.Request.Cookies.TryGetValue(
+                            Extensions.AuthCookieExtensions.AccessTokenCookieName,
+                            out var token))
+                        {
+                            context.Token = token;
+                        }
+                    }
+                    return Task.CompletedTask;
+                },
                 OnAuthenticationFailed = context =>
                 {
                     if (context.Exception is SecurityTokenExpiredException)

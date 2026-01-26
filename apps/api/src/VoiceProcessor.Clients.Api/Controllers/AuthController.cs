@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using VoiceProcessor.Clients.Api.Extensions;
 using VoiceProcessor.Clients.Api.Services;
 using VoiceProcessor.Domain.DTOs.Requests.Auth;
 using VoiceProcessor.Domain.DTOs.Responses.Auth;
+using VoiceProcessor.Engines.Security;
 using VoiceProcessor.Managers.Contracts;
 
 namespace VoiceProcessor.Clients.Api.Controllers;
@@ -14,15 +17,21 @@ public class AuthController : ControllerBase
     private readonly IAuthManager _authManager;
     private readonly ICurrentUserService _currentUser;
     private readonly ILogger<AuthController> _logger;
+    private readonly IWebHostEnvironment _environment;
+    private readonly JwtOptions _jwtOptions;
 
     public AuthController(
         IAuthManager authManager,
         ICurrentUserService currentUser,
-        ILogger<AuthController> logger)
+        ILogger<AuthController> logger,
+        IWebHostEnvironment environment,
+        IOptions<JwtOptions> jwtOptions)
     {
         _authManager = authManager;
         _currentUser = currentUser;
         _logger = logger;
+        _environment = environment;
+        _jwtOptions = jwtOptions.Value;
     }
 
     /// <summary>
@@ -40,6 +49,15 @@ public class AuthController : ControllerBase
         try
         {
             var response = await _authManager.RegisterAsync(request, cancellationToken);
+            
+            Response.SetAuthCookies(
+                response.AccessToken,
+                response.RefreshToken,
+                _jwtOptions.AccessTokenExpirationMinutes,
+                _jwtOptions.RefreshTokenExpirationDays,
+                _environment.IsDevelopment()
+            );
+            
             return CreatedAtAction(nameof(GetCurrentUser), response);
         }
         catch (InvalidOperationException ex) when (ex.Message.Contains("already registered"))
@@ -63,6 +81,15 @@ public class AuthController : ControllerBase
         {
             var ipAddress = GetClientIpAddress();
             var response = await _authManager.LoginAsync(request, ipAddress, cancellationToken);
+            
+            Response.SetAuthCookies(
+                response.AccessToken,
+                response.RefreshToken,
+                _jwtOptions.AccessTokenExpirationMinutes,
+                _jwtOptions.RefreshTokenExpirationDays,
+                _environment.IsDevelopment()
+            );
+            
             return Ok(response);
         }
         catch (InvalidOperationException ex)
@@ -78,15 +105,42 @@ public class AuthController : ControllerBase
     [AllowAnonymous]
     [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> RefreshToken(
         [FromBody] RefreshTokenRequest request,
         CancellationToken cancellationToken)
     {
         try
         {
+            // Try to get refresh token from request body first
+            var refreshToken = request.RefreshToken;
+            
+            // If empty, try to get from cookie
+            if (string.IsNullOrWhiteSpace(refreshToken))
+            {
+                Request.Cookies.TryGetValue(
+                    Extensions.AuthCookieExtensions.RefreshTokenCookieName, 
+                    out refreshToken);
+            }
+            
+            // If still empty, return 400 Bad Request
+            if (string.IsNullOrWhiteSpace(refreshToken))
+            {
+                return BadRequest(new { error = "Refresh token is required" });
+            }
+            
             var ipAddress = GetClientIpAddress();
             var response = await _authManager.RefreshTokenAsync(
-                request.RefreshToken, ipAddress, cancellationToken);
+                refreshToken, ipAddress, cancellationToken);
+            
+            Response.SetAuthCookies(
+                response.AccessToken,
+                response.RefreshToken,
+                _jwtOptions.AccessTokenExpirationMinutes,
+                _jwtOptions.RefreshTokenExpirationDays,
+                _environment.IsDevelopment()
+            );
+            
             return Ok(response);
         }
         catch (InvalidOperationException ex)
@@ -110,6 +164,9 @@ public class AuthController : ControllerBase
             ?? throw new UnauthorizedAccessException("User not authenticated");
 
         await _authManager.LogoutAsync(userId, request?.RefreshToken, cancellationToken);
+        
+        Response.ClearAuthCookies();
+        
         return NoContent();
     }
 
@@ -247,6 +304,15 @@ public class AuthController : ControllerBase
             var ipAddress = GetClientIpAddress();
             var response = await _authManager.OAuthLoginAsync(
                 provider, request.Code, request.RedirectUri, ipAddress, cancellationToken);
+            
+            Response.SetAuthCookies(
+                response.AccessToken,
+                response.RefreshToken,
+                _jwtOptions.AccessTokenExpirationMinutes,
+                _jwtOptions.RefreshTokenExpirationDays,
+                _environment.IsDevelopment()
+            );
+            
             return Ok(response);
         }
         catch (InvalidOperationException ex)
