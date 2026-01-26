@@ -42,7 +42,9 @@ public static class AuthenticationExtensions
                     // Only use cookie if no Authorization header present
                     if (!context.Request.Headers.ContainsKey("Authorization"))
                     {
-                        if (context.Request.Cookies.TryGetValue("vp_access_token", out var token))
+                        if (context.Request.Cookies.TryGetValue(
+                            Extensions.AuthCookieExtensions.AccessTokenCookieName,
+                            out var token))
                         {
                             context.Token = token;
                         }

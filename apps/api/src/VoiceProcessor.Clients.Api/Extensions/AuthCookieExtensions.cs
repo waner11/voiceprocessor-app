@@ -5,8 +5,15 @@ namespace VoiceProcessor.Clients.Api.Extensions;
 /// </summary>
 public static class AuthCookieExtensions
 {
-    private const string AccessTokenCookieName = "vp_access_token";
-    private const string RefreshTokenCookieName = "vp_refresh_token";
+    /// <summary>
+    /// Cookie name for JWT access token.
+    /// </summary>
+    public const string AccessTokenCookieName = "vp_access_token";
+
+    /// <summary>
+    /// Cookie name for JWT refresh token.
+    /// </summary>
+    public const string RefreshTokenCookieName = "vp_refresh_token";
 
     /// <summary>
     /// Sets HttpOnly authentication cookies for access and refresh tokens.
@@ -30,7 +37,9 @@ public static class AuthCookieExtensions
             HttpOnly = true,
             SameSite = SameSiteMode.Lax,
             Secure = !isDevelopment,
-            MaxAge = TimeSpan.FromMinutes(accessTokenExpiryMinutes)
+            MaxAge = TimeSpan.FromMinutes(accessTokenExpiryMinutes),
+            Path = "/",
+            IsEssential = true
         };
 
         var refreshCookieOptions = new CookieOptions
@@ -38,7 +47,9 @@ public static class AuthCookieExtensions
             HttpOnly = true,
             SameSite = SameSiteMode.Lax,
             Secure = !isDevelopment,
-            MaxAge = TimeSpan.FromDays(refreshTokenExpiryDays)
+            MaxAge = TimeSpan.FromDays(refreshTokenExpiryDays),
+            Path = "/api/v1/auth",
+            IsEssential = true
         };
 
         response.Cookies.Append(AccessTokenCookieName, accessToken, accessCookieOptions);
