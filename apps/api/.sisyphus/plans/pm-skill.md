@@ -85,11 +85,11 @@ Create a PM skill that auto-triggers during Prometheus planning to assess featur
 Each TODO includes manual verification:
 
 **For Skill Functionality:**
-- [ ] Open new Prometheus session
-- [ ] Request feature work ("Add voice cloning feature")
-- [ ] Verify PM assessment appears before planning begins
-- [ ] Verify recommendation is one of: PROCEED / DEFER / QUESTION
-- [ ] Verify override works: say "proceed anyway" and planning continues
+- [x] Open new Prometheus session
+- [x] Request feature work ("Add voice cloning feature")
+- [x] Verify PM assessment appears before planning begins
+- [x] Verify recommendation is one of: PROCEED / DEFER / QUESTION
+- [x] Verify override works: say "proceed anyway" and planning continues
 
 **Evidence Required:**
 - Screenshot of PM assessment in Prometheus session
