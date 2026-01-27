@@ -28,25 +28,101 @@ bd update {issue-id} --status in_progress  # Claim the work
 - Create a branch without pulling latest first
 - Skip the branch creation step
 
-## Landing the Plane (Session Completion)
+## Work Session Workflow
 
-**When ending a work session**, you MUST complete ALL steps below. Work is NOT complete until `git push` succeeds.
+This section covers the complete git workflow from starting work to finishing and creating a pull request.
 
-**MANDATORY WORKFLOW:**
+### Phase 1: Starting Work
 
-1. **File issues for remaining work** - Create issues for anything that needs follow-up
-2. **Run quality gates** (if code changed) - Tests, linters, builds
-3. **Update issue status** - Close finished work, update in-progress items
-4. **PUSH TO REMOTE** - This is MANDATORY:
+Before you begin coding, follow these steps to set up your feature branch:
+
+1. **Check for clean working directory**:
    ```bash
-   git pull --rebase
-   bd sync
-   git push
-   git status  # MUST show "up to date with origin"
+   git status
    ```
-5. **Clean up** - Clear stashes, prune remote branches
-6. **Verify** - All changes committed AND pushed
-7. **Hand off** - Provide context for next session
+   If you have uncommitted changes, commit or stash them before proceeding.
+
+2. **Switch to main and sync**:
+   ```bash
+   git checkout main
+   git pull --rebase origin main
+   ```
+
+3. **Create feature branch from issue ID**:
+   ```bash
+   git checkout -b voiceprocessor-web-xxx
+   ```
+   Example: `git checkout -b voiceprocessor-web-p9f`
+   
+   **Edge case**: If the branch already exists locally, delete it first:
+   ```bash
+   git branch -D voiceprocessor-web-xxx
+   git checkout -b voiceprocessor-web-xxx
+   ```
+
+4. **Claim the issue**:
+   ```bash
+   bd update <id> --status in_progress
+   ```
+
+### Phase 2: During Work
+
+While working on your feature:
+
+- **Commit frequently** with meaningful messages
+- **Follow commit conventions**:
+  - Use lowercase, imperative mood, no period
+  - **NO AI attribution** in messages
+  - Examples:
+    - `fix voice selector not updating on provider change`
+    - `add cost estimate component`
+    - `handle empty text input gracefully`
+
+### Phase 3: Finishing Work ("Landing the Plane")
+
+When your work is complete, you **MUST** follow this sequence. Work is not done until it is pushed and a PR is created.
+
+1. **Quality Check**: Run `npm run build`, `npm run lint`, and `npm test`. Fix any errors.
+
+2. **Cleanup**: Remove unused imports, temp comments, debug code.
+
+3. **Commit final changes**:
+   ```bash
+   git add -A
+   git commit -m "implement feature description"
+   ```
+
+4. **Sync main and rebase**:
+   ```bash
+   git checkout main
+   git pull --rebase origin main
+   git checkout voiceprocessor-web-xxx
+   git rebase main
+   ```
+   
+   **If conflicts occur during rebase**:
+   - Open the conflicted files and resolve conflicts manually
+   - Stage the resolved files: `git add <file>`
+   - Continue the rebase: `git rebase --continue`
+   - Repeat until rebase completes
+   - If you need to abort: `git rebase --abort`
+
+5. **Push and create PR**:
+   ```bash
+   git push -u origin voiceprocessor-web-xxx
+   gh pr create --base main --fill
+   ```
+   
+   **Edge case**: If PR already exists, check with:
+   ```bash
+   gh pr list
+   ```
+
+6. **Sync beads and close issue**:
+   ```bash
+   bd sync
+   bd close <id> --reason="PR created"
+   ```
 
 **CRITICAL RULES:**
 - Work is NOT complete until `git push` succeeds
