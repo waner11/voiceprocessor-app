@@ -1,7 +1,13 @@
 {
-  "session_id": "ses_4096e0ea9ffeHatngGuOpe4E10",
+  "active_plan": null,
   "started_at": "2026-01-25T19:11:58.393Z",
   "completed_at": "2026-01-25T19:25:08.849Z",
+  "session_ids": ["ses_4096e0ea9ffeHatngGuOpe4E10"],
+  "plan_name": null,
+  "status": "complete",
+  "completion_percentage": 100,
+  "tasks_completed": 3,
+  "tasks_total": 3,
   "plans_completed": [
     {
       "name": "git-workflow",
@@ -17,5 +23,5 @@
     "blocked": 0,
     "all_work_complete": true
   },
-  "last_updated": "2026-01-25T19:25:08.849Z"
+  "last_updated": "2026-01-27T03:45:00.000Z"
 }
