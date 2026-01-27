@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAuthStore } from "@/stores";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -20,7 +19,6 @@ interface ApiKeyCreated extends ApiKey {
 }
 
 export default function ApiKeysSettingsPage() {
-  const token = useAuthStore((state) => state.token);
   const [keys, setKeys] = useState<ApiKey[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
@@ -32,13 +30,9 @@ export default function ApiKeysSettingsPage() {
   // Fetch existing API keys on mount
   useEffect(() => {
     const fetchKeys = async () => {
-      if (!token) return;
-
       try {
         const response = await fetch(`${API_URL}/api/v1/Auth/api-keys`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          credentials: "include",
         });
 
         if (response.ok) {
@@ -53,10 +47,10 @@ export default function ApiKeysSettingsPage() {
     };
 
     fetchKeys();
-  }, [token]);
+  }, []);
 
   const handleCreateKey = async () => {
-    if (!newKeyName.trim() || !token) return;
+    if (!newKeyName.trim()) return;
 
     setError(null);
     try {
@@ -64,8 +58,8 @@ export default function ApiKeysSettingsPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
+        credentials: "include",
         body: JSON.stringify({ name: newKeyName }),
       });
 
@@ -95,14 +89,10 @@ export default function ApiKeysSettingsPage() {
       return;
     }
 
-    if (!token) return;
-
     try {
       const response = await fetch(`${API_URL}/api/v1/Auth/api-keys/${id}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        credentials: "include",
       });
 
       if (response.ok || response.status === 204) {
