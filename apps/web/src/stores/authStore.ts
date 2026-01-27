@@ -10,15 +10,13 @@ export interface User {
 
 interface AuthState {
   user: User | null;
-  token: string | null;
   creditsRemaining: number;
   isAuthenticated: boolean;
   isLoading: boolean;
 
   setUser: (user: User | null) => void;
-  setToken: (token: string | null) => void;
   setCredits: (credits: number) => void;
-  login: (user: User, token: string, creditsRemaining?: number) => void;
+  login: (user: User, creditsRemaining?: number) => void;
   logout: () => void;
   setLoading: (isLoading: boolean) => void;
 }
@@ -27,7 +25,6 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       user: null,
-      token: null,
       creditsRemaining: 0,
       isAuthenticated: false,
       isLoading: true,
@@ -35,23 +32,19 @@ export const useAuthStore = create<AuthState>()(
       setUser: (user) =>
         set({ user, isAuthenticated: !!user }),
 
-      setToken: (token) =>
-        set({ token }),
-
       setCredits: (credits) =>
         set({ creditsRemaining: credits }),
 
-      login: (user, token, creditsRemaining) =>
+      login: (user, creditsRemaining) =>
         set({
           user,
-          token,
           creditsRemaining: creditsRemaining ?? 0,
           isAuthenticated: true,
           isLoading: false
         }),
 
       logout: () =>
-        set({ user: null, token: null, creditsRemaining: 0, isAuthenticated: false }),
+        set({ user: null, creditsRemaining: 0, isAuthenticated: false }),
 
       setLoading: (isLoading) =>
         set({ isLoading }),
@@ -60,7 +53,6 @@ export const useAuthStore = create<AuthState>()(
       name: "voiceprocessor-auth",
       partialize: (state) => ({
         user: state.user,
-        token: state.token,
         creditsRemaining: state.creditsRemaining,
         isAuthenticated: state.isAuthenticated,
       }),
@@ -71,7 +63,4 @@ export const useAuthStore = create<AuthState>()(
   )
 );
 
-// Helper to get token for API calls
-export function getAuthToken(): string | null {
-  return useAuthStore.getState().token;
-}
+

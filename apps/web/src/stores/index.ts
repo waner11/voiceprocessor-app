@@ -1,2 +1,2 @@
 export { useUIStore, type RoutingStrategy } from "./uiStore";
-export { useAuthStore, getAuthToken, type User } from "./authStore";
+export { useAuthStore, type User } from "./authStore";

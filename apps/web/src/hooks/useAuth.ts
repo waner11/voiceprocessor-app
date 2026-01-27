@@ -18,8 +18,6 @@ interface RegisterRequest {
 }
 
 interface AuthResponse {
-  accessToken: string;
-  refreshToken: string;
   user: {
     id: string;
     email: string;
@@ -42,6 +40,7 @@ async function apiRequest<T>(
 ): Promise<T> {
   const response = await fetch(`${API_URL}${endpoint}`, {
     ...options,
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
       ...options.headers,
@@ -80,7 +79,7 @@ export function useLogin() {
       return response;
     },
     onSuccess: (data) => {
-      login(data.user, data.accessToken, data.user.creditsRemaining);
+      login(data.user, data.user.creditsRemaining);
       router.push("/dashboard");
     },
   });
@@ -102,7 +101,7 @@ export function useRegister() {
       return response;
     },
     onSuccess: (data) => {
-      login(data.user, data.accessToken, data.user.creditsRemaining);
+      login(data.user, data.user.creditsRemaining);
       router.push("/dashboard");
     },
   });
@@ -110,21 +109,16 @@ export function useRegister() {
 
 export function useLogout() {
   const logout = useAuthStore((state) => state.logout);
-  const token = useAuthStore((state) => state.token);
   const router = useRouter();
 
   return useMutation({
     mutationFn: async () => {
-      if (token) {
-        await apiRequest("/api/v1/Auth/logout", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }).catch(() => {
-          // Ignore logout API errors - still logout locally
-        });
-      }
+      // Call logout API - server clears cookie
+      await apiRequest("/api/v1/Auth/logout", {
+        method: "POST",
+      }).catch(() => {
+        // Ignore logout API errors - still logout locally
+      });
     },
     onSettled: () => {
       logout();
@@ -138,18 +132,19 @@ export function useRefreshToken() {
   const logout = useAuthStore((state) => state.logout);
 
   return useMutation({
-    mutationFn: async (refreshToken: string) => {
+    mutationFn: async () => {
+      // No refresh token in body - backend reads from cookie
       const response = await apiRequest<AuthResponse>(
         "/api/v1/Auth/refresh",
         {
           method: "POST",
-          body: JSON.stringify({ refreshToken }),
+          body: JSON.stringify({}),
         }
       );
       return response;
     },
     onSuccess: (data) => {
-      login(data.user, data.accessToken);
+      login(data.user, data.user.creditsRemaining);
     },
     onError: () => {
       logout();
@@ -158,28 +153,21 @@ export function useRefreshToken() {
 }
 
 export function useCurrentUser() {
-  const token = useAuthStore((state) => state.token);
   const login = useAuthStore((state) => state.login);
 
   return useMutation({
     mutationFn: async () => {
-      if (!token) throw new Error("No token");
-
+      // No token needed - cookie sent automatically
       const response = await apiRequest<AuthResponse["user"]>(
         "/api/v1/Auth/me",
         {
           method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
         }
       );
       return response;
     },
     onSuccess: (user) => {
-      if (token) {
-        login(user, token, user.creditsRemaining);
-      }
+      login(user, user.creditsRemaining);
     },
   });
 }
