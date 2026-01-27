@@ -100,6 +100,34 @@ pnpm generate:api
 
 This ensures type safety and keeps the frontend in sync with the API.
 
+## Development Workflow
+
+This project follows a structured development workflow. See these guides for details:
+
+- **[WORKFLOW.md](WORKFLOW.md)** - Complete git workflow, beads issue tracking, commit conventions
+- **[AGENTS.md](AGENTS.md)** - Project-specific instructions for AI agents and developers
+- **[PM_AGENT.md](PM_AGENT.md)** - Product management framework and prioritization strategy
+
+### Quick Start
+
+```bash
+# Find available work
+bd ready
+
+# Claim an issue
+bd update <id> --status in_progress
+
+# Create feature branch
+git checkout -b voiceprocessor-web-xxx
+
+# ... make changes ...
+
+# Complete work (see WORKFLOW.md for full process)
+git push -u origin voiceprocessor-web-xxx
+gh pr create --base main --fill
+bd close <id> --reason="PR created"
+```
+
 ## Related Repositories
 
 - [voiceprocessor-api](https://github.com/waner11/voiceprocessor-api) - Backend API
