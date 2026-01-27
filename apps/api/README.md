@@ -71,6 +71,36 @@ dotnet run
 | `OpenAI__ApiKey` | OpenAI API key | - |
 | `Google__CredentialsPath` | Path to Google Cloud credentials | - |
 
+## Development Workflow
+
+This project follows a structured development workflow. See these guides for details:
+
+- **[WORKFLOW.md](WORKFLOW.md)** - Complete git workflow, beads issue tracking, commit conventions
+- **[AGENTS.md](AGENTS.md)** - Project-specific instructions for AI agents and developers
+- **[PM_AGENT.md](PM_AGENT.md)** - Product management framework and prioritization strategy
+- **[CLAUDE.md](CLAUDE.md)** - Claude-specific guidance and best practices
+- **[GEMINI.md](GEMINI.md)** - Gemini-specific guidance and best practices
+
+### Quick Start
+
+```bash
+# Find available work
+bd ready
+
+# Claim an issue
+bd update <id> --status in_progress
+
+# Create feature branch
+git checkout -b beads-xxx-short-description
+
+# ... make changes ...
+
+# Complete work (see WORKFLOW.md for full process)
+git push -u origin beads-xxx-short-description
+gh pr create --base main --fill
+bd close <id> --reason="PR created"
+```
+
 ## Related Repositories
 
 - [voiceprocessor-web](https://github.com/waner11/voiceprocessor-web) - Frontend application (coming soon)
