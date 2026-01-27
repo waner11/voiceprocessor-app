@@ -35,10 +35,10 @@ Expose `CreditsRequired` field in the API cost estimate response so frontend can
 - `GenerationManager.EstimateCostAsync()` mapping both fields
 
 ### Definition of Done
-- [ ] `GET /api/generations/estimate` returns `creditsRequired` at top level
-- [ ] Each provider estimate includes `creditsRequired`
-- [ ] `dotnet build` succeeds with no errors
-- [ ] API response verified via curl
+- [x] `GET /api/generations/estimate` returns `creditsRequired` at top level
+- [x] Each provider estimate includes `creditsRequired`
+- [x] `dotnet build` succeeds with no errors
+- [x] API response verified via curl
 
 ### Must Have
 - Top-level `CreditsRequired` on `CostEstimateResponse`
@@ -83,7 +83,7 @@ Task 1 (DTO) → Task 2 (Mapping) → Task 3 (Verify)
 
 ## TODOs
 
-- [ ] 1. Add CreditsRequired properties to DTOs
+- [x] 1. Add CreditsRequired properties to DTOs
 
   **What to do**:
   - Add `public required int CreditsRequired { get; init; }` to `CostEstimateResponse` record
@@ -114,7 +114,7 @@ Task 1 (DTO) → Task 2 (Mapping) → Task 3 (Verify)
 
 ---
 
-- [ ] 2. Update GenerationManager mapping to include CreditsRequired
+- [x] 2. Update GenerationManager mapping to include CreditsRequired
 
   **What to do**:
   - In `EstimateCostAsync()`, add `CreditsRequired = bestEstimate.CreditsRequired` to CostEstimateResponse
@@ -147,7 +147,7 @@ Task 1 (DTO) → Task 2 (Mapping) → Task 3 (Verify)
 
 ---
 
-- [ ] 3. Verify API response includes CreditsRequired
+- [x] 3. Verify API response includes CreditsRequired
 
   **What to do**:
   - Start the API server
@@ -196,10 +196,10 @@ dotnet build  # Expected: Build succeeded
 ```
 
 ### Final Checklist
-- [ ] Top-level `creditsRequired` in API response
-- [ ] Per-provider `creditsRequired` in each estimate
-- [ ] Build passes
-- [ ] No changes to PricingEngine (already correct)
+- [x] Top-level `creditsRequired` in API response
+- [x] Per-provider `creditsRequired` in each estimate
+- [x] Build passes
+- [x] No changes to PricingEngine (already correct)
 
 ---
 
