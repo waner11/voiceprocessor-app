@@ -7,7 +7,7 @@ import { describe, it, expect } from 'vitest';
  */
 const formatCostDisplay = (credits: number | undefined, cost: number) => {
   if (credits && credits > 0) {
-    return `${credits.toLocaleString()} credits ($${cost.toFixed(4)})`;
+    return `${credits.toLocaleString('en-US')} credits ($${cost.toFixed(4)})`;
   }
   return `$${cost.toFixed(4)}`;
 };
