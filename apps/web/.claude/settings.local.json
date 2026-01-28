@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push)",
+      "Bash(bd list:*)",
+      "Bash(bd stats:*)",
+      "Bash(bd create:*)",
+      "Bash(bd close:*)",
+      "Bash(bd dep add:*)",
+      "Bash(bd ready:*)",
+      "Bash(bd sync:*)",
+      "Bash(bd update voiceprocessor-web-2iv --notes \"Created locally, NOT tracked in git \\(excluded by global ~/.gitignore_global\\). Contains: tech stack, commands, architecture, commit message rules \\(no AI attribution, natural style\\). Backend path: /home/wanerpena/Documents/Projects/voiceprocessor-api\")",
+      "Bash(bd update:*)",
+      "Bash(bd show:*)"
+    ]
+  }
+}
