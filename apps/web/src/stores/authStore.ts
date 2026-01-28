@@ -57,6 +57,20 @@ export const useAuthStore = create<AuthState>()(
         isAuthenticated: state.isAuthenticated,
       }),
       onRehydrateStorage: () => (state) => {
+        // Clean up legacy token if it exists
+        const stored = localStorage.getItem('voiceprocessor-auth');
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored);
+            if (parsed.state?.token) {
+              delete parsed.state.token;
+              localStorage.setItem('voiceprocessor-auth', JSON.stringify(parsed));
+              console.log('Legacy token cleaned up');
+            }
+          } catch (e) {
+            // Ignore parse errors
+          }
+        }
         state?.setLoading(false);
       },
     }

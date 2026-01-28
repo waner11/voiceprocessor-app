@@ -54,3 +54,4 @@ next-env.d.ts
 
 # Internal planning
 .sisyphus/
+package-lock.json
