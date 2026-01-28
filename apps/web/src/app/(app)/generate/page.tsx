@@ -87,6 +87,13 @@ export default function GeneratePage() {
 
   const selectedVoiceData = voices.find((v) => v.id === selectedVoice);
 
+  const formatCostWithCredits = (credits: number | undefined, cost: number) => {
+    if (credits && credits > 0) {
+      return `${credits.toLocaleString('en-US')} credits ($${cost.toFixed(4)})`;
+    }
+    return `$${cost.toFixed(4)}`;
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900">
       <div className="container mx-auto px-4 py-8">
@@ -250,9 +257,7 @@ export default function GeneratePage() {
                       {isEstimating ? (
                         <span className="text-xl">...</span>
                       ) : costEstimate ? (
-                        costEstimate.creditsRequired && costEstimate.creditsRequired > 0
-                          ? `${costEstimate.creditsRequired.toLocaleString()} credits ($${costEstimate.estimatedCost.toFixed(4)})`
-                          : `$${costEstimate.estimatedCost.toFixed(4)}`
+                        formatCostWithCredits(costEstimate.creditsRequired, costEstimate.estimatedCost)
                       ) : (
                         `$${(characterCount * 0.00003).toFixed(4)}`
                       )}
@@ -287,9 +292,7 @@ export default function GeneratePage() {
                           >
                             <span>{estimate.provider}</span>
                             <span>
-                              {estimate.creditsRequired && estimate.creditsRequired > 0
-                                ? `${estimate.creditsRequired.toLocaleString()} credits ($${estimate.cost.toFixed(4)})`
-                                : `$${estimate.cost.toFixed(4)}`}
+                              {formatCostWithCredits(estimate.creditsRequired, estimate.cost)}
                             </span>
                           </div>
                         ))}
