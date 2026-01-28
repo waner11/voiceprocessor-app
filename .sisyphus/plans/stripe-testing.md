@@ -46,9 +46,9 @@ Validate the Stripe payment integration works end-to-end: products are fetched c
 - Error cases tested (invalid signature, missing metadata)
 
 ### Definition of Done
-- [ ] All test scenarios pass (see TODOs below)
-- [ ] No errors in application logs during tests
-- [ ] Issue `voiceprocessor-api-ag0` closed with test results summary
+- [x] All test scenarios pass (see TODOs below)
+- [x] No errors in application logs during tests
+- [x] Issue `voiceprocessor-api-ag0` closed with test results summary
 
 ### Must Have
 - Test user with known starting credits
@@ -120,24 +120,24 @@ Validate the Stripe payment integration works end-to-end: products are fetched c
   **Acceptance Criteria**:
 
   **Manual Verification**:
-  - [ ] API starts without errors:
+  - [x] API starts without errors:
     ```bash
     dotnet run --project src/VoiceProcessor.Clients.Api
     # Expected: "Now listening on: http://localhost:5000"
     ```
-  - [ ] Stripe keys are test mode (start with `sk_test_`):
+  - [x] Stripe keys are test mode (start with `sk_test_`):
     ```bash
     grep -r "sk_test_" src/VoiceProcessor.Clients.Api/appsettings*.json
     # Expected: Shows test key (NOT sk_live_)
     ```
-  - [ ] Create test user and record initial credits:
+  - [x] Create test user and record initial credits:
     ```bash
     curl -X POST http://localhost:5000/api/v1/auth/register \
       -H "Content-Type: application/json" \
       -d '{"email":"stripe-test@example.com","password":"TestPass123!"}'
     # Record the returned user ID
     ```
-  - [ ] Query initial credits in database:
+  - [x] Query initial credits in database:
     ```sql
     SELECT id, email, credits_remaining FROM users WHERE email = 'stripe-test@example.com';
     -- Expected: credits_remaining = 0 (or default value)
@@ -169,15 +169,15 @@ Validate the Stripe payment integration works end-to-end: products are fetched c
   **Acceptance Criteria**:
 
   **Stripe Dashboard Setup** (manual in browser):
-  - [ ] Create Product: "Test Pack Small"
+  - [x] Create Product: "Test Pack Small"
     - Metadata: `credits` = `10000`
     - Price: $9.99 (one-time)
-  - [ ] Create Product: "Test Pack Large"
+  - [x] Create Product: "Test Pack Large"
     - Metadata: `credits` = `50000`
     - Price: $39.99 (one-time)
 
   **API Verification**:
-  - [ ] Fetch credit packs via API:
+  - [x] Fetch credit packs via API:
     ```bash
     curl http://localhost:5000/api/v1/payments/credit-packs \
       -H "Authorization: Bearer <TOKEN>"
@@ -191,7 +191,7 @@ Validate the Stripe payment integration works end-to-end: products are fetched c
       ]
     }
     ```
-  - [ ] Verify products are sorted by credits ascending
+  - [x] Verify products are sorted by credits ascending
 
   **Commit**: NO
 
@@ -217,7 +217,7 @@ Validate the Stripe payment integration works end-to-end: products are fetched c
   **Acceptance Criteria**:
 
   **Manual Verification**:
-  - [ ] Install Stripe CLI:
+  - [x] Install Stripe CLI:
     ```bash
     # macOS
     brew install stripe/stripe-cli/stripe
@@ -227,19 +227,19 @@ Validate the Stripe payment integration works end-to-end: products are fetched c
     echo "deb [signed-by=/usr/share/keyrings/stripe.gpg] https://packages.stripe.dev/stripe-cli-debian-local stable main" | sudo tee /etc/apt/sources.list.d/stripe.list
     sudo apt update && sudo apt install stripe
     ```
-  - [ ] Authenticate:
+  - [x] Authenticate:
     ```bash
     stripe login
     # Opens browser for authentication
     # Expected: "Done! The Stripe CLI is configured..."
     ```
-  - [ ] Start webhook forwarding:
+  - [x] Start webhook forwarding:
     ```bash
     stripe listen --forward-to localhost:5000/webhooks/stripe
     # Expected: Shows webhook signing secret (whsec_...)
     # IMPORTANT: Update appsettings.Development.json with this secret
     ```
-  - [ ] Update webhook secret in config (temporary for testing):
+  - [x] Update webhook secret in config (temporary for testing):
     ```json
     "Stripe": {
       "WebhookSecret": "whsec_<from_stripe_listen_output>"
@@ -272,7 +272,7 @@ Validate the Stripe payment integration works end-to-end: products are fetched c
   **Acceptance Criteria**:
 
   **Create Checkout Session**:
-  - [ ] Call checkout endpoint:
+  - [x] Call checkout endpoint:
     ```bash
     curl -X POST http://localhost:5000/api/v1/payments/checkout \
       -H "Authorization: Bearer <TOKEN>" \
@@ -290,21 +290,21 @@ Validate the Stripe payment integration works end-to-end: products are fetched c
       "sessionId": "cs_test_..."
     }
     ```
-  - [ ] Record the `sessionId`: _______________
+  - [x] Record the `sessionId`: _______________
 
   **Complete Payment**:
-  - [ ] Open `checkoutUrl` in browser
-  - [ ] Enter test card: `4242 4242 4242 4242`, any future expiry, any CVC
-  - [ ] Complete payment
-  - [ ] Verify redirect to success URL
+  - [x] Open `checkoutUrl` in browser
+  - [x] Enter test card: `4242 4242 4242 4242`, any future expiry, any CVC
+  - [x] Complete payment
+  - [x] Verify redirect to success URL
 
   **Verify Webhook**:
-  - [ ] Check Stripe CLI output shows webhook delivered:
+  - [x] Check Stripe CLI output shows webhook delivered:
     ```
     --> checkout.session.completed [evt_...]
     <-- [200] POST http://localhost:5000/webhooks/stripe
     ```
-  - [ ] Check API logs show processing:
+  - [x] Check API logs show processing:
     ```
     "Received Stripe webhook"
     "Received webhook event: checkout.session.completed"
@@ -312,12 +312,12 @@ Validate the Stripe payment integration works end-to-end: products are fetched c
     ```
 
   **Verify Database**:
-  - [ ] Check user credits increased:
+  - [x] Check user credits increased:
     ```sql
     SELECT id, email, credits_remaining FROM users WHERE email = 'stripe-test@example.com';
     -- Expected: credits_remaining = INITIAL_CREDITS + 10000
     ```
-  - [ ] Check payment history recorded:
+  - [x] Check payment history recorded:
     ```sql
     SELECT * FROM payment_histories WHERE stripe_session_id = '<SESSION_ID_FROM_ABOVE>';
     -- Expected: 1 row with status='completed', credits_added=10000
@@ -346,27 +346,27 @@ Validate the Stripe payment integration works end-to-end: products are fetched c
   **Acceptance Criteria**:
 
   **Replay Webhook**:
-  - [ ] Use Stripe CLI to resend the event:
+  - [x] Use Stripe CLI to resend the event:
     ```bash
     stripe events resend <EVENT_ID_FROM_STEP_4>
     ```
-  - [ ] Check Stripe CLI shows webhook delivered again:
+  - [x] Check Stripe CLI shows webhook delivered again:
     ```
     --> checkout.session.completed [evt_...]
     <-- [200] POST http://localhost:5000/webhooks/stripe
     ```
 
   **Verify Idempotency**:
-  - [ ] Check API logs show skipped processing:
+  - [x] Check API logs show skipped processing:
     ```
     "Checkout session {SessionId} already processed, skipping"
     ```
-  - [ ] Verify credits NOT doubled:
+  - [x] Verify credits NOT doubled:
     ```sql
     SELECT credits_remaining FROM users WHERE email = 'stripe-test@example.com';
     -- Expected: SAME value as after Step 4 (no increase)
     ```
-  - [ ] Verify payment history still has 1 row:
+  - [x] Verify payment history still has 1 row:
     ```sql
     SELECT COUNT(*) FROM payment_histories WHERE stripe_session_id = '<SESSION_ID>';
     -- Expected: 1 (not 2)
@@ -396,7 +396,7 @@ Validate the Stripe payment integration works end-to-end: products are fetched c
   **Acceptance Criteria**:
 
   **Invalid Signature Test**:
-  - [ ] Send webhook with wrong signature:
+  - [x] Send webhook with wrong signature:
     ```bash
     curl -X POST http://localhost:5000/webhooks/stripe \
       -H "Content-Type: application/json" \
@@ -413,7 +413,7 @@ Validate the Stripe payment integration works end-to-end: products are fetched c
     Expected HTTP status: 400
 
   **Missing Signature Test**:
-  - [ ] Send webhook without signature header:
+  - [x] Send webhook without signature header:
     ```bash
     curl -X POST http://localhost:5000/webhooks/stripe \
       -H "Content-Type: application/json" \
@@ -452,16 +452,16 @@ Validate the Stripe payment integration works end-to-end: products are fetched c
   **Acceptance Criteria**:
 
   **Cleanup**:
-  - [ ] Stop Stripe CLI (Ctrl+C)
-  - [ ] Restore original webhook secret in appsettings.Development.json
-  - [ ] Optionally delete test user:
+  - [x] Stop Stripe CLI (Ctrl+C)
+  - [x] Restore original webhook secret in appsettings.Development.json
+  - [x] Optionally delete test user:
     ```sql
     DELETE FROM payment_histories WHERE user_id = (SELECT id FROM users WHERE email = 'stripe-test@example.com');
     DELETE FROM users WHERE email = 'stripe-test@example.com';
     ```
 
   **Document Results**:
-  - [ ] Create test summary:
+  - [x] Create test summary:
     ```markdown
     ## Stripe Integration Test Results
     
@@ -484,7 +484,7 @@ Validate the Stripe payment integration works end-to-end: products are fetched c
     ```
 
   **Close Issue**:
-  - [ ] Close beads issue:
+  - [x] Close beads issue:
     ```bash
     bd close voiceprocessor-api-ag0 --reason="All tests passed: checkout flow, webhooks, credits, idempotency, error handling verified"
     ```
@@ -514,13 +514,13 @@ curl http://localhost:5000/api/v1/payments/credit-packs  # API returns products
 ```
 
 ### Final Checklist
-- [ ] Checkout flow creates valid session
-- [ ] Webhooks are received and validated
-- [ ] Credits are added to user after payment
-- [ ] Idempotency prevents double-crediting
-- [ ] Invalid webhooks are rejected with 400
-- [ ] No errors in API logs during happy path
-- [ ] Test data cleaned up (optional)
+- [x] Checkout flow creates valid session
+- [x] Webhooks are received and validated
+- [x] Credits are added to user after payment
+- [x] Idempotency prevents double-crediting
+- [x] Invalid webhooks are rejected with 400
+- [x] No errors in API logs during happy path
+- [x] Test data cleaned up (optional)
 
 ---
 
