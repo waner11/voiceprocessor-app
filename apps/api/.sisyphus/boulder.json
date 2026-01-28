@@ -1,13 +1,13 @@
 {
-  "active_plan": null,
-  "started_at": "2026-01-25T19:11:58.393Z",
-  "completed_at": "2026-01-25T19:25:08.849Z",
-  "session_ids": ["ses_4096e0ea9ffeHatngGuOpe4E10"],
-  "plan_name": null,
-  "status": "complete",
-  "completion_percentage": 100,
-  "tasks_completed": 3,
-  "tasks_total": 3,
+  "active_plan": "/home/wanerpena/Documents/Projects/voiceprocessor-api/.sisyphus/plans/monorepo-merge.md",
+  "started_at": "2026-01-28T02:01:03.770Z",
+  "session_ids": ["ses_3fdaace2effebeJ5sbYr3PSy6u"],
+  "plan_name": "monorepo-merge",
+  "status": "in_progress",
+  "completion_percentage": 0,
+  "tasks_completed": 0,
+  "tasks_total": 22,
+  "next_action": "CONTINUE_WORK",
   "plans_completed": [
     {
       "name": "git-workflow",
@@ -18,10 +18,10 @@
     }
   ],
   "summary": {
-    "total_plans": 1,
+    "total_plans": 2,
     "complete": 1,
-    "blocked": 0,
-    "all_work_complete": true
+    "in_progress": 1,
+    "blocked": 0
   },
-  "last_updated": "2026-01-27T03:45:00.000Z"
+  "last_updated": "2026-01-28T02:01:03.770Z"
 }
