@@ -339,4 +339,4 @@ const logger = {
 
 ---
 
-**Related:** See `WORKFLOW.md` for git workflow and commit conventions.
+**Related:** See `../../WORKFLOW.md` for git workflow and commit conventions.

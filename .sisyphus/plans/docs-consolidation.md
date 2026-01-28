@@ -119,7 +119,7 @@ Wave 3 (After Wave 2):
 
 ## TODOs
 
-- [ ] 1. Move files to root and delete duplicates
+- [x] 1. Move files to root and delete duplicates
 
   **What to do**:
   - Create `./docs/` directory at root if not exists

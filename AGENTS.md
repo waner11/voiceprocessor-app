@@ -20,6 +20,15 @@ This monorepo contains both the API and Web applications.
 - **API Development**: See `apps/api/AGENTS.md`
 - **Web Development**: See `apps/web/AGENTS.md`
 
+## Shared Documentation
+
+These docs apply to the entire monorepo:
+
+- `WORKFLOW.md` - Git workflow, beads issue tracking, commit conventions
+- `docs/IDESIGN_ARCHITECTURE.md` - iDesign architecture patterns and layer rules
+- `docs/APPLICATION_FLOWS.md` - User journeys and application flows
+- `docs/MARKET_ANALYSIS.md` - Market validation and business analysis
+
 ## Beads Workflow
 
 Use beads for all task tracking:

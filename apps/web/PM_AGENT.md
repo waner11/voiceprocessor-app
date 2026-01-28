@@ -113,7 +113,7 @@ When presented with a new idea or feature request, evaluate it against:
 
 ## 6. Reference Files
 - `ROADMAP.md` (if exists) - Timeline & Features
-- `WORKFLOW.md` - Development workflow
+- `../../WORKFLOW.md` - Development workflow
 - `AGENTS.md` - Agent instructions
 
 ## 7. Interaction

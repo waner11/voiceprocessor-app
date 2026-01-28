@@ -10,7 +10,7 @@ VoiceProcessor API is a multi-provider Text-to-Speech SaaS platform built with A
 
 ## Architecture
 
-This project uses **iDesign Method** (Volatility-Based Decomposition) by Juval Löwy. See `docs/IDESIGN_ARCHITECTURE.md` for full details.
+This project uses **iDesign Method** (Volatility-Based Decomposition) by Juval Löwy. See `../../docs/IDESIGN_ARCHITECTURE.md` for full details.
 
 ### Service Layers
 ```
@@ -103,6 +103,8 @@ See **AGENTS.md Section 4** for the complete git workflow including:
 - Starting work (sync main, create branch, claim issue)
 - During work (commit conventions)
 - Finishing work (rebase, PR creation, close issue)
+
+**Reference**: See `../../WORKFLOW.md` for detailed workflow instructions
 
 ## Technology Stack
 
@@ -383,7 +385,7 @@ When generating tests:
 
 When working on complex features:
 
-1. **Read documentation first**: Check `docs/IDESIGN_ARCHITECTURE.md` and `docs/TECHNICAL_DESIGN.md`
+1. **Read documentation first**: Check `../../docs/IDESIGN_ARCHITECTURE.md` and `docs/TECHNICAL_DESIGN.md`
 2. **Plan the layers**: Identify which Managers, Engines, and Accessors are needed
 3. **Start from the bottom up**: Implement Accessors → Engines → Managers → Controllers
 4. **Write tests alongside**: Don't wait until the end to add tests
@@ -391,7 +393,7 @@ When working on complex features:
 
 ### Documentation
 
-- `docs/IDESIGN_ARCHITECTURE.md` - **iDesign method guide, calling rules, project structure**
+- `../../docs/IDESIGN_ARCHITECTURE.md` - **iDesign method guide, calling rules, project structure**
 - `docs/TECHNICAL_DESIGN.md` - System architecture, API design, data flows
 - `docs/TECHNOLOGY_STACK_DOTNET.md` - Implementation patterns, code examples
-- `docs/MARKET_ANALYSIS.md` - Business model, target markets
+- `../../docs/MARKET_ANALYSIS.md` - Business model, target markets

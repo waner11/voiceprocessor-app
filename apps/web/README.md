@@ -104,7 +104,7 @@ This ensures type safety and keeps the frontend in sync with the API.
 
 This project follows a structured development workflow. See these guides for details:
 
-- **[WORKFLOW.md](WORKFLOW.md)** - Complete git workflow, beads issue tracking, commit conventions
+- **[WORKFLOW.md](../../WORKFLOW.md)** - Complete git workflow, beads issue tracking, commit conventions
 - **[AGENTS.md](AGENTS.md)** - Project-specific instructions for AI agents and developers
 - **[PM_AGENT.md](PM_AGENT.md)** - Product management framework and prioritization strategy
 
@@ -122,7 +122,7 @@ git checkout -b voiceprocessor-web-xxx
 
 # ... make changes ...
 
-# Complete work (see WORKFLOW.md for full process)
+# Complete work (see ../../WORKFLOW.md for full process)
 git push -u origin voiceprocessor-web-xxx
 gh pr create --base main --fill
 bd close <id> --reason="PR created"
