@@ -195,7 +195,7 @@ See existing PR review files for examples:
 2. **Explain why** - Don't just say "change this", explain the reasoning
 3. **Suggest alternatives** - Provide concrete examples of better approaches
 4. **Acknowledge good work** - Call out well-written code and good patterns
-5. **Link to docs** - Reference AGENTS.md, IDESIGN_ARCHITECTURE.md, etc.
+5. **Link to docs** - Reference AGENTS.md, ../../../docs/IDESIGN_ARCHITECTURE.md, etc.
 6. **Prioritize** - Use severity levels to help authors focus on critical issues first
 
 ## Tips for Authors
@@ -217,5 +217,5 @@ Periodically review PR findings to identify:
 ## Related Documentation
 
 - `AGENTS.md` - Project coding standards and workflow
-- `docs/IDESIGN_ARCHITECTURE.md` - Architecture patterns and rules
-- `WORKFLOW.md` - Git workflow and PR process
+- `../../../docs/IDESIGN_ARCHITECTURE.md` - Architecture patterns and rules
+- `../../../WORKFLOW.md` - Git workflow and PR process
