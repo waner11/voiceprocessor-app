@@ -54,11 +54,11 @@ Eliminate documentation duplication in the monorepo by consolidating identical f
 - 18 updated cross-references in app-specific files
 
 ### Definition of Done
-- [ ] No duplicate files exist in `apps/api/` or `apps/web/`
-- [ ] All 4 consolidated files exist at root level
-- [ ] Git history is preserved for moved files (`git log --follow` shows history)
-- [ ] All 18 cross-references point to correct new locations
-- [ ] `grep` verification finds no broken references
+- [x] No duplicate files exist in `apps/api/` or `apps/web/`
+- [x] All 4 consolidated files exist at root level
+- [x] Git history is preserved for moved files (`git log --follow` shows history)
+- [x] All 18 cross-references point to correct new locations
+- [x] `grep` verification finds no broken references
 
 ### Must Have
 - Use `git mv` for all moves (preserves history)
@@ -176,7 +176,7 @@ Wave 3 (After Wave 2):
 
 ---
 
-- [ ] 2. Update API app references (14 changes in 5 files)
+- [x] 2. Update API app references (14 changes in 5 files)
 
   **What to do**:
   - Update 8 cross-references in `apps/api/` files to point to new root locations
@@ -229,7 +229,7 @@ Wave 3 (After Wave 2):
 
 ---
 
-- [ ] 3. Update Web app references (4 updates)
+- [x] 3. Update Web app references (4 updates)
 
   **What to do**:
   - Update 4 cross-references in `apps/web/` files to point to new root locations
@@ -272,7 +272,7 @@ Wave 3 (After Wave 2):
 
 ---
 
-- [ ] 4. Update root AGENTS.md with documentation navigation
+- [x] 4. Update root AGENTS.md with documentation navigation
 
   **What to do**:
   - Add a "Shared Documentation" section to root `AGENTS.md`
@@ -326,7 +326,7 @@ Wave 3 (After Wave 2):
 
 ---
 
-- [ ] 5. Final verification
+- [x] 5. Final verification
 
   **What to do**:
   - Run comprehensive verification to ensure no broken references
@@ -396,10 +396,10 @@ grep -rn "apps/api/WORKFLOW\|apps/web/WORKFLOW\|apps/api/docs/IDESIGN\|apps/api/
 ```
 
 ### Final Checklist
-- [ ] 4 files consolidated at root
-- [ ] 4 duplicates deleted from apps/web/
-- [ ] 18 cross-references updated
-- [ ] Root AGENTS.md has documentation navigation
-- [ ] Git history preserved for all moved files
-- [ ] All tests pass (N/A - no tests)
-- [ ] Clean git status (all committed)
+- [x] 4 files consolidated at root
+- [x] 4 duplicates deleted from apps/web/
+- [x] 18 cross-references updated
+- [x] Root AGENTS.md has documentation navigation
+- [x] Git history preserved for all moved files
+- [x] All tests pass (N/A - no tests)
+- [x] Clean git status (all committed)

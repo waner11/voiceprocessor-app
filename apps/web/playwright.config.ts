@@ -24,6 +24,17 @@ export default defineConfig({
       name: "webkit",
       use: { ...devices["Desktop Safari"] },
     },
+    {
+      name: "brave",
+      use: {
+        ...devices["Desktop Chrome"],
+        channel: undefined,
+        launchOptions: {
+          executablePath:
+            "/var/lib/flatpak/app/com.brave.Browser/current/active/files/brave/brave",
+        },
+      },
+    },
   ],
   webServer: {
     command: "pnpm dev",
