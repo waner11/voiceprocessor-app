@@ -10,7 +10,7 @@ VoiceProcessor API is a multi-provider Text-to-Speech SaaS platform built with A
 
 ## Architecture
 
-This project uses **iDesign Method** (Volatility-Based Decomposition) by Juval Löwy. See `docs/IDESIGN_ARCHITECTURE.md` for full details.
+This project uses **iDesign Method** (Volatility-Based Decomposition) by Juval Löwy. See `../../docs/IDESIGN_ARCHITECTURE.md` for full details.
 
 ### Service Layers
 ```
@@ -269,7 +269,7 @@ This ensures future sessions have context about what was done and why.
 
 ## Documentation
 
-- `docs/IDESIGN_ARCHITECTURE.md` - **iDesign method guide, calling rules, project structure**
+- `../../docs/IDESIGN_ARCHITECTURE.md` - **iDesign method guide, calling rules, project structure**
 - `docs/TECHNICAL_DESIGN.md` - System architecture, API design, data flows
 - `docs/TECHNOLOGY_STACK_DOTNET.md` - Implementation patterns, code examples
-- `docs/MARKET_ANALYSIS.md` - Business model, target markets
+- `../../docs/MARKET_ANALYSIS.md` - Business model, target markets
