@@ -250,7 +250,9 @@ export default function GeneratePage() {
                       {isEstimating ? (
                         <span className="text-xl">...</span>
                       ) : costEstimate ? (
-                        `$${costEstimate.estimatedCost.toFixed(4)}`
+                        costEstimate.creditsRequired && costEstimate.creditsRequired > 0
+                          ? `${costEstimate.creditsRequired.toLocaleString()} credits ($${costEstimate.estimatedCost.toFixed(4)})`
+                          : `$${costEstimate.estimatedCost.toFixed(4)}`
                       ) : (
                         `$${(characterCount * 0.00003).toFixed(4)}`
                       )}
@@ -272,6 +274,28 @@ export default function GeneratePage() {
                       </span>
                     </div>
                   </div>
+                  {costEstimate?.providerEstimates && costEstimate.providerEstimates.length > 1 && (
+                    <details className="mt-4 text-sm">
+                      <summary className="cursor-pointer text-blue-400 hover:underline">
+                        Compare all providers
+                      </summary>
+                      <div className="mt-2 space-y-2">
+                        {costEstimate.providerEstimates.map((estimate) => (
+                          <div
+                            key={estimate.provider}
+                            className="flex items-center justify-between rounded p-2 bg-gray-700/50"
+                          >
+                            <span>{estimate.provider}</span>
+                            <span>
+                              {estimate.creditsRequired && estimate.creditsRequired > 0
+                                ? `${estimate.creditsRequired.toLocaleString()} credits ($${estimate.cost.toFixed(4)})`
+                                : `$${estimate.cost.toFixed(4)}`}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </details>
+                  )}
                 </div>
               ) : (
                 <div className="py-4 text-center text-gray-400">
