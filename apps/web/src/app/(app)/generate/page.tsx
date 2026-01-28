@@ -87,6 +87,13 @@ export default function GeneratePage() {
 
   const selectedVoiceData = voices.find((v) => v.id === selectedVoice);
 
+  const formatCostWithCredits = (credits: number | undefined, cost: number) => {
+    if (credits && credits > 0) {
+      return `${credits.toLocaleString('en-US')} credits ($${cost.toFixed(4)})`;
+    }
+    return `$${cost.toFixed(4)}`;
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900">
       <div className="container mx-auto px-4 py-8">
@@ -250,7 +257,7 @@ export default function GeneratePage() {
                       {isEstimating ? (
                         <span className="text-xl">...</span>
                       ) : costEstimate ? (
-                        `$${costEstimate.estimatedCost.toFixed(4)}`
+                        formatCostWithCredits(costEstimate.creditsRequired, costEstimate.estimatedCost)
                       ) : (
                         `$${(characterCount * 0.00003).toFixed(4)}`
                       )}
@@ -272,6 +279,26 @@ export default function GeneratePage() {
                       </span>
                     </div>
                   </div>
+                  {costEstimate?.providerEstimates && costEstimate.providerEstimates.length > 1 && (
+                    <details className="mt-4 text-sm">
+                      <summary className="cursor-pointer text-blue-400 hover:underline">
+                        Compare all providers
+                      </summary>
+                      <div className="mt-2 space-y-2">
+                        {costEstimate.providerEstimates.map((estimate) => (
+                          <div
+                            key={estimate.provider}
+                            className="flex items-center justify-between rounded p-2 bg-gray-700/50"
+                          >
+                            <span>{estimate.provider}</span>
+                            <span>
+                              {formatCostWithCredits(estimate.creditsRequired, estimate.cost)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </details>
+                  )}
                 </div>
               ) : (
                 <div className="py-4 text-center text-gray-400">

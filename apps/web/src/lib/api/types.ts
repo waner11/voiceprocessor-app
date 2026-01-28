@@ -617,6 +617,8 @@ export interface components {
             estimatedChunks: number;
             /** Format: double */
             estimatedCost: number;
+            /** Format: int32 */
+            creditsRequired: number;
             currency: string | null;
             recommendedProvider?: components["schemas"]["Provider"];
             providerEstimates?: components["schemas"]["ProviderEstimate"][] | null;
@@ -693,6 +695,8 @@ export interface components {
             provider: components["schemas"]["Provider"];
             /** Format: double */
             cost: number;
+            /** Format: int32 */
+            creditsRequired: number;
             /** Format: int32 */
             estimatedDurationMs: number;
             qualityTier: string | null;

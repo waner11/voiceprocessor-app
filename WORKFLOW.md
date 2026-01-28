@@ -559,6 +559,8 @@ EOF
   "started_at": "2026-01-27T02:10:15.603Z",
   "session_ids": ["ses_xyz"],
   "plan_name": "feature-name",
+  "issue_id": "voiceprocessor-web-xxx",
+  "branch": "voiceprocessor-web-xxx",
   "status": "in_progress",
   "completion_percentage": 60,
   "tasks_completed": 6,
@@ -566,6 +568,49 @@ EOF
   "blocker": "Waiting for API endpoint",
   "next_action": "CONTINUE_WORK"
 }
+```
+
+**New Fields (2026-01-28):**
+- `issue_id` - The beads issue ID associated with this work
+- `branch` - The git branch for this work (must match issue_id)
+
+### Git Workflow Enforcement
+
+The `/start-work` command automatically enforces the branching workflow:
+
+1. **Branch Check**: Before any work begins, checks if you're on `main`
+2. **Auto-Branch**: If on `main`, creates a feature branch from the issue_id
+3. **Validation**: Ensures branch name matches the issue being worked on
+4. **Tracking**: Records branch in boulder.json for audit trail
+
+**What happens when you run `/start-work`:**
+
+```
+Starting Work Session
+
+Plan: credits-display
+Issue: voiceprocessor-web-0mt
+Branch: voiceprocessor-web-0mt  ← Auto-created if on main
+Session ID: ses_xyz
+Started: 2026-01-28T04:18:20Z
+
+Reading plan and beginning execution...
+```
+
+**Why this matters:**
+- ❌ Prevents accidental commits to `main`
+- ✅ Ensures all work is on a tracked feature branch
+- ✅ Enables proper PR workflow
+- ✅ Creates audit trail of which branch was used
+
+**If you're on the wrong branch:**
+```
+⚠️ WARNING: Branch mismatch detected
+Expected: voiceprocessor-web-0mt
+Actual: some-other-branch
+
+Switch to correct branch? [y/n]
+```
 ```
 
 ---
