@@ -15,25 +15,26 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-  const { mutate: login, isPending, error } = useLogin();
-  const [apiError, setApiError] = useState<string | null>(null);
+   const { mutate: login, isPending } = useLogin();
+   const [apiError, setApiError] = useState<string | null>(null);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginForm>({
-    resolver: zodResolver(loginSchema),
-  });
+   const {
+     register,
+     handleSubmit,
+     formState: { errors },
+   } = useForm<LoginForm>({
+     resolver: zodResolver(loginSchema),
+   });
 
-  const onSubmit = async (data: LoginForm) => {
-    setApiError(null);
-    login(data, {
-      onError: (err: any) => {
-        setApiError(err?.message || "Invalid email or password");
-      },
-    });
-  };
+   const onSubmit = async (data: LoginForm) => {
+     setApiError(null);
+     login(data, {
+       onError: (err: Error) => {
+         const errorMessage = (err as unknown as Record<string, unknown>)?.message || "Invalid email or password";
+         setApiError(String(errorMessage));
+       },
+     });
+   };
 
   return (
     <div className="space-y-6">

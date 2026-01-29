@@ -25,23 +25,23 @@ export default function ForgotPasswordPage() {
     resolver: zodResolver(forgotPasswordSchema),
   });
 
-  const onSubmit = async (data: ForgotPasswordForm) => {
-    setIsLoading(true);
-    setError(null);
+   const onSubmit = async () => {
+     setIsLoading(true);
+     setError(null);
 
-    try {
-      // TODO: Replace with actual API call
-      // await api.POST("/api/v1/auth/forgot-password", { body: data });
+     try {
+       // TODO: Replace with actual API call
+       // await api.POST("/api/v1/auth/forgot-password", { body: data });
 
-      // Mock for now
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setIsSubmitted(true);
-    } catch (err) {
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+       // Mock for now
+       await new Promise((resolve) => setTimeout(resolve, 1000));
+       setIsSubmitted(true);
+     } catch {
+       setError("Something went wrong. Please try again.");
+     } finally {
+       setIsLoading(false);
+     }
+   };
 
   if (isSubmitted) {
     return (

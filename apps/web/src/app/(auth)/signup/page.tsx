@@ -33,21 +33,22 @@ export default function SignupPage() {
     resolver: zodResolver(signupSchema),
   });
 
-  const onSubmit = async (data: SignupForm) => {
-    setApiError(null);
-    register(
-      {
-        name: data.name,
-        email: data.email,
-        password: data.password,
-      },
-      {
-        onError: (err: any) => {
-          setApiError(err?.message || "Something went wrong. Please try again.");
-        },
-      }
-    );
-  };
+   const onSubmit = async (data: SignupForm) => {
+     setApiError(null);
+     register(
+       {
+         name: data.name,
+         email: data.email,
+         password: data.password,
+       },
+       {
+         onError: (err: Error) => {
+           const errorMessage = (err as unknown as Record<string, unknown>)?.message || "Something went wrong. Please try again.";
+           setApiError(String(errorMessage));
+         },
+       }
+     );
+   };
 
   return (
     <div className="space-y-6">

@@ -32,24 +32,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
             credentials: 'include',
           });
           
-          if (response.ok) {
-            const user = await response.json();
-            login(user, user.creditsRemaining); // Update user data
-            console.log('Session validated');
-          } else {
-            console.log('Session invalid, logging out');
-            logout();
-          }
-        } catch (error) {
-          console.log('Session validation failed, logging out');
-          logout();
-        }
+           if (response.ok) {
+             const user = await response.json();
+             login(user, user.creditsRemaining); // Update user data
+           } else {
+             logout();
+           }
+         } catch {
+           logout();
+         }
       }
       setLoading(false);
     };
 
     validateSession();
-  }, []); // Run once on mount
+   // Session validation runs once on mount — adding deps would cause infinite loops
+   // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, []);
 
   useEffect(() => {
     // Wait for hydration to complete

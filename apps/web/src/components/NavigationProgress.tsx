@@ -10,10 +10,12 @@ export function NavigationProgress() {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    // Reset on route change complete
-    setIsNavigating(false);
-    setProgress(0);
-  }, [pathname, searchParams]);
+     // Reset on route change complete
+     // Intentional: setIsNavigating(false) on route change is safe in this context
+     // eslint-disable-next-line react-hooks/set-state-in-effect
+     setIsNavigating(false);
+     setProgress(0);
+   }, [pathname, searchParams]);
 
   useEffect(() => {
     let progressInterval: NodeJS.Timeout;
@@ -34,15 +36,7 @@ export function NavigationProgress() {
       }, 100);
     };
 
-    const handleComplete = () => {
-      setProgress(100);
-      setTimeout(() => {
-        setIsNavigating(false);
-        setProgress(0);
-      }, 200);
-    };
-
-    // Listen for link clicks to start progress
+     // Listen for link clicks to start progress
     const handleClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       const anchor = target.closest("a");

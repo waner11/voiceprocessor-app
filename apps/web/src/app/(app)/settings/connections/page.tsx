@@ -92,10 +92,7 @@ export default function ConnectionsSettingsPage() {
     }
   };
 
-  const isConnected = (provider: "google" | "github") =>
-    connections.some((c) => c.provider === provider);
-
-  return (
+   return (
     <div className="space-y-6">
       <section className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
         <div className="mb-6">

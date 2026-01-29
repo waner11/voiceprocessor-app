@@ -24,10 +24,12 @@ export function Header() {
   const [isMounted, setIsMounted] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Handle hydration
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+   // Handle hydration
+   useEffect(() => {
+     // Intentional: setIsMounted(true) on mount is the standard hydration pattern
+     // eslint-disable-next-line react-hooks/set-state-in-effect
+     setIsMounted(true);
+   }, []);
 
   // Close menu when clicking outside
   useEffect(() => {
