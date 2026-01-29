@@ -584,7 +584,7 @@ Critical Path: Housekeeping → Wave 1 → Wave 2 (Tasks 4→5→6→7→8→9)
 
 ---
 
-- [ ] 7. Wire FeedbackForm to useSubmitFeedback (conditional on Completed)
+- [x] 7. Wire FeedbackForm to useSubmitFeedback (conditional on Completed)
 
   **What to do**:
   - **RED**: Write tests:
