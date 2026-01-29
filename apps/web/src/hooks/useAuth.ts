@@ -27,12 +27,12 @@ interface AuthResponse {
   isNewUser?: boolean;
 }
 
-interface ApiError {
-  code: string;
-  message: string;
-  detail?: string;
-  validationErrors?: { field: string; message: string }[];
-}
+export interface ApiError {
+   code: string;
+   message: string;
+   detail?: string;
+   validationErrors?: { field: string; message: string }[];
+ }
 
 async function apiRequest<T>(
   endpoint: string,
