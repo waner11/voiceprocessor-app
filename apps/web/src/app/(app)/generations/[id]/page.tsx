@@ -3,6 +3,8 @@
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useGeneration } from '@/hooks/useGenerations';
+import { GenerationStatus } from '@/components/GenerationStatus/GenerationStatus';
+import { mapGenerationStatus } from '@/lib/utils/mapGenerationStatus';
 
 export default function GenerationPage() {
   const params = useParams();
@@ -106,10 +108,14 @@ export default function GenerationPage() {
         </div>
 
         <div className="space-y-6">
-          {/* GenerationStatus component will go here */}
           <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
             <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Status</h2>
-            <p className="text-gray-500 dark:text-gray-400">Loading generation {id}...</p>
+            <GenerationStatus
+              generationId={generation.id}
+              status={mapGenerationStatus(generation.status)}
+              progress={generation.progress}
+              error={generation.errorMessage ?? undefined}
+            />
           </div>
 
           {/* Generation info */}
