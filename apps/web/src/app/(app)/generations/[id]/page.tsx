@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useGeneration } from '@/hooks/useGenerations';
 import { GenerationStatus } from '@/components/GenerationStatus/GenerationStatus';
 import { mapGenerationStatus } from '@/lib/utils/mapGenerationStatus';
+import { AudioPlayer } from '@/components/AudioPlayer/AudioPlayer';
 
 export default function GenerationPage() {
   const params = useParams();
@@ -73,31 +74,20 @@ export default function GenerationPage() {
 
       <div className="grid gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
-          {/* AudioPlayer component will go here */}
           <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
             <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Audio Player</h2>
-            <div className="h-32 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 dark:text-gray-400">
-              Waveform visualization will appear here
-            </div>
-            <div className="mt-4 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <button className="rounded-full border border-gray-200 dark:border-gray-700 p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
-                  ▶
-                </button>
-                <span className="text-sm text-gray-500 dark:text-gray-400">0:00 / --:--</span>
+            {generation.audioUrl ? (
+              <AudioPlayer audioUrl={generation.audioUrl} />
+            ) : (
+              <div className="rounded-lg bg-gray-100 dark:bg-gray-800 p-8 text-center">
+                <p className="text-gray-500 dark:text-gray-400">
+                  {generation.status === 'Completed' 
+                    ? 'Audio file not available' 
+                    : `Audio will appear here once generation completes${generation.progress ? ` (${generation.progress}%)` : ''}`
+                  }
+                </p>
               </div>
-              <div className="flex items-center gap-2">
-                <select className="rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2 py-1 text-sm text-gray-900 dark:text-white">
-                  <option>1x</option>
-                  <option>1.25x</option>
-                  <option>1.5x</option>
-                  <option>2x</option>
-                </select>
-                <button className="rounded border border-gray-200 dark:border-gray-700 px-3 py-1 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
-                  Download
-                </button>
-              </div>
-            </div>
+            )}
           </div>
 
           {/* Chapters */}

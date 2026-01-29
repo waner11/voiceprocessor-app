@@ -441,7 +441,7 @@ Critical Path: Housekeeping → Wave 1 → Wave 2 (Tasks 4→5→6→7→8→9)
 
 ---
 
-- [ ] 5. Create status mapping utility + wire GenerationStatus component
+- [x] 5. Create status mapping utility + wire GenerationStatus component
 
   **What to do**:
   - **RED**: Write tests:
