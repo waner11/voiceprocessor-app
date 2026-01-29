@@ -107,3 +107,32 @@
 
 ### Next Steps
 - Task 5: Create status mapping utility + wire GenerationStatus component
+
+## [2026-01-29T05:10] Tasks 6-9 Complete - Detail Page Fully Wired
+
+### Task 6: AudioPlayer Integration
+- Conditional rendering based on `audioUrl` presence
+- Placeholder shows progress percentage for in-progress generations
+- AudioPlayer component handles all playback controls
+
+### Task 7: FeedbackForm Integration
+- Only shown when status is 'Completed'
+- Tags appended to comment string (backend doesn't support tags field)
+- Uses `useSubmitFeedback` mutation hook
+
+### Task 8: Details Section Population
+- Provider, character count, duration, cost, timestamps
+- Duration formatted as mm:ss from milliseconds
+- Cost shows actual if available, otherwise estimated with ~ prefix
+- Dates formatted with locale-aware formatting
+
+### Task 9: Edge Case Handling
+- 404 detection via error message inspection
+- Cancelled status gets distinct yellow badge (not red "failed")
+- Invalid UUID handled naturally (API returns 404)
+- All error states show "Back to Generations" link
+
+### All 9 Tasks Complete
+- Wave 1 (cleanup): 3 tasks ✅
+- Wave 2 (detail page): 6 tasks ✅
+- Ready to create PR and close beads issue

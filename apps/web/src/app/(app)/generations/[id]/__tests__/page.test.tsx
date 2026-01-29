@@ -20,7 +20,7 @@ describe('Generation Detail Page', () => {
   });
 
   it('renders loading state when data is fetching', () => {
-    (useGeneration as any).mockReturnValue({
+    (useGeneration as ReturnType<typeof vi.fn>).mockReturnValue({
       data: null,
       error: null,
       isLoading: true,
@@ -43,7 +43,7 @@ describe('Generation Detail Page', () => {
       createdAt: '2026-01-29T00:00:00Z',
     };
 
-    (useGeneration as any).mockReturnValue({
+    (useGeneration as ReturnType<typeof vi.fn>).mockReturnValue({
       data: mockGeneration,
       error: null,
       isLoading: false,
@@ -57,7 +57,7 @@ describe('Generation Detail Page', () => {
   });
 
   it('renders error state when fetch fails', () => {
-    (useGeneration as any).mockReturnValue({
+    (useGeneration as ReturnType<typeof vi.fn>).mockReturnValue({
       data: null,
       error: { message: 'Failed to fetch generation' },
       isLoading: false,

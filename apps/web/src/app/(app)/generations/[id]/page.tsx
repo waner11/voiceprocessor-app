@@ -39,12 +39,18 @@ export default function GenerationPage() {
   }
 
   if (error) {
+    const is404 = error.message?.includes('404') || error.message?.includes('not found');
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
-          <h1 className="mb-4 text-2xl font-bold text-red-600 dark:text-red-400">Error</h1>
+          <h1 className="mb-4 text-2xl font-bold text-red-600 dark:text-red-400">
+            {is404 ? 'Generation Not Found' : 'Error'}
+          </h1>
           <p className="mb-6 text-gray-600 dark:text-gray-400">
-            Failed to fetch generation: {error.message || 'Unknown error'}
+            {is404 
+              ? 'The generation you are looking for does not exist or has been deleted.'
+              : `Failed to fetch generation: ${error.message || 'Unknown error'}`
+            }
           </p>
           <Link 
             href="/generations" 
@@ -61,10 +67,13 @@ export default function GenerationPage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
-          <p className="text-gray-600 dark:text-gray-400">Generation not found</p>
+          <h1 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">Generation Not Found</h1>
+          <p className="mb-6 text-gray-600 dark:text-gray-400">
+            The generation you are looking for does not exist.
+          </p>
           <Link 
             href="/generations" 
-            className="inline-block mt-4 rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+            className="inline-block rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
           >
             Back to Generations
           </Link>
@@ -113,12 +122,21 @@ export default function GenerationPage() {
         <div className="space-y-6">
           <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
             <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Status</h2>
-            <GenerationStatus
-              generationId={generation.id}
-              status={mapGenerationStatus(generation.status)}
-              progress={generation.progress}
-              error={generation.errorMessage ?? undefined}
-            />
+            {generation.status === 'Cancelled' ? (
+              <div className="rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 p-4">
+                <p className="text-yellow-800 dark:text-yellow-200 font-medium">Cancelled</p>
+                <p className="text-yellow-700 dark:text-yellow-300 text-sm mt-1">
+                  This generation was cancelled before completion.
+                </p>
+              </div>
+            ) : (
+              <GenerationStatus
+                generationId={generation.id}
+                status={mapGenerationStatus(generation.status)}
+                progress={generation.progress}
+                error={generation.errorMessage ?? undefined}
+              />
+            )}
           </div>
 
           <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">

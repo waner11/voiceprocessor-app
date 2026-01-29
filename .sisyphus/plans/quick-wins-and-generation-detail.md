@@ -665,7 +665,7 @@ Critical Path: Housekeeping → Wave 1 → Wave 2 (Tasks 4→5→6→7→8→9)
 
 ---
 
-- [ ] 8. Populate details section from GenerationResponse
+- [x] 8. Populate details section from GenerationResponse
 
   **What to do**:
   - **RED**: Write tests:
@@ -739,7 +739,7 @@ Critical Path: Housekeeping → Wave 1 → Wave 2 (Tasks 4→5→6→7→8→9)
 
 ---
 
-- [ ] 9. Handle edge cases (404, invalid UUID, cancelled generation)
+- [x] 9. Handle edge cases (404, invalid UUID, cancelled generation)
 
   **What to do**:
   - **RED**: Write tests:
