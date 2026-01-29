@@ -520,7 +520,7 @@ Critical Path: Housekeeping → Wave 1 → Wave 2 (Tasks 4→5→6→7→8→9)
 
 ---
 
-- [ ] 6. Wire AudioPlayer component (conditional on audioUrl)
+- [x] 6. Wire AudioPlayer component (conditional on audioUrl)
 
   **What to do**:
   - **RED**: Write tests:

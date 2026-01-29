@@ -2,15 +2,28 @@
 
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { useGeneration } from '@/hooks/useGenerations';
+import { useGeneration, useSubmitFeedback } from '@/hooks/useGenerations';
 import { GenerationStatus } from '@/components/GenerationStatus/GenerationStatus';
 import { mapGenerationStatus } from '@/lib/utils/mapGenerationStatus';
 import { AudioPlayer } from '@/components/AudioPlayer/AudioPlayer';
+import { FeedbackForm } from '@/components/FeedbackForm/FeedbackForm';
 
 export default function GenerationPage() {
   const params = useParams();
   const id = params?.id as string;
   const { data: generation, error, isLoading } = useGeneration(id);
+  const submitFeedback = useSubmitFeedback();
+
+  const handleFeedbackSubmit = (feedback: { generationId: string; rating: number; tags: string[]; comment: string }) => {
+    const tagPrefix = feedback.tags.length > 0
+      ? `[Tags: ${feedback.tags.join(", ")}] `
+      : "";
+    submitFeedback.mutate({
+      id: generation!.id,
+      rating: feedback.rating,
+      comment: tagPrefix + feedback.comment,
+    });
+  };
 
   if (isLoading) {
     return (
@@ -131,10 +144,18 @@ export default function GenerationPage() {
             </dl>
           </div>
 
-          {/* Feedback */}
           <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
             <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Feedback</h2>
-            <p className="text-gray-500 dark:text-gray-400">Rate this generation...</p>
+            {generation.status === 'Completed' ? (
+              <FeedbackForm 
+                generationId={generation.id}
+                onSubmit={handleFeedbackSubmit}
+              />
+            ) : (
+              <p className="text-gray-500 dark:text-gray-400">
+                Feedback will be available once generation completes
+              </p>
+            )}
           </div>
         </div>
       </div>
