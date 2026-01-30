@@ -6,7 +6,7 @@ import { useGeneration, useSubmitFeedback } from '@/hooks/useGenerations';
 import { GenerationStatus } from '@/components/GenerationStatus/GenerationStatus';
 import { mapGenerationStatus } from '@/lib/utils/mapGenerationStatus';
 import { AudioPlayer } from '@/components/AudioPlayer/AudioPlayer';
-import { FeedbackForm } from '@/components/FeedbackForm/FeedbackForm';
+import { FeedbackForm, type FeedbackData } from '@/components/FeedbackForm/FeedbackForm';
 
 export default function GenerationPage() {
   const params = useParams();
@@ -14,12 +14,12 @@ export default function GenerationPage() {
   const { data: generation, error, isLoading } = useGeneration(id);
   const submitFeedback = useSubmitFeedback();
 
-  const handleFeedbackSubmit = (feedback: { generationId: string; rating: number; tags: string[]; comment: string }) => {
+  const handleFeedbackSubmit = (feedback: FeedbackData) => {
     const tagPrefix = feedback.tags.length > 0
       ? `[Tags: ${feedback.tags.join(", ")}] `
       : "";
     submitFeedback.mutate({
-      id: generation!.id,
+      id,
       rating: feedback.rating,
       comment: tagPrefix + feedback.comment,
     });
@@ -39,7 +39,8 @@ export default function GenerationPage() {
   }
 
   if (error) {
-    const is404 = error.message?.includes('404') || error.message?.includes('not found');
+    const errorObj = error as { code?: string | null; message?: string | null };
+    const is404 = errorObj.code === 'GENERATION_NOT_FOUND' || errorObj.code === 'NOT_FOUND';
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
@@ -148,7 +149,7 @@ export default function GenerationPage() {
               </div>
               <div className="flex justify-between">
                 <dt className="text-gray-500 dark:text-gray-400">Characters</dt>
-                <dd className="text-gray-900 dark:text-white">{generation.characterCount.toLocaleString()}</dd>
+                <dd className="text-gray-900 dark:text-white">{(generation.characterCount ?? 0).toLocaleString('en-US')}</dd>
               </div>
               <div className="flex justify-between">
                 <dt className="text-gray-500 dark:text-gray-400">Duration</dt>
