@@ -76,7 +76,7 @@ public class AuthManagerTests
         var manager = CreateManager();
         var request = new RegisterRequest
         {
-            Email = "test@example.com",
+            Email = "Test@Example.COM",
             Password = "SecurePassword123!",
             Name = "Test User"
         };
