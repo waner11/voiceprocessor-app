@@ -1,0 +1,16 @@
+# Build artifacts
+**/bin/
+**/obj/
+**/Debug/
+**/Release/
+
+# Test artifacts
+playwright-report/
+test-results/
+
+# Internal planning
+.sisyphus/
+
+# OS
+.DS_Store
+Thumbs.db
