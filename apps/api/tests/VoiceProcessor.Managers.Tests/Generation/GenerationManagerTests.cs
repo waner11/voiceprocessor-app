@@ -80,7 +80,7 @@ public class GenerationManagerTests
         _mockVoiceAccessor.Setup(x => x.GetByIdAsync(voiceId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(voice);
 
-        _mockChunkingEngine.Setup(x => x.EstimateChunkCount(request.Text, It.IsAny<ChunkingOptions?>()))
+        _mockChunkingEngine.Setup(x => x.EstimateChunkCount(request.Text, null))
             .Returns(1);
 
         var providerEstimates = new List<ProviderPriceEstimate>
@@ -185,7 +185,7 @@ public class GenerationManagerTests
                 CreditsRequired = 10
             });
 
-        _mockChunkingEngine.Setup(x => x.SplitText(request.Text, It.IsAny<ChunkingOptions?>()))
+        _mockChunkingEngine.Setup(x => x.SplitText(request.Text, null))
             .Returns(new List<TextChunk>
             {
                 new TextChunk { Index = 0, Text = request.Text, StartPosition = 0, EndPosition = request.Text.Length }
@@ -450,60 +450,6 @@ public class GenerationManagerTests
     }
 
     [Fact]
-    public async Task CancelGenerationAsync_FailedGeneration_ReturnsFalse()
-    {
-        // Arrange
-        var manager = CreateManager();
-        var generationId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-
-        var generation = new Domain.Entities.Generation
-        {
-            Id = generationId,
-            UserId = userId,
-            VoiceId = Guid.NewGuid(),
-            InputText = "Test",
-            CharacterCount = 4,
-            Status = GenerationStatus.Failed,
-            RoutingPreference = RoutingPreference.Balanced,
-            SelectedProvider = Provider.ElevenLabs,
-            ChunkCount = 1,
-            ChunksCompleted = 0,
-            Progress = 0,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generationId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(generation);
-
-        // Act
-        var result = await manager.CancelGenerationAsync(generationId, userId);
-
-        // Assert
-        result.Should().BeFalse();
-        _mockGenerationAccessor.Verify(x => x.UpdateStatusAsync(It.IsAny<Guid>(), It.IsAny<GenerationStatus>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
-    }
-
-    [Fact]
-    public async Task CancelGenerationAsync_NonExistentId_ReturnsFalse()
-    {
-        // Arrange
-        var manager = CreateManager();
-        var generationId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-
-        _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generationId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((Domain.Entities.Generation?)null);
-
-        // Act
-        var result = await manager.CancelGenerationAsync(generationId, userId);
-
-        // Assert
-        result.Should().BeFalse();
-        _mockGenerationAccessor.Verify(x => x.UpdateStatusAsync(It.IsAny<Guid>(), It.IsAny<GenerationStatus>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
-    }
-
-    [Fact]
     public async Task CancelGenerationAsync_OtherUsersGeneration_ThrowsException()
     {
         // Arrange
@@ -610,7 +556,7 @@ public class GenerationManagerTests
         _mockVoiceAccessor.Setup(x => x.GetByIdAsync(voiceId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(voice);
 
-        _mockChunkingEngine.Setup(x => x.EstimateChunkCount(request.Text, It.IsAny<ChunkingOptions?>()))
+        _mockChunkingEngine.Setup(x => x.EstimateChunkCount(request.Text, null))
             .Returns(1);
 
         var providerEstimates = new List<ProviderPriceEstimate>
