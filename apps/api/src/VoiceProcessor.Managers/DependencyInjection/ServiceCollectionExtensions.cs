@@ -6,6 +6,7 @@ using VoiceProcessor.Managers.Generation;
 using VoiceProcessor.Managers.Payment;
 using VoiceProcessor.Managers.User;
 using VoiceProcessor.Managers.Voice;
+using VoiceProcessor.Utilities.Timing;
 
 namespace VoiceProcessor.Managers.DependencyInjection;
 
@@ -32,6 +33,9 @@ public static class ServiceCollectionExtensions
 
         // Payment Manager
         services.AddScoped<IPaymentManager, PaymentManager>();
+
+        // Timing utilities
+        services.AddSingleton<IDelayService, DelayService>();
 
         return services;
     }
