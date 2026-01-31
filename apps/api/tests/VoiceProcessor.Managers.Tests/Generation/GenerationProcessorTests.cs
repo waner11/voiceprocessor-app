@@ -987,70 +987,376 @@ public class GenerationProcessorTests
         _mockGenerationAccessor.Verify(x => x.UpdateProgressAsync(generation.Id, 3, 100, It.IsAny<CancellationToken>()), Times.Once);
     }
 
-    [Fact]
-    public async Task ProcessGenerationAsync_ThreeChunks_AccumulatesCostAndDuration()
-    {
-        // Arrange
-        var generation = CreateGeneration();
-        var voice = CreateVoice(generation.VoiceId);
+     [Fact]
+     public async Task ProcessGenerationAsync_ThreeChunks_AccumulatesCostAndDuration()
+     {
+         // Arrange
+         var generation = CreateGeneration();
+         var voice = CreateVoice(generation.VoiceId);
 
-        _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generation.Id, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(generation);
-        _mockVoiceAccessor.Setup(x => x.GetByIdAsync(generation.VoiceId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(voice);
+         _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generation.Id, It.IsAny<CancellationToken>()))
+             .ReturnsAsync(generation);
+         _mockVoiceAccessor.Setup(x => x.GetByIdAsync(generation.VoiceId, It.IsAny<CancellationToken>()))
+             .ReturnsAsync(voice);
 
-        var textChunks = new List<TextChunk>
-        {
-            new TextChunk { Index = 0, Text = "Chunk 1", StartPosition = 0, EndPosition = 7 },
-            new TextChunk { Index = 1, Text = "Chunk 2", StartPosition = 7, EndPosition = 14 },
-            new TextChunk { Index = 2, Text = "Chunk 3", StartPosition = 14, EndPosition = 21 }
-        };
-        _mockChunkingEngine.Setup(x => x.SplitText(generation.InputText, It.IsAny<ChunkingOptions?>()))
-            .Returns(textChunks);
+         var textChunks = new List<TextChunk>
+         {
+             new TextChunk { Index = 0, Text = "Chunk 1", StartPosition = 0, EndPosition = 7 },
+             new TextChunk { Index = 1, Text = "Chunk 2", StartPosition = 7, EndPosition = 14 },
+             new TextChunk { Index = 2, Text = "Chunk 3", StartPosition = 14, EndPosition = 21 }
+         };
+         _mockChunkingEngine.Setup(x => x.SplitText(generation.InputText, It.IsAny<ChunkingOptions?>()))
+             .Returns(textChunks);
 
-        var mockProvider = SetupMockProvider();
-        var callCount = 0;
-        mockProvider.Setup(x => x.GenerateSpeechAsync(It.IsAny<TtsRequest>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(() =>
-            {
-                callCount++;
-                return new TtsResult
-                {
-                    Success = true,
-                    AudioData = new byte[] { 1, 2, 3 },
-                    ContentType = "audio/mpeg",
-                    DurationMs = 1000 + (callCount * 100),
-                    Cost = 0.01m + (callCount * 0.005m),
-                    CharactersProcessed = 7
-                };
-            });
+         var mockProvider = SetupMockProvider();
+         var callCount = 0;
+         mockProvider.Setup(x => x.GenerateSpeechAsync(It.IsAny<TtsRequest>(), It.IsAny<CancellationToken>()))
+             .ReturnsAsync(() =>
+             {
+                 callCount++;
+                 return new TtsResult
+                 {
+                     Success = true,
+                     AudioData = new byte[] { 1, 2, 3 },
+                     ContentType = "audio/mpeg",
+                     DurationMs = 1000 + (callCount * 100),
+                     Cost = 0.01m + (callCount * 0.005m),
+                     CharactersProcessed = 7
+                 };
+             });
 
-        SetupChunkAccessorDefaults();
+         SetupChunkAccessorDefaults();
 
-        var mergeResult = new AudioMergeResult
-        {
-            AudioData = new byte[] { 1, 2, 3 },
-            ContentType = "audio/mpeg",
-            DurationMs = 3300,
-            SizeBytes = 15
-        };
-        SetupCompletionPipeline(mergeResult);
+         var mergeResult = new AudioMergeResult
+         {
+             AudioData = new byte[] { 1, 2, 3 },
+             ContentType = "audio/mpeg",
+             DurationMs = 3300,
+             SizeBytes = 15
+         };
+         SetupCompletionPipeline(mergeResult);
 
-        var processor = CreateProcessor();
+         var processor = CreateProcessor();
 
-        // Act
-        await processor.ProcessGenerationAsync(generation.Id);
+         // Act
+         await processor.ProcessGenerationAsync(generation.Id);
 
-        // Assert
-        var expectedTotalCost = 0.015m + 0.020m + 0.025m; // 0.06m
-        _mockGenerationAccessor.Verify(x => x.SetCompletedAsync(
-            generation.Id,
-            It.IsAny<string>(),
-            "mp3",
-            3300,
-            15,
-            expectedTotalCost,
-            It.IsAny<CancellationToken>()), Times.Once);
-        _mockUserAccessor.Verify(x => x.DeductCreditsAsync(generation.UserId, 6, It.IsAny<CancellationToken>()), Times.Once);
-    }
+         // Assert
+         var expectedTotalCost = 0.015m + 0.020m + 0.025m; // 0.06m
+         _mockGenerationAccessor.Verify(x => x.SetCompletedAsync(
+             generation.Id,
+             It.IsAny<string>(),
+             "mp3",
+             3300,
+             15,
+             expectedTotalCost,
+             It.IsAny<CancellationToken>()), Times.Once);
+         _mockUserAccessor.Verify(x => x.DeductCreditsAsync(generation.UserId, 6, It.IsAny<CancellationToken>()), Times.Once);
+     }
+
+     // CREDIT DEDUCTION RESILIENCE TESTS (5 tests — including test from Task 1)
+
+     [Fact]
+     public async Task ProcessGenerationAsync_CreditDeductionFails_GenerationStaysCompleted()
+     {
+         // Arrange — same as SingleChunk happy path
+         var generation = CreateGeneration();
+         var voice = CreateVoice(generation.VoiceId);
+         var ttsResult = CreateSuccessfulTtsResult();
+
+         _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generation.Id, It.IsAny<CancellationToken>()))
+             .ReturnsAsync(generation);
+         _mockVoiceAccessor.Setup(x => x.GetByIdAsync(generation.VoiceId, It.IsAny<CancellationToken>()))
+             .ReturnsAsync(voice);
+
+         var textChunks = new List<TextChunk>
+         {
+             new TextChunk { Index = 0, Text = generation.InputText, StartPosition = 0, EndPosition = generation.InputText.Length }
+         };
+         _mockChunkingEngine.Setup(x => x.SplitText(generation.InputText, It.IsAny<ChunkingOptions?>()))
+             .Returns(textChunks);
+
+         var mockProvider = SetupMockProvider();
+         mockProvider.Setup(x => x.GenerateSpeechAsync(It.IsAny<TtsRequest>(), It.IsAny<CancellationToken>()))
+             .ReturnsAsync(ttsResult);
+
+         SetupChunkAccessorDefaults();
+
+         var mergeResult = new AudioMergeResult
+         {
+             AudioData = new byte[] { 1, 2, 3 },
+             ContentType = "audio/mpeg",
+             DurationMs = 1000,
+             SizeBytes = 5
+         };
+         SetupCompletionPipeline(mergeResult);
+
+         // OVERRIDE: Make credit deduction always fail
+         _mockUserAccessor.Setup(x => x.DeductCreditsAsync(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+             .ThrowsAsync(new InvalidOperationException("Credit service unavailable"));
+
+         _mockDelayService.Setup(x => x.DelayAsync(It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>()))
+             .Returns(Task.CompletedTask);
+
+         var processor = CreateProcessor();
+
+         // Act
+         await processor.ProcessGenerationAsync(generation.Id);
+
+         // Assert — generation stays Completed, never transitions to Failed
+         _mockGenerationAccessor.Verify(x => x.SetCompletedAsync(
+             It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(),
+             It.IsAny<int>(), It.IsAny<long>(), It.IsAny<decimal>(),
+             It.IsAny<CancellationToken>()), Times.Once);
+         _mockGenerationAccessor.Verify(x => x.UpdateStatusAsync(
+             generation.Id, GenerationStatus.Failed,
+             It.IsAny<string?>(), It.IsAny<CancellationToken>()), Times.Never);
+     }
+
+     [Fact]
+     public async Task ProcessGenerationAsync_CreditDeductionFailsOnce_RetriesAndSucceeds()
+     {
+         // Arrange — same as SingleChunk happy path
+         var generation = CreateGeneration();
+         var voice = CreateVoice(generation.VoiceId);
+         var ttsResult = CreateSuccessfulTtsResult();
+
+         _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generation.Id, It.IsAny<CancellationToken>()))
+             .ReturnsAsync(generation);
+         _mockVoiceAccessor.Setup(x => x.GetByIdAsync(generation.VoiceId, It.IsAny<CancellationToken>()))
+             .ReturnsAsync(voice);
+
+         var textChunks = new List<TextChunk>
+         {
+             new TextChunk { Index = 0, Text = generation.InputText, StartPosition = 0, EndPosition = generation.InputText.Length }
+         };
+         _mockChunkingEngine.Setup(x => x.SplitText(generation.InputText, It.IsAny<ChunkingOptions?>()))
+             .Returns(textChunks);
+
+         var mockProvider = SetupMockProvider();
+         mockProvider.Setup(x => x.GenerateSpeechAsync(It.IsAny<TtsRequest>(), It.IsAny<CancellationToken>()))
+             .ReturnsAsync(ttsResult);
+
+         SetupChunkAccessorDefaults();
+
+         var mergeResult = new AudioMergeResult
+         {
+             AudioData = new byte[] { 1, 2, 3 },
+             ContentType = "audio/mpeg",
+             DurationMs = 1000,
+             SizeBytes = 5
+         };
+         SetupCompletionPipeline(mergeResult);
+
+         // OVERRIDE: Make credit deduction fail once, then succeed
+         var callCount = 0;
+         _mockUserAccessor.Setup(x => x.DeductCreditsAsync(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+             .Returns(() =>
+             {
+                 callCount++;
+                 if (callCount == 1)
+                     throw new InvalidOperationException("Credit service temporarily unavailable");
+                 return Task.CompletedTask;
+             });
+
+         _mockDelayService.Setup(x => x.DelayAsync(It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>()))
+             .Returns(Task.CompletedTask);
+
+         var processor = CreateProcessor();
+
+         // Act
+         await processor.ProcessGenerationAsync(generation.Id);
+
+         // Assert
+         _mockUserAccessor.Verify(x => x.DeductCreditsAsync(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
+         _mockDelayService.Verify(x => x.DelayAsync(TimeSpan.FromSeconds(1), CancellationToken.None), Times.Once);
+         _mockGenerationAccessor.Verify(x => x.SetCompletedAsync(
+             It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(),
+             It.IsAny<int>(), It.IsAny<long>(), It.IsAny<decimal>(),
+             It.IsAny<CancellationToken>()), Times.Once);
+     }
+
+     [Fact]
+     public async Task ProcessGenerationAsync_CreditDeductionExhaustsRetries_GenerationStaysCompleted()
+     {
+         // Arrange — same as SingleChunk happy path
+         var generation = CreateGeneration();
+         var voice = CreateVoice(generation.VoiceId);
+         var ttsResult = CreateSuccessfulTtsResult();
+
+         _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generation.Id, It.IsAny<CancellationToken>()))
+             .ReturnsAsync(generation);
+         _mockVoiceAccessor.Setup(x => x.GetByIdAsync(generation.VoiceId, It.IsAny<CancellationToken>()))
+             .ReturnsAsync(voice);
+
+         var textChunks = new List<TextChunk>
+         {
+             new TextChunk { Index = 0, Text = generation.InputText, StartPosition = 0, EndPosition = generation.InputText.Length }
+         };
+         _mockChunkingEngine.Setup(x => x.SplitText(generation.InputText, It.IsAny<ChunkingOptions?>()))
+             .Returns(textChunks);
+
+         var mockProvider = SetupMockProvider();
+         mockProvider.Setup(x => x.GenerateSpeechAsync(It.IsAny<TtsRequest>(), It.IsAny<CancellationToken>()))
+             .ReturnsAsync(ttsResult);
+
+         SetupChunkAccessorDefaults();
+
+         var mergeResult = new AudioMergeResult
+         {
+             AudioData = new byte[] { 1, 2, 3 },
+             ContentType = "audio/mpeg",
+             DurationMs = 1000,
+             SizeBytes = 5
+         };
+         SetupCompletionPipeline(mergeResult);
+
+         // OVERRIDE: Make credit deduction always fail
+         _mockUserAccessor.Setup(x => x.DeductCreditsAsync(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+             .ThrowsAsync(new InvalidOperationException("Credit service unavailable"));
+
+         _mockDelayService.Setup(x => x.DelayAsync(It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>()))
+             .Returns(Task.CompletedTask);
+
+         var processor = CreateProcessor();
+
+         // Act
+         await processor.ProcessGenerationAsync(generation.Id);
+
+         // Assert
+         _mockUserAccessor.Verify(x => x.DeductCreditsAsync(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Exactly(4));
+         _mockGenerationAccessor.Verify(x => x.SetCompletedAsync(
+             It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(),
+             It.IsAny<int>(), It.IsAny<long>(), It.IsAny<decimal>(),
+             It.IsAny<CancellationToken>()), Times.Once);
+         _mockGenerationAccessor.Verify(x => x.UpdateStatusAsync(
+             generation.Id, GenerationStatus.Failed,
+             It.IsAny<string?>(), It.IsAny<CancellationToken>()), Times.Never);
+         _mockLogger.Verify(
+             x => x.Log(
+                 LogLevel.Critical,
+                 It.IsAny<EventId>(),
+                 It.Is<It.IsAnyType>((o, t) => o.ToString()!.Contains("BILLING")),
+                 It.IsAny<Exception?>(),
+                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+             Times.Once);
+     }
+
+     [Fact]
+     public async Task ProcessGenerationAsync_CreditDeductionRetry_UsesExpectedBackoffDelays()
+     {
+         // Arrange — same as SingleChunk happy path
+         var generation = CreateGeneration();
+         var voice = CreateVoice(generation.VoiceId);
+         var ttsResult = CreateSuccessfulTtsResult();
+
+         _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generation.Id, It.IsAny<CancellationToken>()))
+             .ReturnsAsync(generation);
+         _mockVoiceAccessor.Setup(x => x.GetByIdAsync(generation.VoiceId, It.IsAny<CancellationToken>()))
+             .ReturnsAsync(voice);
+
+         var textChunks = new List<TextChunk>
+         {
+             new TextChunk { Index = 0, Text = generation.InputText, StartPosition = 0, EndPosition = generation.InputText.Length }
+         };
+         _mockChunkingEngine.Setup(x => x.SplitText(generation.InputText, It.IsAny<ChunkingOptions?>()))
+             .Returns(textChunks);
+
+         var mockProvider = SetupMockProvider();
+         mockProvider.Setup(x => x.GenerateSpeechAsync(It.IsAny<TtsRequest>(), It.IsAny<CancellationToken>()))
+             .ReturnsAsync(ttsResult);
+
+         SetupChunkAccessorDefaults();
+
+         var mergeResult = new AudioMergeResult
+         {
+             AudioData = new byte[] { 1, 2, 3 },
+             ContentType = "audio/mpeg",
+             DurationMs = 1000,
+             SizeBytes = 5
+         };
+         SetupCompletionPipeline(mergeResult);
+
+         // OVERRIDE: Make credit deduction fail twice, succeed on third
+         var callCount = 0;
+         _mockUserAccessor.Setup(x => x.DeductCreditsAsync(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+             .Returns(() =>
+             {
+                 callCount++;
+                 if (callCount <= 2)
+                     throw new InvalidOperationException("Credit service temporarily unavailable");
+                 return Task.CompletedTask;
+             });
+
+         _mockDelayService.Setup(x => x.DelayAsync(It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>()))
+             .Returns(Task.CompletedTask);
+
+         var processor = CreateProcessor();
+
+         // Act
+         await processor.ProcessGenerationAsync(generation.Id);
+
+         // Assert
+         _mockDelayService.Verify(x => x.DelayAsync(TimeSpan.FromSeconds(1), CancellationToken.None), Times.Once);
+         _mockDelayService.Verify(x => x.DelayAsync(TimeSpan.FromSeconds(3), CancellationToken.None), Times.Once);
+         _mockDelayService.Verify(x => x.DelayAsync(TimeSpan.FromSeconds(10), CancellationToken.None), Times.Never);
+     }
+
+     [Fact]
+     public async Task ProcessGenerationAsync_CreditDeductionRetry_UsesCancellationTokenNone()
+     {
+         // Arrange — same as SingleChunk happy path
+         var generation = CreateGeneration();
+         var voice = CreateVoice(generation.VoiceId);
+         var ttsResult = CreateSuccessfulTtsResult();
+
+         _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generation.Id, It.IsAny<CancellationToken>()))
+             .ReturnsAsync(generation);
+         _mockVoiceAccessor.Setup(x => x.GetByIdAsync(generation.VoiceId, It.IsAny<CancellationToken>()))
+             .ReturnsAsync(voice);
+
+         var textChunks = new List<TextChunk>
+         {
+             new TextChunk { Index = 0, Text = generation.InputText, StartPosition = 0, EndPosition = generation.InputText.Length }
+         };
+         _mockChunkingEngine.Setup(x => x.SplitText(generation.InputText, It.IsAny<ChunkingOptions?>()))
+             .Returns(textChunks);
+
+         var mockProvider = SetupMockProvider();
+         mockProvider.Setup(x => x.GenerateSpeechAsync(It.IsAny<TtsRequest>(), It.IsAny<CancellationToken>()))
+             .ReturnsAsync(ttsResult);
+
+         SetupChunkAccessorDefaults();
+
+         var mergeResult = new AudioMergeResult
+         {
+             AudioData = new byte[] { 1, 2, 3 },
+             ContentType = "audio/mpeg",
+             DurationMs = 1000,
+             SizeBytes = 5
+         };
+         SetupCompletionPipeline(mergeResult);
+
+         // OVERRIDE: Make credit deduction fail once, then succeed
+         var callCount = 0;
+         _mockUserAccessor.Setup(x => x.DeductCreditsAsync(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+             .Returns(() =>
+             {
+                 callCount++;
+                 if (callCount == 1)
+                     throw new InvalidOperationException("Credit service temporarily unavailable");
+                 return Task.CompletedTask;
+             });
+
+         _mockDelayService.Setup(x => x.DelayAsync(It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>()))
+             .Returns(Task.CompletedTask);
+
+         var processor = CreateProcessor();
+
+         // Act
+         await processor.ProcessGenerationAsync(generation.Id);
+
+         // Assert — ALL DeductCreditsAsync calls received CancellationToken.None
+         _mockUserAccessor.Verify(x => x.DeductCreditsAsync(It.IsAny<Guid>(), It.IsAny<int>(), CancellationToken.None), Times.Exactly(2));
+     }
 }
