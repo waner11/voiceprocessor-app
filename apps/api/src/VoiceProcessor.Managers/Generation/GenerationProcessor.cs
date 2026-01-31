@@ -242,11 +242,37 @@ public class GenerationProcessor : IGenerationProcessor
                 "Generation {GenerationId} completed successfully. Cost: {Cost}, Chunks: {Chunks}",
                 generationId, totalCost, chunksCompleted);
 
-            // Deduct credits from user
-            await _userAccessor.DeductCreditsAsync(
-                generation.UserId,
-                (int)Math.Ceiling(totalCost * 100), // Convert to credits
-                cancellationToken);
+            // Deduct credits from user (isolated — must not affect generation status)
+            var creditsToDeduct = (int)Math.Ceiling(totalCost * 100);
+            for (var creditAttempt = 0; creditAttempt <= MaxChunkRetries; creditAttempt++)
+            {
+                try
+                {
+                    if (creditAttempt > 0)
+                    {
+                        _logger.LogWarning(
+                            "Retrying credit deduction for generation {GenerationId}, attempt {Attempt}/{MaxAttempts}, credits: {Credits}",
+                            generationId, creditAttempt, MaxChunkRetries, creditsToDeduct);
+                        await _delayService.DelayAsync(RetryDelays[creditAttempt - 1], CancellationToken.None);
+                    }
+
+                    await _userAccessor.DeductCreditsAsync(
+                        generation.UserId,
+                        creditsToDeduct,
+                        CancellationToken.None);
+
+                    break; // Success
+                }
+                catch (Exception ex)
+                {
+                    if (creditAttempt == MaxChunkRetries)
+                    {
+                        _logger.LogCritical(ex,
+                            "BILLING: Failed to deduct {Credits} credits from user {UserId} for completed generation {GenerationId} after {MaxAttempts} attempts. Manual reconciliation required.",
+                            creditsToDeduct, generation.UserId, generationId, MaxChunkRetries + 1);
+                    }
+                }
+            }
         }
         catch (OperationCanceledException)
         {
