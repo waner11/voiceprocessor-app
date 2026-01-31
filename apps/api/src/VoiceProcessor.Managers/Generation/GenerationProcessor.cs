@@ -5,6 +5,7 @@ using VoiceProcessor.Domain.Entities;
 using VoiceProcessor.Domain.Enums;
 using VoiceProcessor.Engines.Contracts;
 using VoiceProcessor.Managers.Contracts;
+using VoiceProcessor.Utilities.Timing;
 
 namespace VoiceProcessor.Managers.Generation;
 
@@ -26,6 +27,7 @@ public class GenerationProcessor : IGenerationProcessor
     private readonly IChunkingEngine _chunkingEngine;
     private readonly IAudioMergeEngine _audioMergeEngine;
     private readonly ILogger<GenerationProcessor> _logger;
+    private readonly IDelayService _delayService;
 
     public GenerationProcessor(
         IGenerationAccessor generationAccessor,
@@ -36,7 +38,8 @@ public class GenerationProcessor : IGenerationProcessor
         IStorageAccessor storageAccessor,
         IChunkingEngine chunkingEngine,
         IAudioMergeEngine audioMergeEngine,
-        ILogger<GenerationProcessor> logger)
+        ILogger<GenerationProcessor> logger,
+        IDelayService delayService)
     {
         _generationAccessor = generationAccessor;
         _chunkAccessor = chunkAccessor;
@@ -47,6 +50,7 @@ public class GenerationProcessor : IGenerationProcessor
         _chunkingEngine = chunkingEngine;
         _audioMergeEngine = audioMergeEngine;
         _logger = logger;
+        _delayService = delayService;
     }
 
     public async Task ProcessGenerationAsync(Guid generationId, CancellationToken cancellationToken = default)
@@ -129,7 +133,7 @@ public class GenerationProcessor : IGenerationProcessor
                             _logger.LogInformation(
                                 "Retrying chunk {ChunkIndex} for generation {GenerationId}, attempt {Attempt}",
                                 i, generationId, attempt);
-                            await Task.Delay(RetryDelays[attempt - 1], cancellationToken);
+                            await _delayService.DelayAsync(RetryDelays[attempt - 1], cancellationToken);
                         }
 
                         // Call TTS provider
