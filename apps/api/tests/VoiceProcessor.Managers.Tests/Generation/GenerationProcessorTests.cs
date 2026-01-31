@@ -74,11 +74,11 @@ public class GenerationProcessorTests
         };
     }
 
-    private Domain.Entities.Voice CreateVoice()
+    private Domain.Entities.Voice CreateVoice(Guid? id = null)
     {
         return new Domain.Entities.Voice
         {
-            Id = Guid.NewGuid(),
+            Id = id ?? Guid.NewGuid(),
             Name = "Test Voice",
             Provider = Provider.ElevenLabs,
             ProviderVoiceId = "voice_123",
@@ -98,6 +98,38 @@ public class GenerationProcessorTests
             Cost = 0.01m,
             CharactersProcessed = 24
         };
+    }
+
+    private void SetupChunkAccessorDefaults()
+    {
+        _mockChunkAccessor.Setup(x => x.CreateAsync(It.IsAny<GenerationChunk>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((GenerationChunk chunk, CancellationToken ct) => chunk);
+        _mockChunkAccessor.Setup(x => x.UpdateAsync(It.IsAny<GenerationChunk>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+    }
+
+    private Mock<ITtsProviderAccessor> SetupMockProvider(Provider provider = Provider.ElevenLabs)
+    {
+        var mockProvider = new Mock<ITtsProviderAccessor>();
+        mockProvider.Setup(x => x.Provider).Returns(provider);
+        _mockProviderFactory.Setup(x => x.GetProvider(provider))
+            .Returns(mockProvider.Object);
+        return mockProvider;
+    }
+
+    private void SetupCompletionPipeline(
+        AudioMergeResult mergeResult,
+        string storageUrl = "https://storage.example.com/chunk.mp3")
+    {
+        _mockStorageAccessor.Setup(x => x.UploadAsync(It.IsAny<StorageUploadRequest>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(storageUrl);
+        _mockAudioMergeEngine.Setup(x => x.MergeAudioChunksAsync(
+            It.IsAny<IReadOnlyList<byte[]>>(),
+            It.IsAny<AudioMergeOptions>(),
+            It.IsAny<CancellationToken>()))
+            .ReturnsAsync(mergeResult);
+        _mockUserAccessor.Setup(x => x.DeductCreditsAsync(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
     }
 
     // STATE MACHINE TESTS (4 tests)
@@ -184,7 +216,7 @@ public class GenerationProcessorTests
     {
         // Arrange
         var generation = CreateGeneration();
-        var voice = CreateVoice();
+        var voice = CreateVoice(generation.VoiceId);
         var ttsResult = CreateSuccessfulTtsResult();
 
         _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generation.Id, It.IsAny<CancellationToken>()))
@@ -199,20 +231,11 @@ public class GenerationProcessorTests
         _mockChunkingEngine.Setup(x => x.SplitText(generation.InputText, It.IsAny<ChunkingOptions?>()))
             .Returns(textChunks);
 
-        var mockProvider = new Mock<ITtsProviderAccessor>();
-        mockProvider.Setup(x => x.Provider).Returns(Provider.ElevenLabs);
+        var mockProvider = SetupMockProvider();
         mockProvider.Setup(x => x.GenerateSpeechAsync(It.IsAny<TtsRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(ttsResult);
-        _mockProviderFactory.Setup(x => x.GetProvider(Provider.ElevenLabs))
-            .Returns(mockProvider.Object);
 
-        _mockChunkAccessor.Setup(x => x.CreateAsync(It.IsAny<GenerationChunk>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((GenerationChunk chunk, CancellationToken ct) => chunk);
-        _mockChunkAccessor.Setup(x => x.UpdateAsync(It.IsAny<GenerationChunk>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
-
-        _mockStorageAccessor.Setup(x => x.UploadAsync(It.IsAny<StorageUploadRequest>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync("https://storage.example.com/chunk.mp3");
+        SetupChunkAccessorDefaults();
 
         var mergeResult = new AudioMergeResult
         {
@@ -221,14 +244,7 @@ public class GenerationProcessorTests
             DurationMs = 1000,
             SizeBytes = 5
         };
-        _mockAudioMergeEngine.Setup(x => x.MergeAudioChunksAsync(
-            It.IsAny<IReadOnlyList<byte[]>>(),
-            It.IsAny<AudioMergeOptions>(),
-            It.IsAny<CancellationToken>()))
-            .ReturnsAsync(mergeResult);
-
-        _mockUserAccessor.Setup(x => x.DeductCreditsAsync(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
+        SetupCompletionPipeline(mergeResult);
 
         var processor = CreateProcessor();
 
@@ -257,7 +273,7 @@ public class GenerationProcessorTests
     {
         // Arrange
         var generation = CreateGeneration();
-        var voice = CreateVoice();
+        var voice = CreateVoice(generation.VoiceId);
         var ttsResult = CreateSuccessfulTtsResult();
 
         _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generation.Id, It.IsAny<CancellationToken>()))
@@ -274,20 +290,11 @@ public class GenerationProcessorTests
         _mockChunkingEngine.Setup(x => x.SplitText(generation.InputText, It.IsAny<ChunkingOptions?>()))
             .Returns(textChunks);
 
-        var mockProvider = new Mock<ITtsProviderAccessor>();
-        mockProvider.Setup(x => x.Provider).Returns(Provider.ElevenLabs);
+        var mockProvider = SetupMockProvider();
         mockProvider.Setup(x => x.GenerateSpeechAsync(It.IsAny<TtsRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(ttsResult);
-        _mockProviderFactory.Setup(x => x.GetProvider(Provider.ElevenLabs))
-            .Returns(mockProvider.Object);
 
-        _mockChunkAccessor.Setup(x => x.CreateAsync(It.IsAny<GenerationChunk>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((GenerationChunk chunk, CancellationToken ct) => chunk);
-        _mockChunkAccessor.Setup(x => x.UpdateAsync(It.IsAny<GenerationChunk>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
-
-        _mockStorageAccessor.Setup(x => x.UploadAsync(It.IsAny<StorageUploadRequest>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync("https://storage.example.com/chunk.mp3");
+        SetupChunkAccessorDefaults();
 
         var mergeResult = new AudioMergeResult
         {
@@ -296,14 +303,7 @@ public class GenerationProcessorTests
             DurationMs = 3000,
             SizeBytes = 15
         };
-        _mockAudioMergeEngine.Setup(x => x.MergeAudioChunksAsync(
-            It.IsAny<IReadOnlyList<byte[]>>(),
-            It.IsAny<AudioMergeOptions>(),
-            It.IsAny<CancellationToken>()))
-            .ReturnsAsync(mergeResult);
-
-        _mockUserAccessor.Setup(x => x.DeductCreditsAsync(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
+        SetupCompletionPipeline(mergeResult);
 
         var processor = CreateProcessor();
 
@@ -325,7 +325,7 @@ public class GenerationProcessorTests
     {
         // Arrange
         var generation = CreateGeneration();
-        var voice = CreateVoice();
+        var voice = CreateVoice(generation.VoiceId);
         var ttsResult = new TtsResult
         {
             Success = true,
@@ -348,20 +348,11 @@ public class GenerationProcessorTests
         _mockChunkingEngine.Setup(x => x.SplitText(generation.InputText, It.IsAny<ChunkingOptions?>()))
             .Returns(textChunks);
 
-        var mockProvider = new Mock<ITtsProviderAccessor>();
-        mockProvider.Setup(x => x.Provider).Returns(Provider.ElevenLabs);
+        var mockProvider = SetupMockProvider();
         mockProvider.Setup(x => x.GenerateSpeechAsync(It.IsAny<TtsRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(ttsResult);
-        _mockProviderFactory.Setup(x => x.GetProvider(Provider.ElevenLabs))
-            .Returns(mockProvider.Object);
 
-        _mockChunkAccessor.Setup(x => x.CreateAsync(It.IsAny<GenerationChunk>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((GenerationChunk chunk, CancellationToken ct) => chunk);
-        _mockChunkAccessor.Setup(x => x.UpdateAsync(It.IsAny<GenerationChunk>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
-
-        _mockStorageAccessor.Setup(x => x.UploadAsync(It.IsAny<StorageUploadRequest>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync("https://storage.example.com/audio.mp3");
+        SetupChunkAccessorDefaults();
 
         var mergeResult = new AudioMergeResult
         {
@@ -370,14 +361,7 @@ public class GenerationProcessorTests
             DurationMs = 2500,
             SizeBytes = 12345
         };
-        _mockAudioMergeEngine.Setup(x => x.MergeAudioChunksAsync(
-            It.IsAny<IReadOnlyList<byte[]>>(),
-            It.IsAny<AudioMergeOptions>(),
-            It.IsAny<CancellationToken>()))
-            .ReturnsAsync(mergeResult);
-
-        _mockUserAccessor.Setup(x => x.DeductCreditsAsync(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
+        SetupCompletionPipeline(mergeResult, "https://storage.example.com/audio.mp3");
 
         var processor = CreateProcessor();
 
@@ -403,7 +387,7 @@ public class GenerationProcessorTests
     {
         // Arrange
         var generation = CreateGeneration();
-        var voice = CreateVoice();
+        var voice = CreateVoice(generation.VoiceId);
         var ttsResult = CreateSuccessfulTtsResult();
 
         _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generation.Id, It.IsAny<CancellationToken>()))
@@ -418,8 +402,7 @@ public class GenerationProcessorTests
         _mockChunkingEngine.Setup(x => x.SplitText(generation.InputText, It.IsAny<ChunkingOptions?>()))
             .Returns(textChunks);
 
-        var mockProvider = new Mock<ITtsProviderAccessor>();
-        mockProvider.Setup(x => x.Provider).Returns(Provider.ElevenLabs);
+        var mockProvider = SetupMockProvider();
         var callCount = 0;
         mockProvider.Setup(x => x.GenerateSpeechAsync(It.IsAny<TtsRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(() =>
@@ -429,16 +412,8 @@ public class GenerationProcessorTests
                     throw new InvalidOperationException("TTS provider temporarily unavailable");
                 return ttsResult;
             });
-        _mockProviderFactory.Setup(x => x.GetProvider(Provider.ElevenLabs))
-            .Returns(mockProvider.Object);
 
-        _mockChunkAccessor.Setup(x => x.CreateAsync(It.IsAny<GenerationChunk>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((GenerationChunk chunk, CancellationToken ct) => chunk);
-        _mockChunkAccessor.Setup(x => x.UpdateAsync(It.IsAny<GenerationChunk>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
-
-        _mockStorageAccessor.Setup(x => x.UploadAsync(It.IsAny<StorageUploadRequest>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync("https://storage.example.com/chunk.mp3");
+        SetupChunkAccessorDefaults();
 
         var mergeResult = new AudioMergeResult
         {
@@ -447,16 +422,9 @@ public class GenerationProcessorTests
             DurationMs = 1000,
             SizeBytes = 5
         };
-        _mockAudioMergeEngine.Setup(x => x.MergeAudioChunksAsync(
-            It.IsAny<IReadOnlyList<byte[]>>(),
-            It.IsAny<AudioMergeOptions>(),
-            It.IsAny<CancellationToken>()))
-            .ReturnsAsync(mergeResult);
+        SetupCompletionPipeline(mergeResult);
 
         _mockDelayService.Setup(x => x.DelayAsync(It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
-
-        _mockUserAccessor.Setup(x => x.DeductCreditsAsync(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
         var processor = CreateProcessor();
@@ -482,7 +450,7 @@ public class GenerationProcessorTests
     {
         // Arrange
         var generation = CreateGeneration();
-        var voice = CreateVoice();
+        var voice = CreateVoice(generation.VoiceId);
         var ttsResult = CreateSuccessfulTtsResult();
 
         _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generation.Id, It.IsAny<CancellationToken>()))
@@ -497,8 +465,7 @@ public class GenerationProcessorTests
         _mockChunkingEngine.Setup(x => x.SplitText(generation.InputText, It.IsAny<ChunkingOptions?>()))
             .Returns(textChunks);
 
-        var mockProvider = new Mock<ITtsProviderAccessor>();
-        mockProvider.Setup(x => x.Provider).Returns(Provider.ElevenLabs);
+        var mockProvider = SetupMockProvider();
         var callCount = 0;
         mockProvider.Setup(x => x.GenerateSpeechAsync(It.IsAny<TtsRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(() =>
@@ -508,16 +475,8 @@ public class GenerationProcessorTests
                     throw new InvalidOperationException("TTS provider temporarily unavailable");
                 return ttsResult;
             });
-        _mockProviderFactory.Setup(x => x.GetProvider(Provider.ElevenLabs))
-            .Returns(mockProvider.Object);
 
-        _mockChunkAccessor.Setup(x => x.CreateAsync(It.IsAny<GenerationChunk>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((GenerationChunk chunk, CancellationToken ct) => chunk);
-        _mockChunkAccessor.Setup(x => x.UpdateAsync(It.IsAny<GenerationChunk>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
-
-        _mockStorageAccessor.Setup(x => x.UploadAsync(It.IsAny<StorageUploadRequest>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync("https://storage.example.com/chunk.mp3");
+        SetupChunkAccessorDefaults();
 
         var mergeResult = new AudioMergeResult
         {
@@ -526,16 +485,9 @@ public class GenerationProcessorTests
             DurationMs = 1000,
             SizeBytes = 5
         };
-        _mockAudioMergeEngine.Setup(x => x.MergeAudioChunksAsync(
-            It.IsAny<IReadOnlyList<byte[]>>(),
-            It.IsAny<AudioMergeOptions>(),
-            It.IsAny<CancellationToken>()))
-            .ReturnsAsync(mergeResult);
+        SetupCompletionPipeline(mergeResult);
 
         _mockDelayService.Setup(x => x.DelayAsync(It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
-
-        _mockUserAccessor.Setup(x => x.DeductCreditsAsync(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
         var processor = CreateProcessor();
@@ -562,7 +514,7 @@ public class GenerationProcessorTests
     {
         // Arrange
         var generation = CreateGeneration();
-        var voice = CreateVoice();
+        var voice = CreateVoice(generation.VoiceId);
         var ttsResult = CreateSuccessfulTtsResult();
 
         _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generation.Id, It.IsAny<CancellationToken>()))
@@ -577,8 +529,7 @@ public class GenerationProcessorTests
         _mockChunkingEngine.Setup(x => x.SplitText(generation.InputText, It.IsAny<ChunkingOptions?>()))
             .Returns(textChunks);
 
-        var mockProvider = new Mock<ITtsProviderAccessor>();
-        mockProvider.Setup(x => x.Provider).Returns(Provider.ElevenLabs);
+        var mockProvider = SetupMockProvider();
         var callCount = 0;
         mockProvider.Setup(x => x.GenerateSpeechAsync(It.IsAny<TtsRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(() =>
@@ -588,16 +539,8 @@ public class GenerationProcessorTests
                     throw new InvalidOperationException("TTS provider temporarily unavailable");
                 return ttsResult;
             });
-        _mockProviderFactory.Setup(x => x.GetProvider(Provider.ElevenLabs))
-            .Returns(mockProvider.Object);
 
-        _mockChunkAccessor.Setup(x => x.CreateAsync(It.IsAny<GenerationChunk>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((GenerationChunk chunk, CancellationToken ct) => chunk);
-        _mockChunkAccessor.Setup(x => x.UpdateAsync(It.IsAny<GenerationChunk>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
-
-        _mockStorageAccessor.Setup(x => x.UploadAsync(It.IsAny<StorageUploadRequest>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync("https://storage.example.com/chunk.mp3");
+        SetupChunkAccessorDefaults();
 
         var mergeResult = new AudioMergeResult
         {
@@ -606,16 +549,9 @@ public class GenerationProcessorTests
             DurationMs = 1000,
             SizeBytes = 5
         };
-        _mockAudioMergeEngine.Setup(x => x.MergeAudioChunksAsync(
-            It.IsAny<IReadOnlyList<byte[]>>(),
-            It.IsAny<AudioMergeOptions>(),
-            It.IsAny<CancellationToken>()))
-            .ReturnsAsync(mergeResult);
+        SetupCompletionPipeline(mergeResult);
 
         _mockDelayService.Setup(x => x.DelayAsync(It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
-
-        _mockUserAccessor.Setup(x => x.DeductCreditsAsync(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
         var processor = CreateProcessor();
@@ -643,7 +579,7 @@ public class GenerationProcessorTests
     {
         // Arrange
         var generation = CreateGeneration();
-        var voice = CreateVoice();
+        var voice = CreateVoice(generation.VoiceId);
 
         _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generation.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(generation);
@@ -657,17 +593,11 @@ public class GenerationProcessorTests
         _mockChunkingEngine.Setup(x => x.SplitText(generation.InputText, It.IsAny<ChunkingOptions?>()))
             .Returns(textChunks);
 
-        var mockProvider = new Mock<ITtsProviderAccessor>();
-        mockProvider.Setup(x => x.Provider).Returns(Provider.ElevenLabs);
+        var mockProvider = SetupMockProvider();
         mockProvider.Setup(x => x.GenerateSpeechAsync(It.IsAny<TtsRequest>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(new InvalidOperationException("TTS provider permanently unavailable"));
-        _mockProviderFactory.Setup(x => x.GetProvider(Provider.ElevenLabs))
-            .Returns(mockProvider.Object);
 
-        _mockChunkAccessor.Setup(x => x.CreateAsync(It.IsAny<GenerationChunk>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((GenerationChunk chunk, CancellationToken ct) => chunk);
-        _mockChunkAccessor.Setup(x => x.UpdateAsync(It.IsAny<GenerationChunk>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
+        SetupChunkAccessorDefaults();
 
         _mockDelayService.Setup(x => x.DelayAsync(It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
@@ -694,7 +624,7 @@ public class GenerationProcessorTests
     {
         // Arrange
         var generation = CreateGeneration();
-        var voice = CreateVoice();
+        var voice = CreateVoice(generation.VoiceId);
         var ttsResult = CreateSuccessfulTtsResult();
 
         _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generation.Id, It.IsAny<CancellationToken>()))
@@ -709,8 +639,7 @@ public class GenerationProcessorTests
         _mockChunkingEngine.Setup(x => x.SplitText(generation.InputText, It.IsAny<ChunkingOptions?>()))
             .Returns(textChunks);
 
-        var mockProvider = new Mock<ITtsProviderAccessor>();
-        mockProvider.Setup(x => x.Provider).Returns(Provider.ElevenLabs);
+        var mockProvider = SetupMockProvider();
         var callCount = 0;
         mockProvider.Setup(x => x.GenerateSpeechAsync(It.IsAny<TtsRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(() =>
@@ -720,16 +649,8 @@ public class GenerationProcessorTests
                     throw new InvalidOperationException("TTS provider temporarily unavailable");
                 return ttsResult;
             });
-        _mockProviderFactory.Setup(x => x.GetProvider(Provider.ElevenLabs))
-            .Returns(mockProvider.Object);
 
-        _mockChunkAccessor.Setup(x => x.CreateAsync(It.IsAny<GenerationChunk>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((GenerationChunk chunk, CancellationToken ct) => chunk);
-        _mockChunkAccessor.Setup(x => x.UpdateAsync(It.IsAny<GenerationChunk>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
-
-        _mockStorageAccessor.Setup(x => x.UploadAsync(It.IsAny<StorageUploadRequest>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync("https://storage.example.com/chunk.mp3");
+        SetupChunkAccessorDefaults();
 
         var mergeResult = new AudioMergeResult
         {
@@ -738,16 +659,9 @@ public class GenerationProcessorTests
             DurationMs = 1000,
             SizeBytes = 5
         };
-        _mockAudioMergeEngine.Setup(x => x.MergeAudioChunksAsync(
-            It.IsAny<IReadOnlyList<byte[]>>(),
-            It.IsAny<AudioMergeOptions>(),
-            It.IsAny<CancellationToken>()))
-            .ReturnsAsync(mergeResult);
+        SetupCompletionPipeline(mergeResult);
 
         _mockDelayService.Setup(x => x.DelayAsync(It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
-
-        _mockUserAccessor.Setup(x => x.DeductCreditsAsync(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
         var processor = CreateProcessor();
@@ -768,7 +682,7 @@ public class GenerationProcessorTests
     {
         // Arrange
         var generation = CreateGeneration();
-        var voice = CreateVoice();
+        var voice = CreateVoice(generation.VoiceId);
 
         _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generation.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(generation);
@@ -782,12 +696,9 @@ public class GenerationProcessorTests
         _mockChunkingEngine.Setup(x => x.SplitText(generation.InputText, It.IsAny<ChunkingOptions?>()))
             .Returns(textChunks);
 
-        var mockProvider = new Mock<ITtsProviderAccessor>();
-        mockProvider.Setup(x => x.Provider).Returns(Provider.ElevenLabs);
+        var mockProvider = SetupMockProvider();
         mockProvider.Setup(x => x.GenerateSpeechAsync(It.IsAny<TtsRequest>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(new OperationCanceledException());
-        _mockProviderFactory.Setup(x => x.GetProvider(Provider.ElevenLabs))
-            .Returns(mockProvider.Object);
 
         _mockChunkAccessor.Setup(x => x.CreateAsync(It.IsAny<GenerationChunk>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((GenerationChunk chunk, CancellationToken ct) => chunk);
@@ -811,7 +722,7 @@ public class GenerationProcessorTests
     {
         // Arrange
         var generation = CreateGeneration();
-        var voice = CreateVoice();
+        var voice = CreateVoice(generation.VoiceId);
 
         _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generation.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(generation);
@@ -825,10 +736,7 @@ public class GenerationProcessorTests
         _mockChunkingEngine.Setup(x => x.SplitText(generation.InputText, It.IsAny<ChunkingOptions?>()))
             .Returns(textChunks);
 
-        var mockProvider = new Mock<ITtsProviderAccessor>();
-        mockProvider.Setup(x => x.Provider).Returns(Provider.ElevenLabs);
-        _mockProviderFactory.Setup(x => x.GetProvider(Provider.ElevenLabs))
-            .Returns(mockProvider.Object);
+        var mockProvider = SetupMockProvider();
 
         var processor = CreateProcessor();
         var cts = new CancellationTokenSource();
@@ -878,7 +786,7 @@ public class GenerationProcessorTests
     {
         // Arrange
         var generation = CreateGeneration();
-        var voice = CreateVoice();
+        var voice = CreateVoice(generation.VoiceId);
 
         _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generation.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(generation);
@@ -892,21 +800,15 @@ public class GenerationProcessorTests
         _mockChunkingEngine.Setup(x => x.SplitText(generation.InputText, It.IsAny<ChunkingOptions?>()))
             .Returns(textChunks);
 
-        var mockProvider = new Mock<ITtsProviderAccessor>();
-        mockProvider.Setup(x => x.Provider).Returns(Provider.ElevenLabs);
+        var mockProvider = SetupMockProvider();
         mockProvider.Setup(x => x.GenerateSpeechAsync(It.IsAny<TtsRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new TtsResult
             {
                 Success = false,
                 ErrorMessage = "TTS generation failed"
             });
-        _mockProviderFactory.Setup(x => x.GetProvider(Provider.ElevenLabs))
-            .Returns(mockProvider.Object);
 
-        _mockChunkAccessor.Setup(x => x.CreateAsync(It.IsAny<GenerationChunk>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((GenerationChunk chunk, CancellationToken ct) => chunk);
-        _mockChunkAccessor.Setup(x => x.UpdateAsync(It.IsAny<GenerationChunk>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
+        SetupChunkAccessorDefaults();
 
         _mockDelayService.Setup(x => x.DelayAsync(It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
@@ -930,7 +832,7 @@ public class GenerationProcessorTests
     {
         // Arrange
         var generation = CreateGeneration();
-        var voice = CreateVoice();
+        var voice = CreateVoice(generation.VoiceId);
         var ttsResult = CreateSuccessfulTtsResult();
 
         _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generation.Id, It.IsAny<CancellationToken>()))
@@ -945,17 +847,11 @@ public class GenerationProcessorTests
         _mockChunkingEngine.Setup(x => x.SplitText(generation.InputText, It.IsAny<ChunkingOptions?>()))
             .Returns(textChunks);
 
-        var mockProvider = new Mock<ITtsProviderAccessor>();
-        mockProvider.Setup(x => x.Provider).Returns(Provider.ElevenLabs);
+        var mockProvider = SetupMockProvider();
         mockProvider.Setup(x => x.GenerateSpeechAsync(It.IsAny<TtsRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(ttsResult);
-        _mockProviderFactory.Setup(x => x.GetProvider(Provider.ElevenLabs))
-            .Returns(mockProvider.Object);
 
-        _mockChunkAccessor.Setup(x => x.CreateAsync(It.IsAny<GenerationChunk>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((GenerationChunk chunk, CancellationToken ct) => chunk);
-        _mockChunkAccessor.Setup(x => x.UpdateAsync(It.IsAny<GenerationChunk>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
+        SetupChunkAccessorDefaults();
 
         _mockStorageAccessor.Setup(x => x.UploadAsync(It.IsAny<StorageUploadRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync("https://storage.example.com/chunk.mp3");
@@ -984,7 +880,7 @@ public class GenerationProcessorTests
     {
         // Arrange
         var generation = CreateGeneration();
-        var voice = CreateVoice();
+        var voice = CreateVoice(generation.VoiceId);
         var ttsResult = CreateSuccessfulTtsResult();
 
         _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generation.Id, It.IsAny<CancellationToken>()))
@@ -999,17 +895,11 @@ public class GenerationProcessorTests
         _mockChunkingEngine.Setup(x => x.SplitText(generation.InputText, It.IsAny<ChunkingOptions?>()))
             .Returns(textChunks);
 
-        var mockProvider = new Mock<ITtsProviderAccessor>();
-        mockProvider.Setup(x => x.Provider).Returns(Provider.ElevenLabs);
+        var mockProvider = SetupMockProvider();
         mockProvider.Setup(x => x.GenerateSpeechAsync(It.IsAny<TtsRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(ttsResult);
-        _mockProviderFactory.Setup(x => x.GetProvider(Provider.ElevenLabs))
-            .Returns(mockProvider.Object);
 
-        _mockChunkAccessor.Setup(x => x.CreateAsync(It.IsAny<GenerationChunk>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((GenerationChunk chunk, CancellationToken ct) => chunk);
-        _mockChunkAccessor.Setup(x => x.UpdateAsync(It.IsAny<GenerationChunk>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
+        SetupChunkAccessorDefaults();
 
         var callCount = 0;
         _mockStorageAccessor.Setup(x => x.UploadAsync(It.IsAny<StorageUploadRequest>(), It.IsAny<CancellationToken>()))
@@ -1054,7 +944,7 @@ public class GenerationProcessorTests
     {
         // Arrange
         var generation = CreateGeneration();
-        var voice = CreateVoice();
+        var voice = CreateVoice(generation.VoiceId);
         var ttsResult = CreateSuccessfulTtsResult();
 
         _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generation.Id, It.IsAny<CancellationToken>()))
@@ -1071,20 +961,11 @@ public class GenerationProcessorTests
         _mockChunkingEngine.Setup(x => x.SplitText(generation.InputText, It.IsAny<ChunkingOptions?>()))
             .Returns(textChunks);
 
-        var mockProvider = new Mock<ITtsProviderAccessor>();
-        mockProvider.Setup(x => x.Provider).Returns(Provider.ElevenLabs);
+        var mockProvider = SetupMockProvider();
         mockProvider.Setup(x => x.GenerateSpeechAsync(It.IsAny<TtsRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(ttsResult);
-        _mockProviderFactory.Setup(x => x.GetProvider(Provider.ElevenLabs))
-            .Returns(mockProvider.Object);
 
-        _mockChunkAccessor.Setup(x => x.CreateAsync(It.IsAny<GenerationChunk>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((GenerationChunk chunk, CancellationToken ct) => chunk);
-        _mockChunkAccessor.Setup(x => x.UpdateAsync(It.IsAny<GenerationChunk>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
-
-        _mockStorageAccessor.Setup(x => x.UploadAsync(It.IsAny<StorageUploadRequest>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync("https://storage.example.com/chunk.mp3");
+        SetupChunkAccessorDefaults();
 
         var mergeResult = new AudioMergeResult
         {
@@ -1093,14 +974,7 @@ public class GenerationProcessorTests
             DurationMs = 3000,
             SizeBytes = 15
         };
-        _mockAudioMergeEngine.Setup(x => x.MergeAudioChunksAsync(
-            It.IsAny<IReadOnlyList<byte[]>>(),
-            It.IsAny<AudioMergeOptions>(),
-            It.IsAny<CancellationToken>()))
-            .ReturnsAsync(mergeResult);
-
-        _mockUserAccessor.Setup(x => x.DeductCreditsAsync(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
+        SetupCompletionPipeline(mergeResult);
 
         var processor = CreateProcessor();
 
@@ -1118,7 +992,7 @@ public class GenerationProcessorTests
     {
         // Arrange
         var generation = CreateGeneration();
-        var voice = CreateVoice();
+        var voice = CreateVoice(generation.VoiceId);
 
         _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generation.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(generation);
@@ -1134,8 +1008,7 @@ public class GenerationProcessorTests
         _mockChunkingEngine.Setup(x => x.SplitText(generation.InputText, It.IsAny<ChunkingOptions?>()))
             .Returns(textChunks);
 
-        var mockProvider = new Mock<ITtsProviderAccessor>();
-        mockProvider.Setup(x => x.Provider).Returns(Provider.ElevenLabs);
+        var mockProvider = SetupMockProvider();
         var callCount = 0;
         mockProvider.Setup(x => x.GenerateSpeechAsync(It.IsAny<TtsRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(() =>
@@ -1151,16 +1024,8 @@ public class GenerationProcessorTests
                     CharactersProcessed = 7
                 };
             });
-        _mockProviderFactory.Setup(x => x.GetProvider(Provider.ElevenLabs))
-            .Returns(mockProvider.Object);
 
-        _mockChunkAccessor.Setup(x => x.CreateAsync(It.IsAny<GenerationChunk>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((GenerationChunk chunk, CancellationToken ct) => chunk);
-        _mockChunkAccessor.Setup(x => x.UpdateAsync(It.IsAny<GenerationChunk>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
-
-        _mockStorageAccessor.Setup(x => x.UploadAsync(It.IsAny<StorageUploadRequest>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync("https://storage.example.com/chunk.mp3");
+        SetupChunkAccessorDefaults();
 
         var mergeResult = new AudioMergeResult
         {
@@ -1169,14 +1034,7 @@ public class GenerationProcessorTests
             DurationMs = 3300,
             SizeBytes = 15
         };
-        _mockAudioMergeEngine.Setup(x => x.MergeAudioChunksAsync(
-            It.IsAny<IReadOnlyList<byte[]>>(),
-            It.IsAny<AudioMergeOptions>(),
-            It.IsAny<CancellationToken>()))
-            .ReturnsAsync(mergeResult);
-
-        _mockUserAccessor.Setup(x => x.DeductCreditsAsync(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
+        SetupCompletionPipeline(mergeResult);
 
         var processor = CreateProcessor();
 

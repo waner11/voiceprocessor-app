@@ -35,6 +35,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPaymentManager, PaymentManager>();
 
         // Timing utilities
+        // TODO: Move IDelayService registration to a VoiceProcessor.Utilities DI module when more utility services are added
         services.AddSingleton<IDelayService, DelayService>();
 
         return services;
