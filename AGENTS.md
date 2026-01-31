@@ -56,6 +56,12 @@ pnpm dev
 Terminal 1: `cd apps/api && dotnet run`
 Terminal 2: `cd apps/web && pnpm dev`
 
+## Development Methodology
+
+This project follows **Test-Driven Development (TDD)**. When implementing features or fixing bugs,
+use the `tdd` skill (`load_skills=["tdd"]`) and follow the Red→Green→Refactor cycle:
+write a failing test first, write minimal code to pass, then refactor.
+
 ## Git Workflow
 
 When working on features that touch both API and Web:

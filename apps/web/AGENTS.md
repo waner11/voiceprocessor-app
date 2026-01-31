@@ -12,6 +12,12 @@ bd close <id>         # Complete work
 bd sync               # Sync with git
 ```
 
+## Development Methodology
+
+This project follows **TDD (Test-Driven Development)**. Use `load_skills=["tdd"]` for all implementation tasks.
+Write a failing test first, make it pass with minimal code, then refactor. See the `tdd` skill for the full
+Red→Green→Refactor workflow, Vitest/Testing Library patterns, and test commands.
+
 ## Starting Work on an Issue
 
 **MANDATORY WORKFLOW** - Before working on ANY issue:

@@ -25,7 +25,13 @@ bd sync                   # Sync with git
 
 ---
 
-## 2. Build, Test, & Run
+## 2. Development Methodology
+
+This project follows **TDD (Test-Driven Development)**. Use `load_skills=["tdd"]` for all implementation tasks.
+Write a failing test first, make it pass with minimal code, then refactor. See the `tdd` skill for the full
+Red→Green→Refactor workflow, xUnit/Moq/FluentAssertions patterns, and test commands.
+
+## 3. Build, Test, & Run
 
 Execute these commands from the repository root.
 
@@ -71,7 +77,7 @@ dotnet ef database update --project src/VoiceProcessor.Accessors --startup-proje
 
 ---
 
-## 3. Code Style & Conventions
+## 4. Code Style & Conventions
 
 ### General Guidelines
 - **Framework**: Use C# 14 features. Target `.net10.0`.
@@ -116,11 +122,11 @@ _logger.LogInformation($"Processing chunk {chunkId} for generation {genId}");
 
 ---
 
-## 4. Work Session Workflow
+## 5. Work Session Workflow
 
 This section covers the complete git workflow from starting work to finishing and creating a pull request.
 
-### 4.1 Starting Work
+### 5.1 Starting Work
 
 Before you begin coding, follow these steps to set up your feature branch:
 
@@ -153,7 +159,7 @@ Before you begin coding, follow these steps to set up your feature branch:
    bd update <id> --status in_progress
    ```
 
-### 4.2 During Work
+### 5.2 During Work
 
 While working on your feature:
 
@@ -166,7 +172,7 @@ While working on your feature:
     - `add elevenlabs provider implementation`
     - `fix null check in chunking service`
 
-### 4.3 Finishing Work ("Landing the Plane")
+### 5.3 Finishing Work ("Landing the Plane")
 
 When your work is complete, you **MUST** follow this sequence. Work is not done until it is pushed and a PR is created.
 
@@ -214,7 +220,7 @@ When your work is complete, you **MUST** follow this sequence. Work is not done 
 
 ---
 
-## 5. Environment & Configuration
+## 6. Environment & Configuration
 
 Ensure these environment variables are set (or use `appsettings.Development.json`):
 
@@ -225,7 +231,7 @@ Ensure these environment variables are set (or use `appsettings.Development.json
 | `ElevenLabs__ApiKey` | API Key for ElevenLabs |
 | `OpenAI__ApiKey` | API Key for OpenAI |
 
-## 6. Key Libraries
+## 7. Key Libraries
 - **Serilog**: Logging.
 - **FluentValidation**: Input validation.
 - **Entity Framework Core**: Data access.
