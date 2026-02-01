@@ -11,6 +11,9 @@ test-results/
 # Internal planning
 .sisyphus/
 
+# Local development configuration (contains secrets)
+**/appsettings.Development.json
+
 # OS
 .DS_Store
 Thumbs.db

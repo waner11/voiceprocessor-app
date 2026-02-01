@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using VoiceProcessor.Accessors.Contracts;
 using VoiceProcessor.Clients.Api.Extensions;
 using VoiceProcessor.Clients.Api.Services;
 using VoiceProcessor.Domain.DTOs.Requests.Auth;
@@ -19,19 +20,22 @@ public class AuthController : ControllerBase
     private readonly ILogger<AuthController> _logger;
     private readonly IWebHostEnvironment _environment;
     private readonly JwtOptions _jwtOptions;
+    private readonly IUserAccessor _userAccessor;
 
     public AuthController(
         IAuthManager authManager,
         ICurrentUserService currentUser,
         ILogger<AuthController> logger,
         IWebHostEnvironment environment,
-        IOptions<JwtOptions> jwtOptions)
+        IOptions<JwtOptions> jwtOptions,
+        IUserAccessor userAccessor)
     {
         _authManager = authManager;
         _currentUser = currentUser;
         _logger = logger;
         _environment = environment;
         _jwtOptions = jwtOptions.Value;
+        _userAccessor = userAccessor;
     }
 
     /// <summary>
@@ -177,11 +181,18 @@ public class AuthController : ControllerBase
     [Authorize]
     [ProducesResponseType(typeof(UserInfoResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public IActionResult GetCurrentUser()
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetCurrentUser(CancellationToken cancellationToken)
     {
         if (!_currentUser.IsAuthenticated || _currentUser.UserId is null)
         {
             return Unauthorized();
+        }
+
+        var user = await _userAccessor.GetByIdAsync(_currentUser.UserId.Value, cancellationToken);
+        if (user is null)
+        {
+            return NotFound();
         }
 
         var response = new UserInfoResponse
@@ -191,7 +202,7 @@ public class AuthController : ControllerBase
             Name = _currentUser.Name,
             Tier = Enum.TryParse<VoiceProcessor.Domain.Enums.SubscriptionTier>(
                 _currentUser.Tier, out var tier) ? tier : Domain.Enums.SubscriptionTier.Free,
-            CreditsRemaining = 0 // This would need to be fetched from the user manager
+            CreditsRemaining = user.CreditsRemaining
         };
 
         return Ok(response);

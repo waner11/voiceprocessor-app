@@ -231,6 +231,29 @@ Ensure these environment variables are set (or use `appsettings.Development.json
 | `ElevenLabs__ApiKey` | API Key for ElevenLabs |
 | `OpenAI__ApiKey` | API Key for OpenAI |
 
+### Local Development Setup
+
+For local development, use `appsettings.Development.json` to manage sensitive configuration without modifying `appsettings.json`.
+
+#### Stripe Configuration
+
+1. Copy the template:
+   ```bash
+   cp src/VoiceProcessor.Clients.Api/appsettings.Development.json.example \
+      src/VoiceProcessor.Clients.Api/appsettings.Development.json
+   ```
+
+2. Edit `appsettings.Development.json` with your Stripe keys:
+   - `SecretKey`: From [Stripe Dashboard](https://dashboard.stripe.com) (Test mode)
+   - `WebhookSecret`: From `stripe listen` output when running Stripe CLI
+
+3. Start the API - it will automatically load Development settings:
+   ```bash
+   dotnet run --project src/VoiceProcessor.Clients.Api
+   ```
+
+**Note**: `appsettings.Development.json` is in `.gitignore` and should never be committed. Use `appsettings.Development.json.example` as a template for new developers.
+
 ## 7. Key Libraries
 - **Serilog**: Logging.
 - **FluentValidation**: Input validation.
