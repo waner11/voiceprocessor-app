@@ -581,8 +581,13 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        // TODO: Regenerate from API spec — manual edit for successUrl/cancelUrl
         CheckoutRequest: {
             priceId: string;
+            /** @description URL to redirect on successful payment */
+            successUrl: string;
+            /** @description URL to redirect on cancelled payment */
+            cancelUrl: string;
         };
         CheckoutSessionResponse: {
             checkoutUrl: string;
