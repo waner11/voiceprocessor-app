@@ -19,8 +19,8 @@ describe('paymentService.createCheckoutSession', () => {
     });
   });
 
-  it('sends correct body shape with all three fields', async () => {
-    await paymentService.createCheckoutSession('pack_short_story');
+  it('sends correct body shape with priceId and URLs', async () => {
+    await paymentService.createCheckoutSession('price_short_story');
 
     expect(api.POST).toHaveBeenCalledWith('/api/v1/payments/checkout', {
       body: expect.objectContaining({
@@ -31,9 +31,21 @@ describe('paymentService.createCheckoutSession', () => {
     });
   });
 
-  it('throws error for invalid pack ID', async () => {
+  it('throws error for empty price ID', async () => {
     await expect(
-      paymentService.createCheckoutSession('invalid')
-    ).rejects.toThrow('Invalid pack selected');
+      paymentService.createCheckoutSession('')
+    ).rejects.toThrow('Invalid price ID');
+  });
+
+  it('passes priceId directly from API packs', async () => {
+    await paymentService.createCheckoutSession('price_from_stripe_api');
+
+    expect(api.POST).toHaveBeenCalledWith('/api/v1/payments/checkout', {
+      body: expect.objectContaining({
+        priceId: 'price_from_stripe_api',
+        successUrl: expect.stringContaining('/payment/success'),
+        cancelUrl: expect.stringContaining('/settings/billing'),
+      }),
+    });
   });
 });

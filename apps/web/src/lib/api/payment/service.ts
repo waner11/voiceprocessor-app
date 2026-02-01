@@ -20,7 +20,7 @@ function normalizePacksData(packs: unknown[]): CreditPack[] {
       id: String(pack.id || pack.priceId || `pack-${index}`),
       name: String(pack.name || 'Credit Pack'),
       credits: Number(pack.credits) || 0,
-      price: Number(pack.priceAmount || pack.price) || 0,
+       price: Number(pack.priceAmount ?? pack.price) || 0,
       priceId: String(pack.priceId || pack.id || ''),
       description: String(pack.description || ''),
     }))
@@ -29,14 +29,15 @@ function normalizePacksData(packs: unknown[]): CreditPack[] {
 
 export const paymentService = {
   createCheckoutSession: async (
-    packIdOrPriceId: string
+    priceId: string
   ): Promise<CheckoutSessionResponse> => {
-    const packFromConstants = CREDIT_PACKS.find((p) => p.id === packIdOrPriceId || p.priceId === packIdOrPriceId);
-    const priceId = packFromConstants ? packFromConstants.priceId : packIdOrPriceId;
+    if (!priceId || !priceId.trim()) {
+      throw new Error("Invalid price ID");
+    }
 
     const { data, error } = await api.POST("/api/v1/payments/checkout", {
       body: {
-        priceId: priceId,
+        priceId,
         successUrl: `${window.location.origin}/payment/success`,
         cancelUrl: `${window.location.origin}/settings/billing`,
       },
