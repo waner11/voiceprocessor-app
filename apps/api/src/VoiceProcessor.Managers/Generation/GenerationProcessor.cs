@@ -255,10 +255,20 @@ public class GenerationProcessor : IGenerationProcessor
                         await _delayService.DelayAsync(RetryDelays[creditAttempt - 1], CancellationToken.None);
                     }
 
-                    await _userAccessor.DeductCreditsAsync(
+                    var applied = await _userAccessor.TryDeductCreditsAsync(
                         generation.UserId,
                         creditsToDeduct,
+                        idempotencyKey: generationId,
+                        generationId: generationId,
                         CancellationToken.None);
+
+                    if (!applied)
+                    {
+                        _logger.LogWarning(
+                            "Credit deduction already applied for generation {GenerationId}, skipping duplicate",
+                            generationId);
+                        break;
+                    }
 
                     break; // Success
                 }
