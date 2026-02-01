@@ -76,7 +76,6 @@ public class GenerationProcessor : IGenerationProcessor
             // Update status to processing
             await _generationAccessor.UpdateStatusAsync(
                 generationId, GenerationStatus.Processing, cancellationToken: cancellationToken);
-            generation.StartedAt = DateTime.UtcNow;
 
             // Get voice details
             var voice = await _voiceAccessor.GetByIdAsync(generation.VoiceId, cancellationToken);
