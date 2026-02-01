@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useVoices, useEstimateCost, useCreateGeneration } from "@/hooks";
 import type { components } from "@/lib/api/types";
+import { formatNumber } from "@/utils/formatNumber";
 
 type RoutingPreference = components["schemas"]["RoutingPreference"];
 
@@ -87,12 +88,12 @@ export default function GeneratePage() {
 
   const selectedVoiceData = voices.find((v) => v.id === selectedVoice);
 
-  const formatCostWithCredits = (credits: number | undefined, cost: number) => {
-    if (credits && credits > 0) {
-      return `${credits.toLocaleString('en-US')} credits ($${cost.toFixed(4)})`;
-    }
-    return `$${cost.toFixed(4)}`;
-  };
+   const formatCostWithCredits = (credits: number | undefined, cost: number) => {
+     if (credits && credits > 0) {
+       return `${formatNumber(credits)} credits ($${cost.toFixed(4)})`;
+     }
+     return `$${cost.toFixed(4)}`;
+   };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900">
@@ -137,10 +138,10 @@ export default function GeneratePage() {
                   </span>
                 </div>
                 <div className="flex gap-4 text-gray-600 dark:text-gray-400">
-                  <span>{wordCount.toLocaleString()} words</span>
-                  <span className="text-gray-300 dark:text-gray-600">|</span>
-                  <span>{characterCount.toLocaleString()} characters</span>
-                </div>
+                   <span>{formatNumber(wordCount)} words</span>
+                   <span className="text-gray-300 dark:text-gray-600">|</span>
+                   <span>{formatNumber(characterCount)} characters</span>
+                 </div>
               </div>
             </div>
 
@@ -265,9 +266,9 @@ export default function GeneratePage() {
                   </div>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-400">Characters</span>
-                      <span>{costEstimate?.characterCount?.toLocaleString() || characterCount.toLocaleString()}</span>
-                    </div>
+                       <span className="text-gray-400">Characters</span>
+                       <span>{formatNumber(costEstimate?.characterCount || characterCount)}</span>
+                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-400">Est. Duration</span>
                       <span>~{Math.ceil(wordCount / 150)} min</span>

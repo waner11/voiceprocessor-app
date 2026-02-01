@@ -76,7 +76,6 @@ public class GenerationProcessor : IGenerationProcessor
             // Update status to processing
             await _generationAccessor.UpdateStatusAsync(
                 generationId, GenerationStatus.Processing, cancellationToken: cancellationToken);
-            generation.StartedAt = DateTime.UtcNow;
 
             // Get voice details
             var voice = await _voiceAccessor.GetByIdAsync(generation.VoiceId, cancellationToken);
@@ -256,10 +255,23 @@ public class GenerationProcessor : IGenerationProcessor
                         await _delayService.DelayAsync(RetryDelays[creditAttempt - 1], CancellationToken.None);
                     }
 
-                    await _userAccessor.DeductCreditsAsync(
+                    // Use generationId as idempotency key — guarantees exactly-one deduction
+                    // per generation. If this is ever extended to support multiple deductions
+                    // per generation (e.g., partial billing), the key strategy must change.
+                    var applied = await _userAccessor.TryDeductCreditsAsync(
                         generation.UserId,
                         creditsToDeduct,
+                        idempotencyKey: generationId,
+                        generationId: generationId,
                         CancellationToken.None);
+
+                    if (!applied)
+                    {
+                        _logger.LogWarning(
+                            "Credit deduction already applied for generation {GenerationId}, skipping duplicate",
+                            generationId);
+                        break;
+                    }
 
                     break; // Success
                 }

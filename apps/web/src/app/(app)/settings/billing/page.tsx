@@ -6,6 +6,7 @@ import { paymentService } from "@/lib/api/payment/service";
 import { usePayment } from "@/hooks/usePayment";
 import { useAuthStore } from "@/stores/authStore";
 import { CreditPack, Payment } from "@/lib/api/payment/types";
+import { formatNumber } from "@/utils/formatNumber";
 
 export default function BillingSettingsPage() {
   const [packs, setPacks] = useState<CreditPack[]>([]);
@@ -110,12 +111,12 @@ export default function BillingSettingsPage() {
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
           Credit Balance
         </h2>
-        <div className="flex items-baseline gap-2">
-          <span className="text-4xl font-bold text-gray-900 dark:text-white">
-            {creditsRemaining.toLocaleString()}
-          </span>
-          <span className="text-gray-500 dark:text-gray-400">credits</span>
-        </div>
+         <div className="flex items-baseline gap-2">
+           <span className="text-4xl font-bold text-gray-900 dark:text-white">
+             {formatNumber(creditsRemaining)}
+           </span>
+           <span className="text-gray-500 dark:text-gray-400">credits</span>
+         </div>
       </section>
 
       <section className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
@@ -179,12 +180,12 @@ export default function BillingSettingsPage() {
 
         <div className="space-y-6">
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Characters</span>
-              <span className="text-sm text-gray-500 dark:text-gray-400">
-                {usage.charactersUsed.toLocaleString()} / {usage.charactersLimit.toLocaleString()}
-              </span>
-            </div>
+             <div className="flex items-center justify-between mb-2">
+               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Characters</span>
+               <span className="text-sm text-gray-500 dark:text-gray-400">
+                 {formatNumber(usage.charactersUsed)} / {formatNumber(usage.charactersLimit)}
+               </span>
+             </div>
             <div className="h-3 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all ${
@@ -197,9 +198,9 @@ export default function BillingSettingsPage() {
                 style={{ width: `${Math.min(usagePercentage, 100)}%` }}
               />
             </div>
-            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              {(usage.charactersLimit - usage.charactersUsed).toLocaleString()} characters remaining
-            </p>
+             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+               {formatNumber(usage.charactersLimit - usage.charactersUsed)} characters remaining
+             </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -285,9 +286,9 @@ export default function BillingSettingsPage() {
                     <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">
                       {payment.packName}
                     </td>
-                    <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">
-                      +{payment.creditsAdded.toLocaleString()}
-                    </td>
+                     <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">
+                       +{formatNumber(payment.creditsAdded)}
+                     </td>
                     <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">
                       {new Intl.NumberFormat('en-US', {
                         style: 'currency',

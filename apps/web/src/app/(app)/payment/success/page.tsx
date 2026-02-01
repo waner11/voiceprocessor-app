@@ -6,6 +6,7 @@ import confetti from "canvas-confetti";
 import toast from "react-hot-toast";
 import { useAuthStore } from "@/stores/authStore";
 import { useCurrentUser } from "@/hooks/useAuth";
+import { formatNumber } from "@/utils/formatNumber";
 
 interface PackInfo {
   packId: string;
@@ -50,15 +51,15 @@ export default function PaymentSuccessPage() {
     }
   }, [hasRefreshed, refreshUser]);
 
-  // Show toast when pack info is available and credits refreshed
-  useEffect(() => {
-    if (packInfo && hasRefreshed) {
-      toast.success(
-        `Added ${packInfo.credits.toLocaleString()} credits to your account!`,
-        { id: "credits-added" } // Prevent duplicate toasts
-      );
-    }
-  }, [packInfo, hasRefreshed]);
+   // Show toast when pack info is available and credits refreshed
+   useEffect(() => {
+     if (packInfo && hasRefreshed) {
+       toast.success(
+         `Added ${formatNumber(packInfo.credits)} credits to your account!`,
+         { id: "credits-added" } // Prevent duplicate toasts
+       );
+     }
+   }, [packInfo, hasRefreshed]);
 
   // Trigger confetti animation
   useEffect(() => {
@@ -122,9 +123,9 @@ export default function PaymentSuccessPage() {
               <p className="text-lg text-gray-700 dark:text-gray-300 mb-2">
                 You purchased the <span className="font-semibold">{packInfo.name}</span> pack
               </p>
-              <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                {packInfo.credits.toLocaleString()} credits added
-              </p>
+               <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                 {formatNumber(packInfo.credits)} credits added
+               </p>
             </div>
           ) : (
             <p className="mb-6 text-lg text-gray-700 dark:text-gray-300">
@@ -137,9 +138,9 @@ export default function PaymentSuccessPage() {
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
               Current Balance
             </p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-white">
-              {creditsRemaining.toLocaleString()}
-            </p>
+             <p className="text-3xl font-bold text-gray-900 dark:text-white">
+               {formatNumber(creditsRemaining)}
+             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400">credits</p>
           </div>
 

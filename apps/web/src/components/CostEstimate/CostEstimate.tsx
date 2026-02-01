@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import type { RoutingStrategy } from "@/stores";
+import { formatNumber } from "@/utils/formatNumber";
 
 interface ProviderEstimate {
   provider: string;
@@ -159,12 +160,12 @@ export function CostEstimate({
 
       {creditsRemaining !== undefined && (
         <div className="border-t pt-4">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-500">Credits Remaining</span>
-            <span className="font-medium">
-              {creditsRemaining.toLocaleString()} chars
-            </span>
-          </div>
+           <div className="flex items-center justify-between text-sm">
+             <span className="text-gray-500">Credits Remaining</span>
+             <span className="font-medium">
+               {formatNumber(creditsRemaining)} chars
+             </span>
+           </div>
           {recommendedEstimate && characterCount > creditsRemaining && (
             <p className="mt-2 text-sm text-red-500">
               Insufficient credits. Please upgrade your plan.
