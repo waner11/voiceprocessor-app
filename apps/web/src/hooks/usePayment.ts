@@ -9,7 +9,7 @@ export function usePayment() {
   const creditsRemaining = useAuthStore((state) => state.creditsRemaining);
 
   const checkoutMutation = useMutation({
-    mutationFn: (packId: string) => paymentService.createCheckoutSession(packId),
+    mutationFn: (priceId: string) => paymentService.createCheckoutSession(priceId),
     onSuccess: (data) => {
       window.location.href = data.checkoutUrl;
     },
@@ -31,8 +31,8 @@ export function usePayment() {
      },
    });
 
-   return {
-     startCheckout: (packId: string) => checkoutMutation.mutate(packId),
+    return {
+      startCheckout: (priceId: string) => checkoutMutation.mutate(priceId),
      verifyTransaction: () =>
        verifyMutation.mutateAsync(),
      isProcessing: checkoutMutation.isPending || verifyMutation.isPending,

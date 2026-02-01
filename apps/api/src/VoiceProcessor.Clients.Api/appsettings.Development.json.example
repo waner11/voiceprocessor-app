@@ -1,0 +1,6 @@
+{
+  "Stripe": {
+    "SecretKey": "sk_test_YOUR_STRIPE_SECRET_KEY",
+    "WebhookSecret": "whsec_YOUR_WEBHOOK_SECRET_FROM_STRIPE_CLI"
+  }
+}

@@ -65,12 +65,12 @@ export default function BillingSettingsPage() {
     fetchPaymentHistory();
   }, []);
 
-   const handleBuyPack = (packId: string) => {
-     setPackErrors((prev) => ({ ...prev, [packId]: "" }));
-     setProcessingPackId(packId);
-     
-     try {
-       const pack = packs.find((p) => p.id === packId);
+    const handleBuyPack = (priceId: string) => {
+      setPackErrors((prev) => ({ ...prev, [priceId]: "" }));
+      setProcessingPackId(priceId);
+      
+      try {
+        const pack = packs.find((p) => p.priceId === priceId);
        if (pack) {
          try {
            const packInfo = {
@@ -84,13 +84,13 @@ export default function BillingSettingsPage() {
          }
        }
        
-       startCheckout(packId);
-     } catch (err) {
-       setProcessingPackId(null);
-       setPackErrors((prev) => ({
-         ...prev,
-         [packId]: err instanceof Error ? err.message : "Checkout failed",
-       }));
+        startCheckout(priceId);
+      } catch (err) {
+        setProcessingPackId(null);
+        setPackErrors((prev) => ({
+          ...prev,
+          [priceId]: err instanceof Error ? err.message : "Checkout failed",
+        }));
      }
    };
   
@@ -161,13 +161,13 @@ export default function BillingSettingsPage() {
 
         {!isLoadingPacks && packs.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {packs.map((pack) => (
-              <CreditPackCard
-                key={pack.id}
-                pack={pack}
-                onBuy={handleBuyPack}
-                isLoading={isProcessing && processingPackId === pack.id}
-                error={packErrors[pack.id]}
+         {packs.map((pack) => (
+               <CreditPackCard
+                 key={pack.id}
+                 pack={pack}
+                 onBuy={handleBuyPack}
+                 isLoading={isProcessing && processingPackId === pack.priceId}
+                 error={packErrors[pack.priceId]}
               />
             ))}
           </div>

@@ -10,6 +10,8 @@ export interface CreditPack {
 
 export interface CheckoutRequest {
   priceId: string;
+  successUrl: string;
+  cancelUrl: string;
 }
 
 export interface CheckoutSessionResponse {
