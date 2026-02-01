@@ -7,6 +7,7 @@ import { GenerationStatus } from '@/components/GenerationStatus/GenerationStatus
 import { mapGenerationStatus } from '@/lib/utils/mapGenerationStatus';
 import { AudioPlayer } from '@/components/AudioPlayer/AudioPlayer';
 import { FeedbackForm, type FeedbackData } from '@/components/FeedbackForm/FeedbackForm';
+import { formatNumber } from '@/utils/formatNumber';
 
 export default function GenerationPage() {
   const params = useParams();
@@ -147,10 +148,10 @@ export default function GenerationPage() {
                 <dt className="text-gray-500 dark:text-gray-400">Provider</dt>
                 <dd className="text-gray-900 dark:text-white">{generation.provider ?? '--'}</dd>
               </div>
-              <div className="flex justify-between">
-                <dt className="text-gray-500 dark:text-gray-400">Characters</dt>
-                <dd className="text-gray-900 dark:text-white">{(generation.characterCount ?? 0).toLocaleString('en-US')}</dd>
-              </div>
+               <div className="flex justify-between">
+                 <dt className="text-gray-500 dark:text-gray-400">Characters</dt>
+                 <dd className="text-gray-900 dark:text-white">{formatNumber(generation.characterCount ?? 0)}</dd>
+               </div>
               <div className="flex justify-between">
                 <dt className="text-gray-500 dark:text-gray-400">Duration</dt>
                 <dd className="text-gray-900 dark:text-white">

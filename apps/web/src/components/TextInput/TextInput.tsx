@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, type ChangeEvent } from "react";
 import { cn } from "@/lib/utils";
+import { formatNumber } from "@/utils/formatNumber";
 
 interface TextInputProps {
   value: string;
@@ -145,14 +146,14 @@ export function TextInput({
           />
         </div>
 
-        <span
-          className={cn(
-            "tabular-nums",
-            isOverLimit ? "text-red-500" : "text-gray-500"
-          )}
-        >
-          {characterCount.toLocaleString()} / {maxLength.toLocaleString()}
-        </span>
+         <span
+           className={cn(
+             "tabular-nums",
+             isOverLimit ? "text-red-500" : "text-gray-500"
+           )}
+         >
+           {formatNumber(characterCount)} / {formatNumber(maxLength)}
+         </span>
       </div>
     </div>
   );

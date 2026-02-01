@@ -1,6 +1,7 @@
 "use client";
 
 import { CreditPack } from "@/lib/api/payment/types";
+import { formatNumber } from "@/utils/formatNumber";
 
 interface CreditPackCardProps {
   pack: CreditPack;
@@ -21,12 +22,12 @@ export function CreditPackCard({
         {pack.name}
       </h3>
 
-      <div>
-        <p className="text-3xl font-bold text-gray-900 dark:text-white">
-          {pack.credits.toLocaleString()}
-        </p>
-        <p className="text-sm text-gray-500 dark:text-gray-400">credits</p>
-      </div>
+       <div>
+         <p className="text-3xl font-bold text-gray-900 dark:text-white">
+           {formatNumber(pack.credits)}
+         </p>
+         <p className="text-sm text-gray-500 dark:text-gray-400">credits</p>
+       </div>
 
       <div>
         <p className="text-2xl font-bold text-gray-900 dark:text-white">

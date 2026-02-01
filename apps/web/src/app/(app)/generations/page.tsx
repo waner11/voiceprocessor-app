@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useGenerations } from "@/hooks";
 import type { components } from "@/lib/api/types";
+import { formatNumber } from "@/utils/formatNumber";
 
 type GenerationStatus = components["schemas"]["GenerationStatus"];
 
@@ -147,10 +148,10 @@ export default function GenerationsPage() {
 
                     {/* Info */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className="font-medium text-gray-900 dark:text-white truncate">
-                          {generation.characterCount.toLocaleString()} characters
-                        </p>
+                       <div className="flex items-center gap-2">
+                         <p className="font-medium text-gray-900 dark:text-white truncate">
+                           {formatNumber(generation.characterCount)} characters
+                         </p>
                         {generation.provider && (
                           <span className="text-xs text-gray-500 dark:text-gray-400">
                             via {generation.provider}

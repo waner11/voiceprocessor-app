@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useGenerations, useUsage } from "@/hooks";
 import type { components } from "@/lib/api/types";
+import { formatNumber } from "@/utils/formatNumber";
 
 type GenerationStatus = components["schemas"]["GenerationStatus"];
 
@@ -66,9 +67,9 @@ export default function DashboardPage() {
             </div>
           ) : (
             <>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                {(usageData?.charactersRemaining || 0).toLocaleString()}
-              </p>
+               <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                 {formatNumber(usageData?.charactersRemaining || 0)}
+               </p>
               <p className="text-sm text-gray-500 dark:text-gray-400">characters remaining</p>
             </>
           )}
@@ -83,9 +84,9 @@ export default function DashboardPage() {
             </div>
           ) : (
             <>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                {totalGenerations.toLocaleString()}
-              </p>
+               <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                 {formatNumber(totalGenerations)}
+               </p>
               <p className="text-sm text-gray-500 dark:text-gray-400">total generations</p>
             </>
           )}
@@ -147,8 +148,8 @@ export default function DashboardPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="font-medium text-gray-900 dark:text-white truncate">
-                      {generation.characterCount.toLocaleString()} characters
-                    </p>
+                       {formatNumber(generation.characterCount)} characters
+                     </p>
                     {generation.provider && (
                       <span className="text-xs text-gray-500 dark:text-gray-400">
                         via {generation.provider}
