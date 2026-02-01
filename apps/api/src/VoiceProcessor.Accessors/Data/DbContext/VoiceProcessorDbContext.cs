@@ -19,6 +19,7 @@ public class VoiceProcessorDbContext : Microsoft.EntityFrameworkCore.DbContext
     public DbSet<ApiKey> ApiKeys => Set<ApiKey>();
     public DbSet<ExternalLogin> ExternalLogins => Set<ExternalLogin>();
     public DbSet<PaymentHistory> PaymentHistories => Set<PaymentHistory>();
+    public DbSet<CreditDeduction> CreditDeductions => Set<CreditDeduction>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -33,6 +34,7 @@ public class VoiceProcessorDbContext : Microsoft.EntityFrameworkCore.DbContext
         ConfigureApiKey(modelBuilder);
         ConfigureExternalLogin(modelBuilder);
         ConfigurePaymentHistory(modelBuilder);
+        ConfigureCreditDeduction(modelBuilder);
     }
 
     private static void ConfigureUser(ModelBuilder modelBuilder)
@@ -323,6 +325,18 @@ public class VoiceProcessorDbContext : Microsoft.EntityFrameworkCore.DbContext
             entity.HasIndex(e => e.StripeSessionId).IsUnique();
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.CreatedAt);
+        });
+    }
+
+    private static void ConfigureCreditDeduction(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<CreditDeduction>(entity =>
+        {
+            entity.ToTable("credit_deductions");
+            entity.HasKey(e => e.Id);
+
+            entity.HasIndex(e => e.IdempotencyKey).IsUnique();
+            entity.HasIndex(e => new { e.UserId, e.CreatedAt });
         });
     }
 }
