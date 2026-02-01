@@ -1357,8 +1357,8 @@ public class GenerationProcessorTests
          await processor.ProcessGenerationAsync(generation.Id);
 
          // Assert — ALL DeductCreditsAsync calls received CancellationToken.None
-         _mockUserAccessor.Verify(x => x.DeductCreditsAsync(It.IsAny<Guid>(), It.IsAny<int>(), CancellationToken.None), Times.Exactly(2));
-     }
+          _mockUserAccessor.Verify(x => x.DeductCreditsAsync(It.IsAny<Guid>(), It.IsAny<int>(), CancellationToken.None), Times.Exactly(2));
+    }
 
      [Fact]
      public async Task ProcessGenerationAsync_PendingGeneration_SetsStatusToProcessing_WhichPersistsStartedAt()
