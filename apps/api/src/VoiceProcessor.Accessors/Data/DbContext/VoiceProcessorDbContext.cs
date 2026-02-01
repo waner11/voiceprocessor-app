@@ -335,6 +335,10 @@ public class VoiceProcessorDbContext : Microsoft.EntityFrameworkCore.DbContext
             entity.ToTable("credit_deductions");
             entity.HasKey(e => e.Id);
 
+            // No FK constraints to users/generations: billing audit records must
+            // survive entity deletion for reconciliation. Referential integrity
+            // is enforced at the application level (only GenerationProcessor
+            // writes to this table via TryDeductCreditsAsync).
             entity.HasIndex(e => e.IdempotencyKey).IsUnique();
             entity.HasIndex(e => new { e.UserId, e.CreatedAt });
         });

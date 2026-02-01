@@ -72,25 +72,23 @@ public class UserAccessor : IUserAccessor
         Guid userId, int credits, Guid idempotencyKey,
         Guid? generationId = null, CancellationToken cancellationToken = default)
     {
-        var sql = @"
+        var deductionId = Guid.NewGuid();
+        var rows = await _dbContext.Database.ExecuteSqlAsync($@"
 WITH ins AS (
     INSERT INTO credit_deductions (id, user_id, idempotency_key, generation_id, credits, created_at)
-    VALUES (@p0, @p1, @p2, @p3, @p4, now())
+    VALUES ({deductionId}, {userId}, {idempotencyKey}, {generationId}, {credits}, now())
     ON CONFLICT (idempotency_key) DO NOTHING
     RETURNING 1
 )
 UPDATE users
-SET credits_remaining = credits_remaining - @p4,
-    credits_used_this_month = credits_used_this_month + @p4
-WHERE id = @p1
-  AND EXISTS (SELECT 1 FROM ins)";
+SET credits_remaining = credits_remaining - {credits},
+    credits_used_this_month = credits_used_this_month + {credits}
+WHERE id = {userId}
+  AND EXISTS (SELECT 1 FROM ins)", cancellationToken);
 
-        var deductionId = Guid.NewGuid();
-        var rows = await _dbContext.Database.ExecuteSqlRawAsync(
-            sql,
-            new object[] { deductionId, userId, idempotencyKey, generationId ?? (object)DBNull.Value, credits },
-            cancellationToken);
-
+        // Returns 1 when credits were deducted (new idempotency key + valid userId).
+        // Returns 0 if idempotency key already exists (duplicate) or userId not found.
+        // In the current flow, userId is always valid (loaded from Generation entity).
         return rows == 1;
     }
 }

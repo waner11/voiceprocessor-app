@@ -255,6 +255,9 @@ public class GenerationProcessor : IGenerationProcessor
                         await _delayService.DelayAsync(RetryDelays[creditAttempt - 1], CancellationToken.None);
                     }
 
+                    // Use generationId as idempotency key — guarantees exactly-one deduction
+                    // per generation. If this is ever extended to support multiple deductions
+                    // per generation (e.g., partial billing), the key strategy must change.
                     var applied = await _userAccessor.TryDeductCreditsAsync(
                         generation.UserId,
                         creditsToDeduct,
