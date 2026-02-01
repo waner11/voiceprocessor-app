@@ -67,4 +67,30 @@ public class UserAccessor : IUserAccessor
                 .SetProperty(u => u.CreditsRemaining, u => u.CreditsRemaining + credits),
                 cancellationToken);
     }
+
+    public async Task<bool> TryDeductCreditsAsync(
+        Guid userId, int credits, Guid idempotencyKey,
+        Guid? generationId = null, CancellationToken cancellationToken = default)
+    {
+        var sql = @"
+WITH ins AS (
+    INSERT INTO credit_deductions (id, user_id, idempotency_key, generation_id, credits, created_at)
+    VALUES (@p0, @p1, @p2, @p3, @p4, now())
+    ON CONFLICT (idempotency_key) DO NOTHING
+    RETURNING 1
+)
+UPDATE users
+SET credits_remaining = credits_remaining - @p4,
+    credits_used_this_month = credits_used_this_month + @p4
+WHERE id = @p1
+  AND EXISTS (SELECT 1 FROM ins)";
+
+        var deductionId = Guid.NewGuid();
+        var rows = await _dbContext.Database.ExecuteSqlRawAsync(
+            sql,
+            new object[] { deductionId, userId, idempotencyKey, generationId ?? (object)DBNull.Value, credits },
+            cancellationToken);
+
+        return rows == 1;
+    }
 }

@@ -19,4 +19,8 @@ public interface IUserAccessor
     Task DeductCreditsAsync(Guid userId, int credits, CancellationToken cancellationToken = default);
 
     Task AddCreditsAsync(Guid userId, int credits, CancellationToken cancellationToken = default);
+
+    Task<bool> TryDeductCreditsAsync(
+        Guid userId, int credits, Guid idempotencyKey,
+        Guid? generationId = null, CancellationToken cancellationToken = default);
 }
