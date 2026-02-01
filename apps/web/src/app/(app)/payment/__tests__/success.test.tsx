@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import PaymentSuccessPage from "../success/page";
 
 vi.mock("canvas-confetti", () => ({
@@ -23,10 +24,20 @@ vi.mock("@/stores/authStore", () => ({
   }),
 }));
 
+const createTestQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+    },
+  });
+
 describe("PaymentSuccessPage", () => {
+  let queryClient: QueryClient;
+
   beforeEach(() => {
     localStorage.clear();
     vi.clearAllMocks();
+    queryClient = createTestQueryClient();
   });
 
   afterEach(() => {
@@ -34,7 +45,11 @@ describe("PaymentSuccessPage", () => {
   });
 
   it("renders success message and triggers confetti", () => {
-    render(<PaymentSuccessPage />);
+    render(
+      <QueryClientProvider client={queryClient}>
+        <PaymentSuccessPage />
+      </QueryClientProvider>
+    );
 
     expect(screen.getByText("Payment Successful!")).toBeInTheDocument();
     expect(
@@ -55,7 +70,11 @@ describe("PaymentSuccessPage", () => {
       JSON.stringify(packInfo)
     );
 
-    render(<PaymentSuccessPage />);
+    render(
+      <QueryClientProvider client={queryClient}>
+        <PaymentSuccessPage />
+      </QueryClientProvider>
+    );
 
     await waitFor(() => {
       expect(screen.getByText(/Starter Pack/)).toBeInTheDocument();
@@ -64,7 +83,11 @@ describe("PaymentSuccessPage", () => {
   });
 
   it("shows fallback message when localStorage is empty", () => {
-    render(<PaymentSuccessPage />);
+    render(
+      <QueryClientProvider client={queryClient}>
+        <PaymentSuccessPage />
+      </QueryClientProvider>
+    );
 
     expect(
       screen.getByText("Your credits have been added to your account!")
@@ -84,7 +107,11 @@ describe("PaymentSuccessPage", () => {
       JSON.stringify(packInfo)
     );
 
-    render(<PaymentSuccessPage />);
+    render(
+      <QueryClientProvider client={queryClient}>
+        <PaymentSuccessPage />
+      </QueryClientProvider>
+    );
 
     await waitFor(() => {
       expect(localStorage.getItem("voiceprocessor_checkout_pack")).toBeNull();
@@ -92,14 +119,22 @@ describe("PaymentSuccessPage", () => {
   });
 
   it("displays current credit balance from auth store", () => {
-    render(<PaymentSuccessPage />);
+    render(
+      <QueryClientProvider client={queryClient}>
+        <PaymentSuccessPage />
+      </QueryClientProvider>
+    );
 
     expect(screen.getByText("1,500")).toBeInTheDocument();
     expect(screen.getByText("credits")).toBeInTheDocument();
   });
 
   it("renders dashboard button with correct href", () => {
-    render(<PaymentSuccessPage />);
+    render(
+      <QueryClientProvider client={queryClient}>
+        <PaymentSuccessPage />
+      </QueryClientProvider>
+    );
 
     const dashboardButton = screen.getByRole("link", {
       name: /Go to Dashboard/i,
@@ -108,14 +143,22 @@ describe("PaymentSuccessPage", () => {
   });
 
   it("renders billing button with correct href", () => {
-    render(<PaymentSuccessPage />);
+    render(
+      <QueryClientProvider client={queryClient}>
+        <PaymentSuccessPage />
+      </QueryClientProvider>
+    );
 
     const billingButton = screen.getByRole("link", { name: /View Billing/i });
     expect(billingButton).toHaveAttribute("href", "/settings/billing");
   });
 
   it("renders success icon", () => {
-    const { container } = render(<PaymentSuccessPage />);
+    const { container } = render(
+      <QueryClientProvider client={queryClient}>
+        <PaymentSuccessPage />
+      </QueryClientProvider>
+    );
 
     const svgs = container.querySelectorAll("svg");
     expect(svgs.length).toBeGreaterThan(0);
