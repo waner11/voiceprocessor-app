@@ -18,3 +18,47 @@ test-results/
 # OS
 .DS_Store
 Thumbs.db
+
+# GrepAI (regenerable via grepai watch)
+.grepai/
+
+# AI Agent Platforms (gitignore all, allow exceptions below)
+.agents/
+.adal/
+.agent/
+.augment/
+.cline/
+.codebuddy/
+.codex/
+.commandcode/
+.continue/
+.crush/
+.cursor/
+.factory/
+.gemini/
+.goose/
+.iflow/
+.junie/
+.kilocode/
+.kiro/
+.kode/
+.mcpjam/
+.mux/
+.neovate/
+.openclaude/
+.openhands/
+.pi/
+.pochi/
+.qoder/
+.qwen/
+.roo/
+.trae/
+.vibe/
+.windsurf/
+.zencoder/
+skills/
+
+# Exception: Commit skills for platforms we actually use
+!.claude/skills/
+!.claude/agents/
+!.opencode/skills/
