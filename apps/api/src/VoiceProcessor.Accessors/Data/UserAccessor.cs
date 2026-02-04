@@ -58,26 +58,26 @@ public class UserAccessor : IUserAccessor
                 cancellationToken);
     }
 
-     public async Task<bool> TryDeductCreditsAsync(
-         Guid userId, int credits, Guid idempotencyKey,
-         Guid? generationId = null, CancellationToken cancellationToken = default)
-     {
-         var deductionId = Guid.NewGuid();
-         var rows = await _dbContext.Database.ExecuteSqlAsync($@"
- WITH ins AS (
-     INSERT INTO credit_deductions (id, user_id, idempotency_key, generation_id, credits, created_at)
-     VALUES ({deductionId}, {userId}, {idempotencyKey}, {generationId}, {credits}, now())
-     ON CONFLICT (idempotency_key) DO NOTHING
-     RETURNING 1
- )
- -- Floor protection: never allow negative credit balance.
- -- If credits_remaining < requested credits, deducts only what's available.
- -- Shortfall is reconcilable from: credit_deductions.credits (requested) vs users.credits_remaining (actual).
- UPDATE users
- SET credits_remaining = GREATEST(0, credits_remaining - {credits}),
-     credits_used_this_month = credits_used_this_month + LEAST(credits_remaining, {credits})
- WHERE id = {userId}
-   AND EXISTS (SELECT 1 FROM ins)", cancellationToken);
+    public async Task<bool> TryDeductCreditsAsync(
+        Guid userId, int credits, Guid idempotencyKey,
+        Guid? generationId = null, CancellationToken cancellationToken = default)
+    {
+        var deductionId = Guid.NewGuid();
+        var rows = await _dbContext.Database.ExecuteSqlAsync($@"
+        WITH ins AS (
+            INSERT INTO credit_deductions (id, user_id, idempotency_key, generation_id, credits, created_at)
+            VALUES ({deductionId}, {userId}, {idempotencyKey}, {generationId}, {credits}, now())
+            ON CONFLICT (idempotency_key) DO NOTHING
+            RETURNING 1
+        )
+        -- Floor protection: never allow negative credit balance.
+        -- If credits_remaining < requested credits, deducts only what's available.
+        -- Shortfall is reconcilable from: credit_deductions.credits (requested) vs users.credits_remaining (actual).
+        UPDATE users
+        SET credits_remaining = GREATEST(0, credits_remaining - {credits}),
+            credits_used_this_month = credits_used_this_month + LEAST(credits_remaining, {credits})
+        WHERE id = {userId}
+        AND EXISTS (SELECT 1 FROM ins)", cancellationToken);
 
         // Returns 1 when credits were deducted (new idempotency key + valid userId).
         // Returns 0 if idempotency key already exists (duplicate) or userId not found.
