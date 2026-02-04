@@ -23,7 +23,6 @@ public record TtsRequest
     public string OutputFormat { get; init; } = "mp3";
     public double? Speed { get; init; }
     public double? Pitch { get; init; }
-    public VoicePreset? Preset { get; init; }
     public double? Stability { get; init; }
     public double? SimilarityBoost { get; init; }
     public double? Style { get; init; }

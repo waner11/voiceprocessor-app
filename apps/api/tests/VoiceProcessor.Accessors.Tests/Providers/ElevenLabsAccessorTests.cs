@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text;
+using System.Text.Json;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -38,12 +39,21 @@ public class ElevenLabsAccessorTests
     public async Task GenerateSpeechAsync_WithPreset_UsesMappedSettings()
     {
         var audioData = Encoding.UTF8.GetBytes("fake-audio-data");
+        HttpRequestMessage? capturedRequest = null;
+        string? capturedBody = null;
+
         _httpMessageHandlerMock
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
                 ItExpr.IsAny<HttpRequestMessage>(),
                 ItExpr.IsAny<CancellationToken>())
+            .Callback<HttpRequestMessage, CancellationToken>(async (req, ct) =>
+            {
+                capturedRequest = req;
+                if (req.Content != null)
+                    capturedBody = await req.Content.ReadAsStringAsync(ct);
+            })
             .ReturnsAsync(new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
@@ -66,6 +76,17 @@ public class ElevenLabsAccessorTests
 
         result.Success.Should().BeTrue();
         result.AudioData.Should().NotBeNull();
+
+        // Verify the HTTP body contains correct voice_settings
+        capturedBody.Should().NotBeNullOrEmpty();
+        using var doc = JsonDocument.Parse(capturedBody!);
+        var root = doc.RootElement;
+
+        var voiceSettings = root.GetProperty("voice_settings");
+        voiceSettings.GetProperty("stability").GetDouble().Should().Be(0.35);
+        voiceSettings.GetProperty("similarity_boost").GetDouble().Should().Be(0.70);
+        voiceSettings.GetProperty("style").GetDouble().Should().Be(0.5);
+        voiceSettings.GetProperty("use_speaker_boost").GetBoolean().Should().BeTrue();
     }
 
     [Fact]
