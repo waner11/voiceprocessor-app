@@ -185,6 +185,7 @@ public class GenerationManager : IGenerationManager
             Status = GenerationStatus.Pending,
             RoutingPreference = request.RoutingPreference,
             SelectedProvider = routingDecision.SelectedProvider,
+            Preset = request.Preset,
             AudioFormat = request.AudioFormat ?? "mp3",
             EstimatedCost = costEstimate.EstimatedCost,
             ChunkCount = chunks.Count,
