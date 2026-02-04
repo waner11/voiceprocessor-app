@@ -16,8 +16,6 @@ public interface IUserAccessor
 
     Task<bool> EmailExistsAsync(string email, CancellationToken cancellationToken = default);
 
-    Task DeductCreditsAsync(Guid userId, int credits, CancellationToken cancellationToken = default);
-
     Task AddCreditsAsync(Guid userId, int credits, CancellationToken cancellationToken = default);
 
     Task<bool> TryDeductCreditsAsync(
