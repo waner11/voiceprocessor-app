@@ -9,4 +9,5 @@ public record CreateGenerationRequest
     public RoutingPreference RoutingPreference { get; init; } = RoutingPreference.Balanced;
     public string? AudioFormat { get; init; } = "mp3";
     public string? CallbackUrl { get; init; }
+    public VoicePreset? Preset { get; init; }
 }

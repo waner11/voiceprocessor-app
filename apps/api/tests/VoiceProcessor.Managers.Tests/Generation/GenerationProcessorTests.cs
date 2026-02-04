@@ -21,6 +21,7 @@ public class GenerationProcessorTests
     private readonly Mock<IStorageAccessor> _mockStorageAccessor;
     private readonly Mock<IChunkingEngine> _mockChunkingEngine;
     private readonly Mock<IAudioMergeEngine> _mockAudioMergeEngine;
+    private readonly Mock<IVoicePresetEngine> _mockPresetEngine;
     private readonly Mock<ILogger<GenerationProcessor>> _mockLogger;
     private readonly Mock<IDelayService> _mockDelayService;
 
@@ -34,6 +35,7 @@ public class GenerationProcessorTests
        _mockStorageAccessor = new Mock<IStorageAccessor>();
        _mockChunkingEngine = new Mock<IChunkingEngine>();
        _mockAudioMergeEngine = new Mock<IAudioMergeEngine>();
+       _mockPresetEngine = new Mock<IVoicePresetEngine>();
        _mockLogger = new Mock<ILogger<GenerationProcessor>>();
        _mockDelayService = new Mock<IDelayService>();
     }
@@ -49,6 +51,7 @@ public class GenerationProcessorTests
            _mockStorageAccessor.Object,
            _mockChunkingEngine.Object,
            _mockAudioMergeEngine.Object,
+           _mockPresetEngine.Object,
            _mockLogger.Object,
            _mockDelayService.Object
        );

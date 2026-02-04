@@ -16,6 +16,7 @@ public class GenerationManager : IGenerationManager
     private readonly IGenerationAccessor _generationAccessor;
     private readonly IVoiceAccessor _voiceAccessor;
     private readonly IUserAccessor _userAccessor;
+    private readonly IFeedbackAccessor _feedbackAccessor;
     private readonly ITtsProviderFactory _providerFactory;
     private readonly IChunkingEngine _chunkingEngine;
     private readonly IPricingEngine _pricingEngine;
@@ -27,6 +28,7 @@ public class GenerationManager : IGenerationManager
         IGenerationAccessor generationAccessor,
         IVoiceAccessor voiceAccessor,
         IUserAccessor userAccessor,
+        IFeedbackAccessor feedbackAccessor,
         ITtsProviderFactory providerFactory,
         IChunkingEngine chunkingEngine,
         IPricingEngine pricingEngine,
@@ -37,6 +39,7 @@ public class GenerationManager : IGenerationManager
         _generationAccessor = generationAccessor;
         _voiceAccessor = voiceAccessor;
         _userAccessor = userAccessor;
+        _feedbackAccessor = feedbackAccessor;
         _providerFactory = providerFactory;
         _chunkingEngine = chunkingEngine;
         _pricingEngine = pricingEngine;
@@ -248,7 +251,17 @@ public class GenerationManager : IGenerationManager
             throw new InvalidOperationException("Generation does not belong to user");
         }
 
-        // TODO: Create feedback record via FeedbackAccessor
+        var feedback = new Feedback
+        {
+            Id = Guid.NewGuid(),
+            GenerationId = generationId,
+            UserId = userId,
+            Rating = request.Rating,
+            Comment = request.Comment,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        await _feedbackAccessor.UpsertAsync(feedback, cancellationToken);
 
         _logger.LogInformation("Feedback submitted for generation {GenerationId}, rating: {Rating}",
             generationId, request.Rating);

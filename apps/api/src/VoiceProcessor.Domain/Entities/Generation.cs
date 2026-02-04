@@ -12,6 +12,7 @@ public class Generation
     public GenerationStatus Status { get; set; } = GenerationStatus.Pending;
     public RoutingPreference RoutingPreference { get; set; } = RoutingPreference.Balanced;
     public Provider? SelectedProvider { get; set; }
+    public VoicePreset? Preset { get; set; }
     public string? AudioUrl { get; set; }
     public string? AudioFormat { get; set; }
     public int? AudioDurationMs { get; set; }

@@ -190,6 +190,7 @@ public class VoiceProcessorDbContext : Microsoft.EntityFrameworkCore.DbContext
             entity.HasIndex(e => e.GenerationId);
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.Rating);
+            entity.HasIndex(e => new { e.GenerationId, e.UserId }).IsUnique();
         });
     }
 
