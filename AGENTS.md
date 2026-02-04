@@ -56,6 +56,20 @@ pnpm dev
 Terminal 1: `cd apps/api && dotnet run`
 Terminal 2: `cd apps/web && pnpm dev`
 
+## Code Search Preference
+
+This project has GrepAI indexed with semantic embeddings (Ollama/nomic-embed-text).
+When searching code, prefer GrepAI MCP tools over Grep:
+
+- **Primary** — `grepai_search`: Semantic/intent-based code discovery. Finds code by meaning
+  (e.g., "authentication flow", "error handling middleware"), not just text patterns.
+- **Relationships** — `grepai_trace_callers` / `grepai_trace_callees` / `grepai_trace_graph`:
+  Understand function call relationships, dependencies, and impact analysis.
+- **Fallback only** — `Grep`: Use for exact text pattern matching (variable names, imports, regex).
+
+For exploration tasks, prefer the `deep-explore` agent (`subagent_type="deep-explore"`)
+which is configured for grepai-first search with Grep as fallback.
+
 ## Development Methodology
 
 This project follows **Test-Driven Development (TDD)**. When implementing features or fixing bugs,

@@ -1,0 +1,55 @@
+{
+  "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json",
+  "agents": {
+    "sisyphus": {
+      "prompt_append": "## GrepAI Semantic Search\n\nThis project has GrepAI indexed with semantic embeddings (Ollama/nomic-embed-text). When searching code:\n- **Prefer** `grepai_search` (MCP tool) for intent-based/semantic code discovery over Grep. It finds code by meaning, not just text.\n- **Prefer** `grepai_trace_callers`/`grepai_trace_callees`/`grepai_trace_graph` for understanding function relationships and impact analysis.\n- **Use Grep only** for exact text pattern matching (variable names, imports, regex patterns).\n- When delegating exploration tasks, use the `deep-explore` subagent_type which is configured for grepai-first search.\n- When delegating to categories (quick, unspecified-low, etc.), include relevant grepai skills in load_skills if the task involves code search."
+    },
+    "explore": {
+      "prompt_append": "## GrepAI Available\n\nThis project has GrepAI MCP tools indexed with semantic embeddings. Prefer these over Grep:\n- `grepai_search` — semantic/intent-based code search (e.g., \"authentication flow\", \"error handling middleware\"). Use this FIRST.\n- `grepai_trace_callers` — find all functions that call a symbol.\n- `grepai_trace_callees` — find all functions called by a symbol.\n- `grepai_trace_graph` — build complete call graph around a symbol.\n- Fall back to Grep only for exact string matching (variable names, imports, regex)."
+    },
+    "prometheus": {
+      "prompt_append": "## GrepAI Available\n\nWhen writing plans that involve code exploration or investigation, recommend GrepAI MCP tools over Grep:\n- `grepai_search` for semantic/intent-based code discovery (understands meaning, not just text patterns).\n- `grepai_trace_callers`/`grepai_trace_callees`/`grepai_trace_graph` for understanding function relationships and dependencies.\n- Recommend Grep only for exact string matching (variable names, imports, regex patterns).\n- Recommend the `deep-explore` agent for exploration tasks (it's configured for grepai-first search)."
+    },
+    "oracle": {
+      "prompt_append": "## GrepAI Available\n\nThis project has GrepAI MCP tools. Use `grepai_search` for semantic code search and `grepai_trace_*` for call graph analysis before falling back to Grep for exact matches."
+    },
+    "librarian": {
+      "prompt_append": "## GrepAI Available\n\nThis project has GrepAI MCP tools. When searching the local codebase, use `grepai_search` for semantic queries and `grepai_trace_*` for function relationships. Use Grep only for exact text matching."
+    },
+    "metis": {
+      "prompt_append": "## GrepAI Available\n\nThis project has GrepAI semantic search indexed. When analyzing tasks that involve code exploration, note that `grepai_search` and `grepai_trace_*` MCP tools should be preferred over Grep for intent-based discovery."
+    },
+    "momus": {
+      "prompt_append": "## GrepAI Available\n\nThis project has GrepAI semantic search. When reviewing plans, verify they recommend `grepai_search` over Grep for code discovery tasks. Grep should only be recommended for exact text matching."
+    },
+    "hephaestus": {
+      "prompt_append": "## GrepAI Available\n\nThis project has GrepAI MCP tools indexed with semantic embeddings. Prefer these over Grep:\n- `grepai_search` — semantic/intent-based code search. Use this FIRST for any code discovery.\n- `grepai_trace_callers`/`grepai_trace_callees`/`grepai_trace_graph` — function relationship analysis.\n- Fall back to Grep only for exact string matching (variable names, imports, regex)."
+    }
+  },
+  "categories": {
+    "quick": {
+      "prompt_append": "GrepAI MCP tools are available in this project. Use `grepai_search` for semantic code search and `grepai_trace_*` for function relationships before falling back to Grep for exact text matching."
+    },
+    "deep": {
+      "prompt_append": "GrepAI MCP tools are available in this project. Use `grepai_search` for semantic code search and `grepai_trace_*` for function relationships before falling back to Grep for exact text matching."
+    },
+    "visual-engineering": {
+      "prompt_append": "GrepAI MCP tools are available in this project. Use `grepai_search` for semantic code search before falling back to Grep for exact text matching."
+    },
+    "ultrabrain": {
+      "prompt_append": "GrepAI MCP tools are available in this project. Use `grepai_search` for semantic code search and `grepai_trace_*` for function relationships before falling back to Grep for exact text matching."
+    },
+    "artistry": {
+      "prompt_append": "GrepAI MCP tools are available in this project. Use `grepai_search` for semantic code search before falling back to Grep for exact text matching."
+    },
+    "unspecified-low": {
+      "prompt_append": "GrepAI MCP tools are available in this project. Use `grepai_search` for semantic code search and `grepai_trace_*` for function relationships before falling back to Grep for exact text matching."
+    },
+    "unspecified-high": {
+      "prompt_append": "GrepAI MCP tools are available in this project. Use `grepai_search` for semantic code search and `grepai_trace_*` for function relationships before falling back to Grep for exact text matching."
+    },
+    "writing": {
+      "prompt_append": "GrepAI MCP tools are available in this project. Use `grepai_search` for semantic code search if you need to reference code."
+    }
+  }
+}
