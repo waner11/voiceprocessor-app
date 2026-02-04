@@ -4,7 +4,6 @@ using VoiceProcessor.Managers.Auth;
 using VoiceProcessor.Managers.Contracts;
 using VoiceProcessor.Managers.Generation;
 using VoiceProcessor.Managers.Payment;
-using VoiceProcessor.Managers.User;
 using VoiceProcessor.Managers.Voice;
 using VoiceProcessor.Utilities.Timing;
 
@@ -18,9 +17,6 @@ public static class ServiceCollectionExtensions
     {
         // Auth Manager
         services.AddScoped<IAuthManager, AuthManager>();
-
-        // User Manager
-        services.AddScoped<IUserManager, UserManager>();
 
         // Voice Manager
         services.AddScoped<IVoiceManager, VoiceManager>();
