@@ -136,7 +136,7 @@ public partial class ChapterDetectionEngine : IChapterDetectionEngine
                 // Include subtitle if present
                 if (match.Groups.Count > 2 && !string.IsNullOrWhiteSpace(match.Groups[2].Value))
                 {
-                    title = $"{match.Groups[0].Value.Trim()}";
+                    title = match.Groups[0].Value.Trim();
                 }
             }
             else if (isWritten && match.Groups.Count > 1)

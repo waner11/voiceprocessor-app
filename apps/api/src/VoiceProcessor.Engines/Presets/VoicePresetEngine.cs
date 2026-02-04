@@ -11,7 +11,7 @@ public class VoicePresetEngine : IVoicePresetEngine
         {
             Provider.ElevenLabs => GetElevenLabsSettings(preset),
             Provider.OpenAI => GetOpenAiSettings(preset),
-            _ => GetDefaultSettings(preset)
+            _ => GetDefaultSettings()
         };
     }
 
@@ -63,7 +63,7 @@ public class VoicePresetEngine : IVoicePresetEngine
         };
     }
 
-    private static VoicePresetSettings GetDefaultSettings(VoicePreset preset)
+    private static VoicePresetSettings GetDefaultSettings()
     {
         return new VoicePresetSettings { Speed = 1.0 };
     }
