@@ -117,6 +117,10 @@ public class VoiceProcessorDbContext : Microsoft.EntityFrameworkCore.DbContext
                 .HasConversion<string>()
                 .HasMaxLength(20);
 
+            entity.Property(e => e.Preset)
+                .HasConversion<string>()
+                .HasMaxLength(20);
+
             entity.Property(e => e.AudioUrl).HasMaxLength(500);
             entity.Property(e => e.AudioFormat).HasMaxLength(10);
             entity.Property(e => e.EstimatedCost).HasPrecision(10, 6);
