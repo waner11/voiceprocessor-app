@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Testcontainers.PostgreSql;
 using VoiceProcessor.Accessors.Data;
 using VoiceProcessor.Accessors.Data.DbContext;
 using VoiceProcessor.Domain.Entities;
@@ -8,25 +8,37 @@ using VoiceProcessor.Domain.Enums;
 
 namespace VoiceProcessor.Accessors.Tests.Data;
 
-public class FeedbackAccessorTests : IDisposable
+/// <summary>
+/// Integration tests for FeedbackAccessor using real PostgreSQL via Testcontainers.
+/// Tests the atomic ON CONFLICT implementation with actual database constraints.
+/// </summary>
+public class FeedbackAccessorIntegrationTests : IAsyncLifetime
 {
-    private readonly VoiceProcessorDbContext _dbContext;
-    private readonly FeedbackAccessor _accessor;
+    private PostgreSqlContainer _container = null!;
+    private VoiceProcessorDbContext _dbContext = null!;
+    private FeedbackAccessor _accessor = null!;
 
-    public FeedbackAccessorTests()
+    public async Task InitializeAsync()
     {
+        _container = new PostgreSqlBuilder("postgres:16-alpine")
+            .Build();
+
+        await _container.StartAsync();
+
         var options = new DbContextOptionsBuilder<VoiceProcessorDbContext>()
-            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+            .UseNpgsql(_container.GetConnectionString())
             .Options;
 
         _dbContext = new VoiceProcessorDbContext(options);
+        await _dbContext.Database.MigrateAsync();
+
         _accessor = new FeedbackAccessor(_dbContext);
     }
 
-    public void Dispose()
+    public async Task DisposeAsync()
     {
-        _dbContext.Database.EnsureDeleted();
-        _dbContext.Dispose();
+        await _dbContext.DisposeAsync();
+        await _container.DisposeAsync();
     }
 
     [Fact]
@@ -65,11 +77,13 @@ public class FeedbackAccessorTests : IDisposable
         result.PlaybackCount.Should().Be(3);
         result.PlaybackDurationMs.Should().Be(15000);
         result.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
-        result.UpdatedAt.Should().BeNull();
+        result.UpdatedAt.Should().BeNull(); // Key assertion: NULL on insert
 
-        var dbFeedback = await _dbContext.Feedbacks.FindAsync(feedback.Id);
+        // Verify in database
+        var dbFeedback = await _dbContext.Feedbacks.FindAsync(result.Id);
         dbFeedback.Should().NotBeNull();
         dbFeedback!.Rating.Should().Be(5);
+        dbFeedback.UpdatedAt.Should().BeNull();
     }
 
     [Fact]
@@ -94,12 +108,12 @@ public class FeedbackAccessorTests : IDisposable
             CreatedAt = DateTime.UtcNow.AddMinutes(-10)
         };
 
-        _dbContext.Feedbacks.Add(originalFeedback);
-        await _dbContext.SaveChangesAsync();
+        // Insert original feedback
+        await _accessor.UpsertAsync(originalFeedback);
 
         var updatedFeedback = new Feedback
         {
-            Id = originalFeedback.Id,
+            Id = Guid.NewGuid(), // Different ID - should be ignored due to ON CONFLICT
             GenerationId = generationId,
             UserId = userId,
             Rating = 5,
@@ -107,7 +121,7 @@ public class FeedbackAccessorTests : IDisposable
             WasDownloaded = true,
             PlaybackCount = 5,
             PlaybackDurationMs = 20000,
-            CreatedAt = originalFeedback.CreatedAt
+            CreatedAt = DateTime.UtcNow // Different CreatedAt - should be ignored
         };
 
         // Act
@@ -115,20 +129,22 @@ public class FeedbackAccessorTests : IDisposable
 
         // Assert
         result.Should().NotBeNull();
-        result.Id.Should().Be(originalFeedback.Id);
+        result.Id.Should().Be(originalFeedback.Id); // Key assertion: ID preserved from original
         result.Rating.Should().Be(5);
         result.Comment.Should().Be("Actually excellent!");
         result.WasDownloaded.Should().BeTrue();
         result.PlaybackCount.Should().Be(5);
         result.PlaybackDurationMs.Should().Be(20000);
-        result.CreatedAt.Should().Be(originalFeedback.CreatedAt);
-        result.UpdatedAt.Should().NotBeNull();
+        result.CreatedAt.Should().Be(originalFeedback.CreatedAt); // CreatedAt preserved
+        result.UpdatedAt.Should().NotBeNull(); // Key assertion: UpdatedAt set on update
         result.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
 
-        var dbFeedback = await _dbContext.Feedbacks.FindAsync(originalFeedback.Id);
-        dbFeedback.Should().NotBeNull();
-        dbFeedback!.Rating.Should().Be(5);
-        dbFeedback.Comment.Should().Be("Actually excellent!");
+        // Verify only one record exists
+        var allFeedback = await _dbContext.Feedbacks
+            .Where(f => f.GenerationId == generationId && f.UserId == userId)
+            .ToListAsync();
+        allFeedback.Should().HaveCount(1);
+        allFeedback[0].Rating.Should().Be(5);
     }
 
     [Fact]
@@ -162,10 +178,67 @@ public class FeedbackAccessorTests : IDisposable
         result.Comment.Should().BeNull();
         result.WasDownloaded.Should().BeTrue();
 
-        var dbFeedback = await _dbContext.Feedbacks.FindAsync(feedback.Id);
+        var dbFeedback = await _dbContext.Feedbacks.FindAsync(result.Id);
         dbFeedback.Should().NotBeNull();
         dbFeedback!.Rating.Should().BeNull();
         dbFeedback.Comment.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task UpsertAsync_ConcurrentInsert_HandledAtomically()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var generationId = Guid.NewGuid();
+
+        await SeedUserAndGeneration(userId, generationId);
+
+        var feedback1 = new Feedback
+        {
+            Id = Guid.NewGuid(),
+            GenerationId = generationId,
+            UserId = userId,
+            Rating = 4,
+            Comment = "First attempt",
+            WasDownloaded = true,
+            PlaybackCount = 1,
+            PlaybackDurationMs = 5000,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        var feedback2 = new Feedback
+        {
+            Id = Guid.NewGuid(),
+            GenerationId = generationId,
+            UserId = userId,
+            Rating = 5,
+            Comment = "Second attempt",
+            WasDownloaded = true,
+            PlaybackCount = 2,
+            PlaybackDurationMs = 10000,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        // Act - Simulate concurrent inserts
+        var task1 = _accessor.UpsertAsync(feedback1);
+        var task2 = _accessor.UpsertAsync(feedback2);
+
+        var results = await Task.WhenAll(task1, task2);
+
+        // Assert - Only one record should exist due to atomic ON CONFLICT handling
+        var allFeedback = await _dbContext.Feedbacks
+            .Where(f => f.GenerationId == generationId && f.UserId == userId)
+            .ToListAsync();
+
+        allFeedback.Should().HaveCount(1, "ON CONFLICT should ensure only one record exists");
+
+        // Both results should reference the same record (one insert, one update)
+        results[0].Id.Should().Be(results[1].Id, "Both operations should converge to the same record");
+
+        // The final state should reflect one of the operations
+        var finalRecord = allFeedback[0];
+        finalRecord.GenerationId.Should().Be(generationId);
+        finalRecord.UserId.Should().Be(userId);
     }
 
     private async Task SeedUserAndGeneration(Guid userId, Guid generationId)
@@ -214,133 +287,5 @@ public class FeedbackAccessorTests : IDisposable
         _dbContext.Voices.Add(voice);
         _dbContext.Generations.Add(generation);
         await _dbContext.SaveChangesAsync();
-    }
-
-    [Fact]
-    public async Task UpsertAsync_ConcurrentInsert_RetriesAsUpdate()
-    {
-        var userId = Guid.NewGuid();
-        var generationId = Guid.NewGuid();
-
-        var options = new DbContextOptionsBuilder<VoiceProcessorDbContext>()
-            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-            .Options;
-
-        var testDbContext = new TestVoiceProcessorDbContext(options);
-
-        var user = new User
-        {
-            Id = userId,
-            Email = "test@example.com",
-            Name = "Test User",
-            Tier = SubscriptionTier.Free,
-            CreditsRemaining = 1000,
-            IsActive = true,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        var voice = new Voice
-        {
-            Id = Guid.NewGuid(),
-            Name = "Test Voice",
-            Provider = Provider.ElevenLabs,
-            ProviderVoiceId = "voice_123",
-            CostPerThousandChars = 0.30m,
-            IsActive = true,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        var generation = new Generation
-        {
-            Id = generationId,
-            UserId = userId,
-            VoiceId = voice.Id,
-            InputText = "Test text",
-            CharacterCount = 9,
-            Status = GenerationStatus.Completed,
-            RoutingPreference = RoutingPreference.Balanced,
-            SelectedProvider = Provider.ElevenLabs,
-            AudioFormat = "mp3",
-            EstimatedCost = 0.01m,
-            ChunkCount = 1,
-            ChunksCompleted = 1,
-            Progress = 100,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        testDbContext.Users.Add(user);
-        testDbContext.Voices.Add(voice);
-        testDbContext.Generations.Add(generation);
-        await testDbContext.SaveChangesAsync();
-
-        var existingFeedback = new Feedback
-        {
-            Id = Guid.NewGuid(),
-            GenerationId = generationId,
-            UserId = userId,
-            Rating = 3,
-            Comment = "Good",
-            WasDownloaded = false,
-            PlaybackCount = 1,
-            PlaybackDurationMs = 5000,
-            CreatedAt = DateTime.UtcNow.AddMinutes(-5)
-        };
-
-        testDbContext.Feedbacks.Add(existingFeedback);
-        await testDbContext.SaveChangesAsync();
-
-        testDbContext.SaveChangesCallCount = 0;
-
-        var accessor = new FeedbackAccessor(testDbContext);
-
-        var newFeedback = new Feedback
-        {
-            Id = Guid.NewGuid(),
-            GenerationId = generationId,
-            UserId = userId,
-            Rating = 5,
-            Comment = "Great!",
-            WasDownloaded = true,
-            PlaybackCount = 2,
-            PlaybackDurationMs = 10000,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        testDbContext.ThrowOnNextSaveChanges = true;
-
-        var result = await accessor.UpsertAsync(newFeedback);
-
-        result.Should().NotBeNull();
-        result.Id.Should().Be(existingFeedback.Id);
-        result.Rating.Should().Be(5);
-        result.Comment.Should().Be("Great!");
-        result.PlaybackCount.Should().Be(2);
-        result.WasDownloaded.Should().BeTrue();
-        testDbContext.SaveChangesCallCount.Should().Be(2);
-    }
-}
-
-public class TestVoiceProcessorDbContext : VoiceProcessorDbContext
-{
-    public bool ThrowOnNextSaveChanges { get; set; }
-    public int SaveChangesCallCount { get; set; }
-
-    public TestVoiceProcessorDbContext(DbContextOptions<VoiceProcessorDbContext> options) : base(options)
-    {
-    }
-
-    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        SaveChangesCallCount++;
-
-        if (ThrowOnNextSaveChanges)
-        {
-            ThrowOnNextSaveChanges = false;
-            throw new DbUpdateException(
-                "The database operation was expected to affect 1 row(s), but actually affected 0 row(s).",
-                new Exception("Unique constraint violation on (GenerationId, UserId)"));
-        }
-
-        return await base.SaveChangesAsync(cancellationToken);
     }
 }
