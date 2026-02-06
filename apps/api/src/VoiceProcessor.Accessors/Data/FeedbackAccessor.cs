@@ -37,6 +37,6 @@ public class FeedbackAccessor : IFeedbackAccessor
                 feedback.CreatedAt)
             .FirstOrDefaultAsync(cancellationToken);
 
-        return result ?? feedback;
+        return result!;
     }
 }
