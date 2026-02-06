@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Testcontainers.PostgreSql;
 using VoiceProcessor.Accessors.Data;
 using VoiceProcessor.Accessors.Data.DbContext;
 using VoiceProcessor.Domain.Entities;
@@ -8,25 +8,31 @@ using VoiceProcessor.Domain.Enums;
 
 namespace VoiceProcessor.Accessors.Tests.Data;
 
-public class FeedbackAccessorTests : IDisposable
+public class FeedbackAccessorTests : IAsyncLifetime
 {
-    private readonly VoiceProcessorDbContext _dbContext;
-    private readonly FeedbackAccessor _accessor;
+    private PostgreSqlContainer _container = null!;
+    private VoiceProcessorDbContext _dbContext = null!;
+    private FeedbackAccessor _accessor = null!;
 
-    public FeedbackAccessorTests()
+    public async Task InitializeAsync()
     {
+        _container = new PostgreSqlBuilder("postgres:16-alpine").Build();
+        await _container.StartAsync();
+
         var options = new DbContextOptionsBuilder<VoiceProcessorDbContext>()
-            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+            .UseNpgsql(_container.GetConnectionString())
             .Options;
 
         _dbContext = new VoiceProcessorDbContext(options);
+        await _dbContext.Database.MigrateAsync();
+
         _accessor = new FeedbackAccessor(_dbContext);
     }
 
-    public void Dispose()
+    public async Task DisposeAsync()
     {
-        _dbContext.Database.EnsureDeleted();
-        _dbContext.Dispose();
+        await _dbContext.DisposeAsync();
+        await _container.DisposeAsync();
     }
 
     [Fact]
@@ -223,7 +229,7 @@ public class FeedbackAccessorTests : IDisposable
         var generationId = Guid.NewGuid();
 
         var options = new DbContextOptionsBuilder<VoiceProcessorDbContext>()
-            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+            .UseNpgsql(_container.GetConnectionString())
             .Options;
 
         var testDbContext = new TestVoiceProcessorDbContext(options);
