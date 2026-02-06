@@ -19,7 +19,7 @@ public partial class ChapterDetectionEngine : IChapterDetectionEngine
     [GeneratedRegex(@"^Section\s+(\d+)(?:\s*[:\-]\s*(.+))?$", RegexOptions.IgnoreCase | RegexOptions.Multiline)]
     private static partial Regex SectionNumberedRegex();
 
-    [GeneratedRegex(@"^Chapter\s+(One|Two|Three|Four|Five|Six|Seven|Eight|Nine|Ten|Eleven|Twelve|Thirteen|Fourteen|Fifteen|Sixteen|Seventeen|Eighteen|Nineteen|Twenty|Twenty-One|Twenty-Two|Twenty-Three|Twenty-Four|Twenty-Five|Twenty-Six|Twenty-Seven|Twenty-Eight|Twenty-Nine|Thirty|Thirty-One|Thirty-Two|Thirty-Three|Thirty-Four|Thirty-Five|Thirty-Six|Thirty-Seven|Thirty-Eight|Thirty-Nine|Forty|Forty-One|Forty-Two|Forty-Three|Forty-Four|Forty-Five|Forty-Six|Forty-Seven|Forty-Eight|Forty-Nine|Fifty|Fifty-One|Fifty-Two|Fifty-Three|Fifty-Four|Fifty-Five|Fifty-Six|Fifty-Seven|Fifty-Eight|Fifty-Nine|Sixty|Sixty-One|Sixty-Two|Sixty-Three|Sixty-Four|Sixty-Five|Sixty-Six|Sixty-Seven|Sixty-Eight|Sixty-Nine|Seventy|Seventy-One|Seventy-Two|Seventy-Three|Seventy-Four|Seventy-Five|Seventy-Six|Seventy-Seven|Seventy-Eight|Seventy-Nine|Eighty|Eighty-One|Eighty-Two|Eighty-Three|Eighty-Four|Eighty-Five|Eighty-Six|Eighty-Seven|Eighty-Eight|Eighty-Nine|Ninety|Ninety-One|Ninety-Two|Ninety-Three|Ninety-Four|Ninety-Five|Ninety-Six|Ninety-Seven|Ninety-Eight|Ninety-Nine|One Hundred)(?:\s*[:\-]\s*(.+))?$", RegexOptions.IgnoreCase | RegexOptions.Multiline)]
+    [GeneratedRegex(@"^Chapter\s+(Seventy-Eight|Seventy-Seven|Seventy-Three|Eighty-Eight|Eighty-Seven|Eighty-Three|Ninety-Eight|Ninety-Seven|Ninety-Three|Seventy-Five|Seventy-Four|Seventy-Nine|Thirty-Eight|Thirty-Seven|Thirty-Three|Twenty-Eight|Twenty-Seven|Twenty-Three|Eighty-Five|Eighty-Four|Eighty-Nine|Fifty-Eight|Fifty-Seven|Fifty-Three|Forty-Eight|Forty-Seven|Forty-Three|Ninety-Five|Ninety-Four|Ninety-Nine|One Hundred|Seventy-One|Seventy-Six|Seventy-Two|Sixty-Eight|Sixty-Seven|Sixty-Three|Thirty-Five|Thirty-Four|Thirty-Nine|Twenty-Five|Twenty-Four|Twenty-Nine|Eighty-One|Eighty-Six|Eighty-Two|Fifty-Five|Fifty-Four|Fifty-Nine|Forty-Five|Forty-Four|Forty-Nine|Ninety-One|Ninety-Six|Ninety-Two|Sixty-Five|Sixty-Four|Sixty-Nine|Thirty-One|Thirty-Six|Thirty-Two|Twenty-One|Twenty-Six|Twenty-Two|Fifty-One|Fifty-Six|Fifty-Two|Forty-One|Forty-Six|Forty-Two|Seventeen|Sixty-One|Sixty-Six|Sixty-Two|Eighteen|Fourteen|Nineteen|Thirteen|Fifteen|Seventy|Sixteen|Eighty|Eleven|Ninety|Thirty|Twelve|Twenty|Eight|Fifty|Forty|Seven|Sixty|Three|Five|Four|Nine|One|Six|Ten|Two)(?:\s*[:\-]\s*(.+))?$", RegexOptions.IgnoreCase | RegexOptions.Multiline)]
     private static partial Regex ChapterWrittenRegex();
 
     [GeneratedRegex(@"^Part\s+(One|Two|Three|Four|Five|Six|Seven|Eight|Nine|Ten)(?:\s*[:\-]\s*(.+))?$", RegexOptions.IgnoreCase | RegexOptions.Multiline)]
@@ -162,14 +162,31 @@ public partial class ChapterDetectionEngine : IChapterDetectionEngine
         }
     }
 
-    private static int EstimateWordCount(string text)
-    {
-        if (string.IsNullOrWhiteSpace(text))
-            return 0;
+     private static int EstimateWordCount(string text)
+     {
+         if (string.IsNullOrWhiteSpace(text))
+             return 0;
 
-        // Split on whitespace and count non-empty entries
-        return text.Split([' ', '\t', '\n', '\r'], StringSplitOptions.RemoveEmptyEntries).Length;
-    }
+         var wordCount = 0;
+         var inWord = false;
+
+         foreach (var c in text)
+         {
+             var isWhitespace = c is ' ' or '\t' or '\n' or '\r';
+
+             if (!isWhitespace && !inWord)
+             {
+                 wordCount++;
+                 inWord = true;
+             }
+             else if (isWhitespace)
+             {
+                 inWord = false;
+             }
+         }
+
+         return wordCount;
+     }
 
     private class ChapterMatch
     {

@@ -38,7 +38,35 @@ public class FeedbackAccessor : IFeedbackAccessor
             feedback = existing;
         }
 
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateException)
+        {
+            // Handle race condition: concurrent insert for same (GenerationId, UserId)
+            // Clear the change tracker and retry by fetching the existing record
+            _dbContext.ChangeTracker.Clear();
+
+            // Re-fetch the existing record that was inserted concurrently
+            var existingRecord = await _dbContext.Feedbacks
+                .FirstOrDefaultAsync(f => f.GenerationId == feedback.GenerationId && f.UserId == feedback.UserId, cancellationToken);
+
+            if (existingRecord is not null)
+            {
+                existingRecord.Rating = feedback.Rating;
+                existingRecord.Comment = feedback.Comment;
+                existingRecord.WasDownloaded = feedback.WasDownloaded;
+                existingRecord.PlaybackCount = feedback.PlaybackCount;
+                existingRecord.PlaybackDurationMs = feedback.PlaybackDurationMs;
+                existingRecord.UpdatedAt = DateTime.UtcNow;
+
+                feedback = existingRecord;
+
+                await _dbContext.SaveChangesAsync(cancellationToken);
+            }
+        }
+
         return feedback;
     }
 }

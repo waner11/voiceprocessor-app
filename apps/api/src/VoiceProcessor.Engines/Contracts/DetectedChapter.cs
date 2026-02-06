@@ -1,4 +1,4 @@
-namespace VoiceProcessor.Domain.DTOs;
+namespace VoiceProcessor.Engines.Contracts;
 
 public record DetectedChapter
 {

@@ -373,11 +373,11 @@ Second part.";
         result[1].Title.Should().Be("Part Two");
     }
 
-    [Fact]
-    public void DetectChapters_EndPositions_AreCorrect()
-    {
-        // Arrange
-        var text = @"Chapter 1
+     [Fact]
+     public void DetectChapters_EndPositions_AreCorrect()
+     {
+         // Arrange
+         var text = @"Chapter 1
 Content 1.
 
 Chapter 2
@@ -386,19 +386,85 @@ Content 2.
 Chapter 3
 Content 3.";
 
-        // Act
-        var result = _engine.DetectChapters(text);
+         // Act
+         var result = _engine.DetectChapters(text);
 
-        // Assert
-        result.Should().HaveCount(3);
+         // Assert
+         result.Should().HaveCount(3);
+
+         // First chapter ends where second starts
+         result[0].EndPosition.Should().Be(result[1].StartPosition);
+
+         // Second chapter ends where third starts
+         result[1].EndPosition.Should().Be(result[2].StartPosition);
+
+         // Last chapter ends at text end
+         result[2].EndPosition.Should().Be(text.Length);
+     }
+
+     [Theory]
+     [InlineData("")]
+     [InlineData("   ")]
+     [InlineData("\t\t\t")]
+     [InlineData("\n\n\n")]
+     [InlineData("\r\n\r\n")]
+     [InlineData("hello")]
+     [InlineData("hello world")]
+     [InlineData("hello  world")]
+     [InlineData("hello\tworld")]
+     [InlineData("hello\nworld")]
+     [InlineData("hello\r\nworld")]
+     [InlineData("  hello  world  ")]
+     [InlineData("\thello\tworld\t")]
+     [InlineData("\nhello\nworld\n")]
+     [InlineData("one two three four five")]
+     [InlineData("one  two   three    four     five")]
+     [InlineData("one\ttwo\tthree\tfour\tfive")]
+     [InlineData("one\ntwo\nthree\nfour\nfive")]
+     [InlineData("word1 word2\tword3\nword4\r\nword5")]
+     public void EstimateWordCount_VariousInputs_ProducesConsistentResults(string input)
+     {
+         // Arrange - Get the expected count using the original Split-based approach
+         int expectedCount = string.IsNullOrWhiteSpace(input)
+             ? 0
+             : input.Split([' ', '\t', '\n', '\r'], StringSplitOptions.RemoveEmptyEntries).Length;
+
+         // Act - Call EstimateWordCount (which will use the new streaming implementation)
+         var result = _engine.DetectChapters($"Chapter 1\n{input}\n\nChapter 2\nDummy");
+
+         // Assert - Verify word count of first chapter matches expected
+         result.Should().HaveCount(2);
+         result[0].EstimatedWordCount.Should().Be(2 + expectedCount,
+             $"Chapter header (2 words) + input '{input}' ({expectedCount} words) should produce {2 + expectedCount} words");
+     }
+
+    [Fact]
+    public void DetectChapters_WrittenNumberMap_AllKeysDetectedByRegex()
+    {
+        // Arrange - Get WrittenNumberMap via reflection
+        var mapField = typeof(ChapterDetectionEngine).GetField(
+            "WrittenNumberMap",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
         
-        // First chapter ends where second starts
-        result[0].EndPosition.Should().Be(result[1].StartPosition);
+        mapField.Should().NotBeNull("WrittenNumberMap field should exist");
         
-        // Second chapter ends where third starts
-        result[1].EndPosition.Should().Be(result[2].StartPosition);
-        
-        // Last chapter ends at text end
-        result[2].EndPosition.Should().Be(text.Length);
+        var writtenNumberMap = (Dictionary<string, int>)mapField!.GetValue(null)!;
+        writtenNumberMap.Should().NotBeEmpty("WrittenNumberMap should contain entries");
+
+        // Act & Assert - For each key in WrittenNumberMap, verify it's detected by regex
+        foreach (var (writtenNumber, expectedChapterNumber) in writtenNumberMap)
+        {
+            var text = $"Chapter {writtenNumber}\nSome content here.";
+            var result = _engine.DetectChapters(text);
+
+            result.Should().HaveCount(1, 
+                $"'{writtenNumber}' should be detected as a chapter");
+            
+            result[0].ChapterNumber.Should().Be(expectedChapterNumber,
+                $"'{writtenNumber}' should map to chapter number {expectedChapterNumber}");
+            
+            result[0].Title.Should().Be($"Chapter {writtenNumber}",
+                $"Title should preserve the written number '{writtenNumber}'");
+        }
     }
 }
