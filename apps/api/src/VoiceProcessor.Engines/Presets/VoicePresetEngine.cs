@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using VoiceProcessor.Domain.Enums;
 using VoiceProcessor.Engines.Contracts;
 
@@ -5,19 +6,26 @@ namespace VoiceProcessor.Engines.Presets;
 
 public class VoicePresetEngine : IVoicePresetEngine
 {
+    private readonly ILogger<VoicePresetEngine> _logger;
+
+    public VoicePresetEngine(ILogger<VoicePresetEngine> logger)
+    {
+        _logger = logger;
+    }
+
     public VoicePresetSettings GetSettingsForProvider(VoicePreset preset, Provider provider)
     {
         return provider switch
         {
             Provider.ElevenLabs => GetElevenLabsSettings(preset),
             Provider.OpenAI => GetOpenAiSettings(preset),
-            _ => GetDefaultSettings()
+            _ => GetDefaultSettings(provider)
         };
     }
 
-    private static VoicePresetSettings GetElevenLabsSettings(VoicePreset preset)
+    private VoicePresetSettings GetElevenLabsSettings(VoicePreset preset)
     {
-        return preset switch
+        var settings = preset switch
         {
             VoicePreset.Audiobook => new VoicePresetSettings
             {
@@ -47,24 +55,41 @@ public class VoicePresetEngine : IVoicePresetEngine
                 Style = 0.0,
                 Speed = 1.0
             },
-            _ => new VoicePresetSettings { Speed = 1.0 }
+            _ => null
         };
+
+        if (settings is null)
+        {
+            _logger.LogWarning("Unknown VoicePreset {Preset} for ElevenLabs, using defaults", preset);
+            return new VoicePresetSettings { Speed = 1.0 };
+        }
+
+        return settings;
     }
 
-    private static VoicePresetSettings GetOpenAiSettings(VoicePreset preset)
+    private VoicePresetSettings GetOpenAiSettings(VoicePreset preset)
     {
-        return preset switch
+        var settings = preset switch
         {
             VoicePreset.Audiobook => new VoicePresetSettings { Speed = 1.0 },
             VoicePreset.Conversational => new VoicePresetSettings { Speed = 1.05 },
             VoicePreset.Dramatic => new VoicePresetSettings { Speed = 0.95 },
             VoicePreset.Professional => new VoicePresetSettings { Speed = 1.0 },
-            _ => new VoicePresetSettings { Speed = 1.0 }
+            _ => null
         };
+
+        if (settings is null)
+        {
+            _logger.LogWarning("Unknown VoicePreset {Preset} for OpenAI, using defaults", preset);
+            return new VoicePresetSettings { Speed = 1.0 };
+        }
+
+        return settings;
     }
 
-    private static VoicePresetSettings GetDefaultSettings()
+    private VoicePresetSettings GetDefaultSettings(Provider provider)
     {
+        _logger.LogWarning("Unsupported provider {Provider} for voice presets, using defaults", provider);
         return new VoicePresetSettings { Speed = 1.0 };
     }
 }
