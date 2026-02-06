@@ -123,6 +123,11 @@ public class GenerationProcessor : IGenerationProcessor
                 };
                 await _chunkAccessor.CreateAsync(chunk, cancellationToken);
 
+                // Get preset settings ONCE (deterministic, doesn't change on retry)
+                var presetSettings = generation.Preset.HasValue
+                    ? _presetEngine.GetSettingsForProvider(generation.Preset.Value, voice.Provider)
+                    : null;
+
                 // Retry loop for transient failures
                 Exception? lastException = null;
                 for (var attempt = 0; attempt <= MaxChunkRetries; attempt++)
@@ -137,10 +142,6 @@ public class GenerationProcessor : IGenerationProcessor
                                 i, generationId, attempt);
                             await _delayService.DelayAsync(RetryDelays[attempt - 1], cancellationToken);
                         }
-
-                        var presetSettings = generation.Preset.HasValue
-                            ? _presetEngine.GetSettingsForProvider(generation.Preset.Value, voice.Provider)
-                            : null;
 
                         var result = await provider.GenerateSpeechAsync(new TtsRequest
                         {
