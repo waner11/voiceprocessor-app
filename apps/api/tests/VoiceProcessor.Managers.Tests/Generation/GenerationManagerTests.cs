@@ -18,6 +18,7 @@ public class GenerationManagerTests
     private readonly Mock<IGenerationAccessor> _mockGenerationAccessor;
     private readonly Mock<IVoiceAccessor> _mockVoiceAccessor;
     private readonly Mock<IUserAccessor> _mockUserAccessor;
+    private readonly Mock<IFeedbackAccessor> _mockFeedbackAccessor;
     private readonly Mock<ITtsProviderFactory> _mockProviderFactory;
     private readonly Mock<IChunkingEngine> _mockChunkingEngine;
     private readonly Mock<IPricingEngine> _mockPricingEngine;
@@ -30,6 +31,7 @@ public class GenerationManagerTests
         _mockGenerationAccessor = new Mock<IGenerationAccessor>();
         _mockVoiceAccessor = new Mock<IVoiceAccessor>();
         _mockUserAccessor = new Mock<IUserAccessor>();
+        _mockFeedbackAccessor = new Mock<IFeedbackAccessor>();
         _mockProviderFactory = new Mock<ITtsProviderFactory>();
         _mockChunkingEngine = new Mock<IChunkingEngine>();
         _mockPricingEngine = new Mock<IPricingEngine>();
@@ -44,6 +46,7 @@ public class GenerationManagerTests
             _mockGenerationAccessor.Object,
             _mockVoiceAccessor.Object,
             _mockUserAccessor.Object,
+            _mockFeedbackAccessor.Object,
             _mockProviderFactory.Object,
             _mockChunkingEngine.Object,
             _mockPricingEngine.Object,
@@ -542,6 +545,83 @@ public class GenerationManagerTests
     }
 
     [Fact]
+    public async Task SubmitFeedbackAsync_ValidRequest_CallsUpsertAsync()
+    {
+        // Arrange
+        var manager = CreateManager();
+        var generationId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+
+        var request = new SubmitFeedbackRequest
+        {
+            Rating = 5,
+            Comment = "Great quality!"
+        };
+
+        var generation = new Domain.Entities.Generation
+        {
+            Id = generationId,
+            UserId = userId,
+            VoiceId = Guid.NewGuid(),
+            InputText = "Test",
+            CharacterCount = 4,
+            Status = GenerationStatus.Completed,
+            RoutingPreference = RoutingPreference.Balanced,
+            SelectedProvider = Provider.ElevenLabs,
+            ChunkCount = 1,
+            ChunksCompleted = 1,
+            Progress = 100,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generationId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(generation);
+
+        Feedback? capturedFeedback = null;
+        _mockFeedbackAccessor.Setup(x => x.UpsertAsync(It.IsAny<Feedback>(), It.IsAny<CancellationToken>()))
+            .Callback<Feedback, CancellationToken>((f, ct) => capturedFeedback = f)
+            .ReturnsAsync((Feedback f, CancellationToken ct) => f);
+
+        // Act
+        await manager.SubmitFeedbackAsync(generationId, userId, request);
+
+        // Assert
+        _mockFeedbackAccessor.Verify(x => x.UpsertAsync(It.IsAny<Feedback>(), It.IsAny<CancellationToken>()), Times.Once);
+        capturedFeedback.Should().NotBeNull();
+        capturedFeedback!.GenerationId.Should().Be(generationId);
+        capturedFeedback.UserId.Should().Be(userId);
+        capturedFeedback.Rating.Should().Be(5);
+        capturedFeedback.Comment.Should().Be("Great quality!");
+    }
+
+    [Fact]
+    public async Task SubmitFeedbackAsync_GenerationNotFound_ThrowsException()
+    {
+        // Arrange
+        var manager = CreateManager();
+        var generationId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+
+        var request = new SubmitFeedbackRequest
+        {
+            Rating = 5,
+            Comment = "Great quality!"
+        };
+
+        _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generationId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Domain.Entities.Generation?)null);
+
+        // Act
+        var act = async () => await manager.SubmitFeedbackAsync(generationId, userId, request);
+
+        // Assert
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage($"Generation {generationId} not found");
+
+        _mockFeedbackAccessor.Verify(x => x.UpsertAsync(It.IsAny<Feedback>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
     public async Task SubmitFeedbackAsync_OtherUsersGeneration_ThrowsException()
     {
         // Arrange
@@ -581,6 +661,93 @@ public class GenerationManagerTests
         // Assert
         await act.Should().ThrowAsync<InvalidOperationException>()
             .WithMessage("Generation does not belong to user");
+
+        _mockFeedbackAccessor.Verify(x => x.UpsertAsync(It.IsAny<Feedback>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task CreateGenerationAsync_WithPreset_SetsPresetOnEntity()
+    {
+        // Arrange
+        var manager = CreateManager();
+        var userId = Guid.NewGuid();
+        var voiceId = Guid.NewGuid();
+
+        var request = new CreateGenerationRequest
+        {
+            Text = "Test text for preset propagation.",
+            VoiceId = voiceId,
+            RoutingPreference = RoutingPreference.Balanced,
+            AudioFormat = "mp3",
+            Preset = VoicePreset.Audiobook
+        };
+
+        var voice = new Domain.Entities.Voice
+        {
+            Id = voiceId,
+            Name = "Test Voice",
+            Provider = Provider.ElevenLabs,
+            ProviderVoiceId = "voice_123",
+            CostPerThousandChars = 0.30m,
+            IsActive = true
+        };
+
+        var user = new Domain.Entities.User
+        {
+            Id = userId,
+            Email = "test@example.com",
+            CreditsRemaining = 1000,
+            IsActive = true
+        };
+
+        _mockVoiceAccessor.Setup(x => x.GetByIdAsync(voiceId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(voice);
+
+        _mockUserAccessor.Setup(x => x.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+
+        _mockPricingEngine.Setup(x => x.CalculateEstimate(It.IsAny<PricingContext>()))
+            .Returns(new PriceEstimate
+            {
+                CharacterCount = request.Text.Length,
+                EstimatedCost = 0.01m,
+                Currency = "USD",
+                Provider = Provider.ElevenLabs,
+                CreditsRequired = 10
+            });
+
+        _mockChunkingEngine.Setup(x => x.SplitText(request.Text, It.IsAny<ChunkingOptions?>()))
+            .Returns(new List<TextChunk>
+            {
+                new TextChunk { Index = 0, Text = request.Text, StartPosition = 0, EndPosition = request.Text.Length }
+            });
+
+        var mockProvider = new Mock<ITtsProviderAccessor>();
+        mockProvider.Setup(x => x.Provider).Returns(Provider.ElevenLabs);
+
+        _mockProviderFactory.Setup(x => x.GetAllProviders())
+            .Returns(new List<ITtsProviderAccessor> { mockProvider.Object });
+
+        _mockRoutingEngine.Setup(x => x.SelectProviderAsync(It.IsAny<RoutingContext>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new RoutingDecision
+            {
+                SelectedProvider = Provider.ElevenLabs,
+                Reason = "Best match",
+                EstimatedCost = 0.01m,
+                EstimatedLatencyMs = 2000
+            });
+
+        Domain.Entities.Generation? capturedGeneration = null;
+        _mockGenerationAccessor.Setup(x => x.CreateAsync(It.IsAny<Domain.Entities.Generation>(), It.IsAny<CancellationToken>()))
+            .Callback<Domain.Entities.Generation, CancellationToken>((g, ct) => capturedGeneration = g)
+            .ReturnsAsync((Domain.Entities.Generation g, CancellationToken ct) => g);
+
+        // Act
+        var result = await manager.CreateGenerationAsync(userId, request);
+
+        // Assert
+        capturedGeneration.Should().NotBeNull();
+        capturedGeneration!.Preset.Should().Be(VoicePreset.Audiobook);
     }
 
     [Fact]

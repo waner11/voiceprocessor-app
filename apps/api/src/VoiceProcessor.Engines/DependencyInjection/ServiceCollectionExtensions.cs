@@ -1,8 +1,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using VoiceProcessor.Engines.Analysis;
 using VoiceProcessor.Engines.Audio;
 using VoiceProcessor.Engines.Chunking;
 using VoiceProcessor.Engines.Contracts;
+using VoiceProcessor.Engines.Presets;
 using VoiceProcessor.Engines.Pricing;
 using VoiceProcessor.Engines.Routing;
 using VoiceProcessor.Engines.Security;
@@ -18,8 +20,14 @@ public static class ServiceCollectionExtensions
         // Chunking Engine (stateless, can be singleton)
         services.AddSingleton<IChunkingEngine, ChunkingEngine>();
 
+        // Chapter Detection Engine (stateless, can be singleton)
+        services.AddSingleton<IChapterDetectionEngine, ChapterDetectionEngine>();
+
         // Audio Merge Engine (stateless, can be singleton)
         services.AddSingleton<IAudioMergeEngine, AudioMergeEngine>();
+
+        // Voice Preset Engine (stateless, can be singleton)
+        services.AddSingleton<IVoicePresetEngine, VoicePresetEngine>();
 
         // Pricing Engine
         services.Configure<PricingOptions>(

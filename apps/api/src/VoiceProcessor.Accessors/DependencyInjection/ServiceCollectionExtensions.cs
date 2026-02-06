@@ -22,6 +22,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IVoiceAccessor, VoiceAccessor>();
         services.AddScoped<IGenerationAccessor, GenerationAccessor>();
         services.AddScoped<IGenerationChunkAccessor, GenerationChunkAccessor>();
+        services.AddScoped<IFeedbackAccessor, FeedbackAccessor>();
         services.AddScoped<IRefreshTokenAccessor, RefreshTokenAccessor>();
         services.AddScoped<IApiKeyAccessor, ApiKeyAccessor>();
         services.AddScoped<IExternalLoginAccessor, ExternalLoginAccessor>();

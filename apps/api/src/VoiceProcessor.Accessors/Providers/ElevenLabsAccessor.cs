@@ -50,9 +50,9 @@ public class ElevenLabsAccessor : ITtsProviderAccessor
                 ModelId = _options.DefaultModel,
                 VoiceSettings = new VoiceSettings
                 {
-                    Stability = 0.5,
-                    SimilarityBoost = 0.75,
-                    Style = 0.0,
+                    Stability = request.Stability ?? 0.5,
+                    SimilarityBoost = request.SimilarityBoost ?? 0.75,
+                    Style = request.Style ?? 0.0,
                     UseSpeakerBoost = true
                 }
             };

@@ -26,6 +26,7 @@ public class GenerationProcessor : IGenerationProcessor
     private readonly IStorageAccessor _storageAccessor;
     private readonly IChunkingEngine _chunkingEngine;
     private readonly IAudioMergeEngine _audioMergeEngine;
+    private readonly IVoicePresetEngine _presetEngine;
     private readonly ILogger<GenerationProcessor> _logger;
     private readonly IDelayService _delayService;
 
@@ -38,6 +39,7 @@ public class GenerationProcessor : IGenerationProcessor
         IStorageAccessor storageAccessor,
         IChunkingEngine chunkingEngine,
         IAudioMergeEngine audioMergeEngine,
+        IVoicePresetEngine presetEngine,
         ILogger<GenerationProcessor> logger,
         IDelayService delayService)
     {
@@ -49,6 +51,7 @@ public class GenerationProcessor : IGenerationProcessor
         _storageAccessor = storageAccessor;
         _chunkingEngine = chunkingEngine;
         _audioMergeEngine = audioMergeEngine;
+        _presetEngine = presetEngine;
         _logger = logger;
         _delayService = delayService;
     }
@@ -120,6 +123,11 @@ public class GenerationProcessor : IGenerationProcessor
                 };
                 await _chunkAccessor.CreateAsync(chunk, cancellationToken);
 
+                // Get preset settings ONCE (deterministic, doesn't change on retry)
+                var presetSettings = generation.Preset.HasValue
+                    ? _presetEngine.GetSettingsForProvider(generation.Preset.Value, voice.Provider)
+                    : null;
+
                 // Retry loop for transient failures
                 Exception? lastException = null;
                 for (var attempt = 0; attempt <= MaxChunkRetries; attempt++)
@@ -135,12 +143,15 @@ public class GenerationProcessor : IGenerationProcessor
                             await _delayService.DelayAsync(RetryDelays[attempt - 1], cancellationToken);
                         }
 
-                        // Call TTS provider
                         var result = await provider.GenerateSpeechAsync(new TtsRequest
                         {
                             Text = textChunk.Text,
                             ProviderVoiceId = voice.ProviderVoiceId,
-                            OutputFormat = generation.AudioFormat ?? "mp3"
+                            OutputFormat = generation.AudioFormat ?? "mp3",
+                            Speed = presetSettings?.Speed,
+                            Stability = presetSettings?.Stability,
+                            SimilarityBoost = presetSettings?.SimilarityBoost,
+                            Style = presetSettings?.Style
                         }, cancellationToken);
 
                         if (!result.Success || result.AudioData is null)
