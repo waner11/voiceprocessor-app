@@ -13,7 +13,7 @@ export {
   useRefreshVoices,
 } from "./useVoices";
 export { useUsage } from "./useUsage";
-export { useGenerationHub } from "./useGenerationHub";
+export { useGenerationHub, useSignalRStatus } from "./useGenerationHub";
 export {
    useLogin,
    useRegister,

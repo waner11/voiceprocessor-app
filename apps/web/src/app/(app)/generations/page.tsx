@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useGenerations } from "@/hooks";
+import { useGenerationHub } from "@/hooks/useGenerationHub";
 import type { components } from "@/lib/api/types";
 import { formatNumber } from "@/utils/formatNumber";
 
@@ -38,6 +39,7 @@ export default function GenerationsPage() {
     pageSize: 10,
     status: status || undefined,
   });
+  useGenerationHub();
 
   const generations = data?.items || [];
 

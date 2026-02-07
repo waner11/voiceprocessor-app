@@ -3,7 +3,7 @@ import * as signalR from "@microsoft/signalr";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 const HUB_URL = `${API_URL}/hubs/generation`;
 
-export type GenerationStatus = "queued" | "processing" | "completed" | "failed";
+export type GenerationStatus = "queued" | "processing" | "completed" | "failed" | "cancelled";
 
 export interface StatusUpdateEvent {
   generationId: string;
@@ -41,7 +41,7 @@ let connection: signalR.HubConnection | null = null;
 export function getConnection(): signalR.HubConnection {
   if (!connection) {
     connection = new signalR.HubConnectionBuilder()
-      .withUrl(HUB_URL)
+      .withUrl(HUB_URL, { withCredentials: true })
       .withAutomaticReconnect()
       .configureLogging(signalR.LogLevel.Information)
       .build();
@@ -76,4 +76,15 @@ export function offEvent<K extends keyof GenerationHubEvents>(
 ): void {
   const conn = getConnection();
   conn.off(event, callback);
+}
+
+export function getConnectionState(): signalR.HubConnectionState {
+  return connection?.state ?? signalR.HubConnectionState.Disconnected;
+}
+
+export function onStateChange(callback: (state: signalR.HubConnectionState) => void): void {
+  const conn = getConnection();
+  conn.onclose(() => callback(signalR.HubConnectionState.Disconnected));
+  conn.onreconnecting(() => callback(signalR.HubConnectionState.Reconnecting));
+  conn.onreconnected(() => callback(signalR.HubConnectionState.Connected));
 }

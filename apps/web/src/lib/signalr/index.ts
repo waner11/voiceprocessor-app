@@ -4,6 +4,8 @@ export {
   stopConnection,
   onEvent,
   offEvent,
+  getConnectionState,
+  onStateChange,
   type GenerationStatus,
   type StatusUpdateEvent,
   type ProgressEvent,

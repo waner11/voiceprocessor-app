@@ -3,6 +3,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import type { components } from "@/lib/api/types";
+import { getConnectionState } from "@/lib/signalr";
+import { HubConnectionState } from "@microsoft/signalr";
 
 type GenerationStatus = components["schemas"]["GenerationStatus"];
 type RoutingPreference = components["schemas"]["RoutingPreference"];
@@ -65,9 +67,11 @@ export function useGeneration(id: string) {
         "Processing",
         "Merging",
       ];
-      return data?.status && inProgressStatuses.includes(data.status)
-        ? 2000
-        : false;
+      if (!data?.status || !inProgressStatuses.includes(data.status)) {
+        return false;
+      }
+      const isConnected = getConnectionState() === HubConnectionState.Connected;
+      return isConnected ? 10000 : 2000;
     },
   });
 }

@@ -1,17 +1,20 @@
 "use client";
 
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   startConnection,
   stopConnection,
   onEvent,
   offEvent,
+  getConnectionState,
+  onStateChange,
   type StatusUpdateEvent,
   type ProgressEvent,
   type CompletedEvent,
   type FailedEvent,
 } from "@/lib/signalr";
+import * as signalR from "@microsoft/signalr";
 
 export function useGenerationHub() {
   const queryClient = useQueryClient();
@@ -21,6 +24,9 @@ export function useGenerationHub() {
       queryClient.invalidateQueries({
         queryKey: ["generation", event.generationId],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["generations"],
+      });
     },
     [queryClient]
   );
@@ -28,8 +34,16 @@ export function useGenerationHub() {
   const handleProgress = useCallback(
     (event: ProgressEvent) => {
       queryClient.setQueryData(
-        ["generation", event.generationId, "progress"],
-        event
+        ["generation", event.generationId],
+        (old: Record<string, unknown> | undefined) =>
+          old
+            ? {
+                ...old,
+                progress: event.progress,
+                chunksCompleted: event.currentChunk ?? old.chunksCompleted,
+                chunkCount: event.totalChunks ?? old.chunkCount,
+              }
+            : old
       );
     },
     [queryClient]
@@ -52,6 +66,9 @@ export function useGenerationHub() {
       queryClient.invalidateQueries({
         queryKey: ["generation", event.generationId],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["generations"],
+      });
     },
     [queryClient]
   );
@@ -72,4 +89,17 @@ export function useGenerationHub() {
       stopConnection();
     };
   }, [handleStatusUpdate, handleProgress, handleCompleted, handleFailed]);
+}
+
+export function useSignalRStatus() {
+  const [state, setState] = useState<signalR.HubConnectionState>(
+    signalR.HubConnectionState.Disconnected
+  );
+
+  useEffect(() => {
+    setState(getConnectionState());
+    onStateChange(setState);
+  }, []);
+
+  return state;
 }
