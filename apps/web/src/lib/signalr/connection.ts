@@ -37,6 +37,9 @@ export type GenerationHubEvents = {
 };
 
 let connection: signalR.HubConnection | null = null;
+let refCount = 0;
+let isStarting = false;
+const stateChangeCallbacks: Array<(state: signalR.HubConnectionState) => void> = [];
 
 export function getConnection(): signalR.HubConnection {
   if (!connection) {
@@ -54,15 +57,34 @@ export function getConnection(): signalR.HubConnection {
 }
 
 export async function startConnection(): Promise<void> {
+  refCount++;
+  
   const conn = getConnection();
-  if (conn.state === signalR.HubConnectionState.Disconnected) {
-    await conn.start();
+  
+  if (refCount === 1 && conn.state === signalR.HubConnectionState.Disconnected && !isStarting) {
+    isStarting = true;
+    try {
+      await conn.start();
+      console.log("SignalR connected");
+    } catch (err) {
+      console.error("SignalR connection failed:", err);
+      refCount--;
+      throw err;
+    } finally {
+      isStarting = false;
+    }
   }
 }
 
-export async function stopConnection(): Promise<void> {
-  if (connection && connection.state === signalR.HubConnectionState.Connected) {
-    await connection.stop();
+export function stopConnection(): void {
+  refCount = Math.max(0, refCount - 1);
+  
+  if (refCount === 0) {
+    const conn = getConnection();
+    if (conn.state !== signalR.HubConnectionState.Disconnected) {
+      conn.stop();
+      console.log("SignalR disconnected");
+    }
   }
 }
 
@@ -86,9 +108,31 @@ export function getConnectionState(): signalR.HubConnectionState {
   return connection?.state ?? signalR.HubConnectionState.Disconnected;
 }
 
-export function onStateChange(callback: (state: signalR.HubConnectionState) => void): void {
+export function onStateChange(callback: (state: signalR.HubConnectionState) => void): () => void {
+  stateChangeCallbacks.push(callback);
+  
   const conn = getConnection();
-  conn.onclose(() => callback(signalR.HubConnectionState.Disconnected));
-  conn.onreconnecting(() => callback(signalR.HubConnectionState.Reconnecting));
-  conn.onreconnected(() => callback(signalR.HubConnectionState.Connected));
+  conn.onclose(() => {
+    stateChangeCallbacks.forEach(cb => cb(signalR.HubConnectionState.Disconnected));
+  });
+  conn.onreconnecting(() => {
+    stateChangeCallbacks.forEach(cb => cb(signalR.HubConnectionState.Reconnecting));
+  });
+  conn.onreconnected(() => {
+    stateChangeCallbacks.forEach(cb => cb(signalR.HubConnectionState.Connected));
+  });
+  
+  return () => {
+    const index = stateChangeCallbacks.indexOf(callback);
+    if (index > -1) {
+      stateChangeCallbacks.splice(index, 1);
+    }
+  };
+}
+
+export function __resetForTesting(): void {
+  connection = null;
+  refCount = 0;
+  isStarting = false;
+  stateChangeCallbacks.length = 0;
 }

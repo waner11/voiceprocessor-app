@@ -98,7 +98,8 @@ export function useSignalRStatus() {
 
   useEffect(() => {
     setState(getConnectionState());
-    onStateChange(setState);
+    const cleanup = onStateChange(setState);
+    return cleanup;
   }, []);
 
   return state;
