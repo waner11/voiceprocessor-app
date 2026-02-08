@@ -113,6 +113,32 @@ describe("SignalR Connection Lifecycle", () => {
 
       expect(conn.stop).not.toHaveBeenCalled();
     });
+
+    it("should allow retry after concurrent start failure", async () => {
+      const conn = getConnection();
+      
+      conn.start.mockRejectedValueOnce(new Error("Connection failed"));
+      
+      const results = await Promise.allSettled([
+        startConnection(),
+        startConnection(),
+      ]);
+      
+      expect(results[0].status).toBe("rejected");
+      expect(results[1].status).toBe("rejected");
+      expect(mockConnectionState).toBe(0);
+      
+      conn.start.mockImplementationOnce(async () => {
+        mockConnectionState = 2;
+      });
+      
+      await startConnection();
+      expect(conn.start).toHaveBeenCalledTimes(2);
+      expect(mockConnectionState).toBe(2);
+      
+      stopConnection();
+      expect(conn.stop).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe("State Change Cleanup", () => {
