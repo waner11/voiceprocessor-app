@@ -43,7 +43,11 @@ export function getConnection(): signalR.HubConnection {
     connection = new signalR.HubConnectionBuilder()
       .withUrl(HUB_URL, { withCredentials: true })
       .withAutomaticReconnect()
-      .configureLogging(signalR.LogLevel.Information)
+      .configureLogging(
+        process.env.NODE_ENV === "production"
+          ? signalR.LogLevel.Warning
+          : signalR.LogLevel.Information
+      )
       .build();
   }
   return connection;
