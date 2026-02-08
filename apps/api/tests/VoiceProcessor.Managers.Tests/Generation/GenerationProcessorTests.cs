@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using VoiceProcessor.Accessors.Contracts;
 using VoiceProcessor.Accessors.Providers;
+using VoiceProcessor.Domain.Contracts.Accessors;
 using VoiceProcessor.Domain.Entities;
 using VoiceProcessor.Domain.Enums;
 using VoiceProcessor.Engines.Contracts;
@@ -24,6 +25,7 @@ public class GenerationProcessorTests
     private readonly Mock<IVoicePresetEngine> _mockPresetEngine;
     private readonly Mock<ILogger<GenerationProcessor>> _mockLogger;
     private readonly Mock<IDelayService> _mockDelayService;
+    private readonly Mock<INotificationAccessor> _mockNotificationAccessor;
 
     public GenerationProcessorTests()
     {
@@ -38,6 +40,7 @@ public class GenerationProcessorTests
        _mockPresetEngine = new Mock<IVoicePresetEngine>();
        _mockLogger = new Mock<ILogger<GenerationProcessor>>();
        _mockDelayService = new Mock<IDelayService>();
+       _mockNotificationAccessor = new Mock<INotificationAccessor>();
     }
 
     private GenerationProcessor CreateProcessor()
@@ -53,7 +56,8 @@ public class GenerationProcessorTests
            _mockAudioMergeEngine.Object,
            _mockPresetEngine.Object,
            _mockLogger.Object,
-           _mockDelayService.Object
+           _mockDelayService.Object,
+           _mockNotificationAccessor.Object
        );
     }
 
@@ -1589,5 +1593,132 @@ public class GenerationProcessorTests
 
         // Assert — DelayAsync never called (no retry delay)
         _mockDelayService.Verify(x => x.DelayAsync(It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    // NOTIFICATION TESTS
+
+    [Fact]
+    public async Task ProcessGenerationAsync_SingleChunk_SendsStatusUpdateOnProcessing()
+    {
+        // Arrange — full happy path setup
+        var generation = CreateGeneration();
+        var voice = CreateVoice(generation.VoiceId);
+        var ttsResult = CreateSuccessfulTtsResult();
+        _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generation.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(generation);
+        _mockVoiceAccessor.Setup(x => x.GetByIdAsync(generation.VoiceId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(voice);
+        _mockChunkingEngine.Setup(x => x.SplitText(generation.InputText, It.IsAny<ChunkingOptions?>()))
+            .Returns(new List<TextChunk> { new TextChunk { Index = 0, Text = generation.InputText, StartPosition = 0, EndPosition = generation.InputText.Length } });
+        var mockProvider = SetupMockProvider();
+        mockProvider.Setup(x => x.GenerateSpeechAsync(It.IsAny<TtsRequest>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ttsResult);
+        SetupChunkAccessorDefaults();
+        SetupCompletionPipeline(new AudioMergeResult { AudioData = new byte[] { 1, 2, 3 }, ContentType = "audio/mpeg", DurationMs = 1000, SizeBytes = 5 });
+        var processor = CreateProcessor();
+
+        // Act
+        await processor.ProcessGenerationAsync(generation.Id);
+
+        // Assert
+        _mockNotificationAccessor.Verify(x => x.SendStatusUpdateAsync(
+            generation.UserId, generation.Id, GenerationStatus.Processing, null, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task ProcessGenerationAsync_SingleChunk_SendsProgressNotification()
+    {
+        // Same happy path setup
+        var generation = CreateGeneration();
+        var voice = CreateVoice(generation.VoiceId);
+        var ttsResult = CreateSuccessfulTtsResult();
+        _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generation.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(generation);
+        _mockVoiceAccessor.Setup(x => x.GetByIdAsync(generation.VoiceId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(voice);
+        _mockChunkingEngine.Setup(x => x.SplitText(generation.InputText, It.IsAny<ChunkingOptions?>()))
+            .Returns(new List<TextChunk> { new TextChunk { Index = 0, Text = generation.InputText, StartPosition = 0, EndPosition = generation.InputText.Length } });
+        var mockProvider = SetupMockProvider();
+        mockProvider.Setup(x => x.GenerateSpeechAsync(It.IsAny<TtsRequest>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ttsResult);
+        SetupChunkAccessorDefaults();
+        SetupCompletionPipeline(new AudioMergeResult { AudioData = new byte[] { 1, 2, 3 }, ContentType = "audio/mpeg", DurationMs = 1000, SizeBytes = 5 });
+        var processor = CreateProcessor();
+
+        // Act
+        await processor.ProcessGenerationAsync(generation.Id);
+
+        // Assert
+        _mockNotificationAccessor.Verify(x => x.SendProgressAsync(
+            generation.UserId, generation.Id, 100, 1, 1, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task ProcessGenerationAsync_SingleChunk_SendsCompletedNotification()
+    {
+        // Same happy path setup
+        var generation = CreateGeneration();
+        var voice = CreateVoice(generation.VoiceId);
+        var ttsResult = CreateSuccessfulTtsResult();
+        _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generation.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(generation);
+        _mockVoiceAccessor.Setup(x => x.GetByIdAsync(generation.VoiceId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(voice);
+        _mockChunkingEngine.Setup(x => x.SplitText(generation.InputText, It.IsAny<ChunkingOptions?>()))
+            .Returns(new List<TextChunk> { new TextChunk { Index = 0, Text = generation.InputText, StartPosition = 0, EndPosition = generation.InputText.Length } });
+        var mockProvider = SetupMockProvider();
+        mockProvider.Setup(x => x.GenerateSpeechAsync(It.IsAny<TtsRequest>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ttsResult);
+        SetupChunkAccessorDefaults();
+        var storageUrl = "https://storage.example.com/audio.mp3";
+        SetupCompletionPipeline(new AudioMergeResult { AudioData = new byte[] { 1, 2, 3 }, ContentType = "audio/mpeg", DurationMs = 1000, SizeBytes = 5 }, storageUrl);
+        var processor = CreateProcessor();
+
+        // Act
+        await processor.ProcessGenerationAsync(generation.Id);
+
+        // Assert
+        _mockNotificationAccessor.Verify(x => x.SendCompletedAsync(
+            generation.UserId, generation.Id, storageUrl, 1000, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task ProcessGenerationAsync_Cancellation_SendsCancelledNotification()
+    {
+        var generation = CreateGeneration();
+        var voice = CreateVoice(generation.VoiceId);
+        _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generation.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(generation);
+        _mockVoiceAccessor.Setup(x => x.GetByIdAsync(generation.VoiceId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(voice);
+        _mockChunkingEngine.Setup(x => x.SplitText(generation.InputText, It.IsAny<ChunkingOptions?>()))
+            .Returns(new List<TextChunk> { new TextChunk { Index = 0, Text = generation.InputText, StartPosition = 0, EndPosition = generation.InputText.Length } });
+        var mockProvider = SetupMockProvider();
+        mockProvider.Setup(x => x.GenerateSpeechAsync(It.IsAny<TtsRequest>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new OperationCanceledException());
+        _mockChunkAccessor.Setup(x => x.CreateAsync(It.IsAny<GenerationChunk>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((GenerationChunk chunk, CancellationToken ct) => chunk);
+        var processor = CreateProcessor();
+
+        await processor.ProcessGenerationAsync(generation.Id);
+
+        _mockNotificationAccessor.Verify(x => x.SendStatusUpdateAsync(
+            generation.UserId, generation.Id, GenerationStatus.Cancelled, null, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task ProcessGenerationAsync_Failure_SendsFailedNotification()
+    {
+        var generation = CreateGeneration();
+        _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generation.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(generation);
+        _mockVoiceAccessor.Setup(x => x.GetByIdAsync(generation.VoiceId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Domain.Entities.Voice?)null);
+        var processor = CreateProcessor();
+
+        await processor.ProcessGenerationAsync(generation.Id);
+
+        _mockNotificationAccessor.Verify(x => x.SendFailedAsync(
+            generation.UserId, generation.Id, It.Is<string>(msg => msg.Contains("not found")), It.IsAny<CancellationToken>()), Times.Once);
     }
 }

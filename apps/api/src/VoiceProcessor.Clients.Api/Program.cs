@@ -7,7 +7,10 @@ using Microsoft.OpenApi;
 using VoiceProcessor.Accessors.Data.DbContext;
 using VoiceProcessor.Accessors.DependencyInjection;
 using VoiceProcessor.Clients.Api.Authentication;
+using VoiceProcessor.Clients.Api.Hubs;
+using VoiceProcessor.Clients.Api.Notifications;
 using VoiceProcessor.Clients.Api.Services;
+using VoiceProcessor.Domain.Contracts.Accessors;
 using VoiceProcessor.Engines.DependencyInjection;
 using VoiceProcessor.Managers.Contracts;
 using VoiceProcessor.Managers.DependencyInjection;
@@ -36,6 +39,10 @@ builder.Services.AddEngines(builder.Configuration);
 
 // Managers (user, voice, generation)
 builder.Services.AddManagers(builder.Configuration);
+
+// SignalR real-time notifications
+builder.Services.AddSignalR();
+builder.Services.AddScoped<INotificationAccessor, GenerationNotificationAccessor>();
 
 // Authentication
 builder.Services.AddVoiceProcessorAuthentication(builder.Configuration);
@@ -148,6 +155,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<GenerationHub>("/hubs/generation");
 
 // Hangfire dashboard (development only for now)
 if (app.Environment.IsDevelopment())

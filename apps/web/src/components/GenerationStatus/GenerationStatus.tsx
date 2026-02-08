@@ -1,7 +1,6 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { useGenerationHub } from "@/hooks/useGenerationHub";
 import type { GenerationStatus as Status } from "@/lib/signalr";
 
 interface GenerationStatusProps {
@@ -19,6 +18,7 @@ const statusColors: Record<Status, string> = {
   processing: "bg-blue-100 text-blue-800",
   completed: "bg-green-100 text-green-800",
   failed: "bg-red-100 text-red-800",
+  cancelled: "bg-gray-100 text-gray-800",
 };
 
 const statusLabels: Record<Status, string> = {
@@ -26,6 +26,7 @@ const statusLabels: Record<Status, string> = {
   processing: "Processing",
   completed: "Completed",
   failed: "Failed",
+  cancelled: "Cancelled",
 };
 
 function formatTimeRemaining(seconds: number): string {
@@ -46,9 +47,6 @@ export function GenerationStatus({
   error,
   className,
 }: GenerationStatusProps) {
-  // Connect to SignalR for real-time updates
-  useGenerationHub();
-
   const isActive = status === "queued" || status === "processing";
 
   return (

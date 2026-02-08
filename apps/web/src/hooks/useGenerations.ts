@@ -3,6 +3,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import type { components } from "@/lib/api/types";
+import { getConnectionState } from "@/lib/signalr";
+import { HubConnectionState } from "@microsoft/signalr";
 
 type GenerationStatus = components["schemas"]["GenerationStatus"];
 type RoutingPreference = components["schemas"]["RoutingPreference"];
@@ -56,6 +58,8 @@ export function useGeneration(id: string) {
       return data;
     },
     enabled: !!id,
+    // Adaptive polling: 10s when SignalR connected (safety net),
+    // 2s when disconnected (degraded fallback mode)
     refetchInterval: (query) => {
       const data = query.state.data;
       const inProgressStatuses: GenerationStatus[] = [
@@ -65,9 +69,11 @@ export function useGeneration(id: string) {
         "Processing",
         "Merging",
       ];
-      return data?.status && inProgressStatuses.includes(data.status)
-        ? 2000
-        : false;
+      if (!data?.status || !inProgressStatuses.includes(data.status)) {
+        return false;
+      }
+      const isConnected = getConnectionState() === HubConnectionState.Connected;
+      return isConnected ? 10000 : 2000;
     },
   });
 }

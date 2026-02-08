@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using VoiceProcessor.Accessors.Contracts;
 using VoiceProcessor.Accessors.Providers;
+using VoiceProcessor.Domain.Contracts.Accessors;
 using VoiceProcessor.Domain.Entities;
 using VoiceProcessor.Domain.Enums;
 using VoiceProcessor.Engines.Contracts;
@@ -29,6 +30,7 @@ public class GenerationProcessor : IGenerationProcessor
     private readonly IVoicePresetEngine _presetEngine;
     private readonly ILogger<GenerationProcessor> _logger;
     private readonly IDelayService _delayService;
+    private readonly INotificationAccessor _notificationAccessor;
 
     public GenerationProcessor(
         IGenerationAccessor generationAccessor,
@@ -41,7 +43,8 @@ public class GenerationProcessor : IGenerationProcessor
         IAudioMergeEngine audioMergeEngine,
         IVoicePresetEngine presetEngine,
         ILogger<GenerationProcessor> logger,
-        IDelayService delayService)
+        IDelayService delayService,
+        INotificationAccessor notificationAccessor)
     {
         _generationAccessor = generationAccessor;
         _chunkAccessor = chunkAccessor;
@@ -54,6 +57,7 @@ public class GenerationProcessor : IGenerationProcessor
         _presetEngine = presetEngine;
         _logger = logger;
         _delayService = delayService;
+        _notificationAccessor = notificationAccessor;
     }
 
     public async Task ProcessGenerationAsync(Guid generationId, CancellationToken cancellationToken = default)
@@ -79,6 +83,8 @@ public class GenerationProcessor : IGenerationProcessor
             // Update status to processing
             await _generationAccessor.UpdateStatusAsync(
                 generationId, GenerationStatus.Processing, cancellationToken: cancellationToken);
+            await _notificationAccessor.SendStatusUpdateAsync(
+                generation.UserId, generationId, GenerationStatus.Processing, cancellationToken: cancellationToken);
 
             // Get voice details
             var voice = await _voiceAccessor.GetByIdAsync(generation.VoiceId, cancellationToken);
@@ -182,12 +188,14 @@ public class GenerationProcessor : IGenerationProcessor
                         totalDurationMs += result.DurationMs ?? 0;
                         chunksCompleted++;
 
-                        // Update generation progress
-                        var progress = (int)((chunksCompleted / (double)textChunks.Count) * 100);
-                        await _generationAccessor.UpdateProgressAsync(
-                            generationId, chunksCompleted, progress, cancellationToken);
+                    // Update generation progress
+                    var progress = (int)((chunksCompleted / (double)textChunks.Count) * 100);
+                    await _generationAccessor.UpdateProgressAsync(
+                        generationId, chunksCompleted, progress, cancellationToken);
+                    await _notificationAccessor.SendProgressAsync(
+                        generation.UserId, generationId, progress, chunksCompleted, textChunks.Count, cancellationToken);
 
-                        lastException = null;
+                    lastException = null;
                         break; // Success, exit retry loop
                     }
                     catch (OperationCanceledException)
@@ -247,6 +255,8 @@ public class GenerationProcessor : IGenerationProcessor
                 mergeResult.SizeBytes,
                 totalCost,
                 cancellationToken);
+            await _notificationAccessor.SendCompletedAsync(
+                generation.UserId, generationId, audioUrl, mergeResult.DurationMs, cancellationToken);
 
             _logger.LogInformation(
                 "Generation {GenerationId} completed successfully. Cost: {Cost}, Chunks: {Chunks}",
@@ -302,6 +312,8 @@ public class GenerationProcessor : IGenerationProcessor
             _logger.LogWarning("Generation {GenerationId} was cancelled", generationId);
             await _generationAccessor.UpdateStatusAsync(
                 generationId, GenerationStatus.Cancelled, cancellationToken: CancellationToken.None);
+            await _notificationAccessor.SendStatusUpdateAsync(
+                generation.UserId, generationId, GenerationStatus.Cancelled, cancellationToken: CancellationToken.None);
         }
         catch (Exception ex)
         {
@@ -311,6 +323,8 @@ public class GenerationProcessor : IGenerationProcessor
                 GenerationStatus.Failed,
                 errorMessage: ex.Message,
                 cancellationToken: CancellationToken.None);
+            await _notificationAccessor.SendFailedAsync(
+                generation.UserId, generationId, ex.Message, CancellationToken.None);
         }
     }
 }
