@@ -58,6 +58,8 @@ export function useGeneration(id: string) {
       return data;
     },
     enabled: !!id,
+    // Adaptive polling: 10s when SignalR connected (safety net),
+    // 2s when disconnected (degraded fallback mode)
     refetchInterval: (query) => {
       const data = query.state.data;
       const inProgressStatuses: GenerationStatus[] = [

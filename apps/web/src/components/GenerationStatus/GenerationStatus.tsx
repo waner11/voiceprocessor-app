@@ -1,7 +1,6 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { useGenerationHub } from "@/hooks/useGenerationHub";
 import type { GenerationStatus as Status } from "@/lib/signalr";
 
 interface GenerationStatusProps {
@@ -48,9 +47,6 @@ export function GenerationStatus({
   error,
   className,
 }: GenerationStatusProps) {
-  // Connect to SignalR for real-time updates
-  useGenerationHub();
-
   const isActive = status === "queued" || status === "processing";
 
   return (
