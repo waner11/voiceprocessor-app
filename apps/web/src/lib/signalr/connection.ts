@@ -39,6 +39,7 @@ export type GenerationHubEvents = {
 let connection: signalR.HubConnection | null = null;
 let refCount = 0;
 let isStarting = false;
+let handlersRegistered = false;
 const stateChangeCallbacks: Array<(state: signalR.HubConnectionState) => void> = [];
 
 export function getConnection(): signalR.HubConnection {
@@ -111,16 +112,19 @@ export function getConnectionState(): signalR.HubConnectionState {
 export function onStateChange(callback: (state: signalR.HubConnectionState) => void): () => void {
   stateChangeCallbacks.push(callback);
   
-  const conn = getConnection();
-  conn.onclose(() => {
-    stateChangeCallbacks.forEach(cb => cb(signalR.HubConnectionState.Disconnected));
-  });
-  conn.onreconnecting(() => {
-    stateChangeCallbacks.forEach(cb => cb(signalR.HubConnectionState.Reconnecting));
-  });
-  conn.onreconnected(() => {
-    stateChangeCallbacks.forEach(cb => cb(signalR.HubConnectionState.Connected));
-  });
+  if (!handlersRegistered) {
+    const conn = getConnection();
+    conn.onclose(() => {
+      stateChangeCallbacks.forEach(cb => cb(signalR.HubConnectionState.Disconnected));
+    });
+    conn.onreconnecting(() => {
+      stateChangeCallbacks.forEach(cb => cb(signalR.HubConnectionState.Reconnecting));
+    });
+    conn.onreconnected(() => {
+      stateChangeCallbacks.forEach(cb => cb(signalR.HubConnectionState.Connected));
+    });
+    handlersRegistered = true;
+  }
   
   return () => {
     const index = stateChangeCallbacks.indexOf(callback);
@@ -134,5 +138,6 @@ export function __resetForTesting(): void {
   connection = null;
   refCount = 0;
   isStarting = false;
+  handlersRegistered = false;
   stateChangeCallbacks.length = 0;
 }

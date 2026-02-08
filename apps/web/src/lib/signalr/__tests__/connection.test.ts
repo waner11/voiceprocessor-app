@@ -150,5 +150,18 @@ describe("SignalR Connection Lifecycle", () => {
       // Should not throw
       expect(true).toBe(true);
     });
+
+    it("should register SignalR event handlers only once even with multiple onStateChange calls", () => {
+      const conn = getConnection();
+
+      onStateChange(vi.fn());
+      onStateChange(vi.fn());
+      onStateChange(vi.fn());
+
+      // Each handler type should be registered exactly once
+      expect(conn.onclose).toHaveBeenCalledTimes(1);
+      expect(conn.onreconnecting).toHaveBeenCalledTimes(1);
+      expect(conn.onreconnected).toHaveBeenCalledTimes(1);
+    });
   });
 });
