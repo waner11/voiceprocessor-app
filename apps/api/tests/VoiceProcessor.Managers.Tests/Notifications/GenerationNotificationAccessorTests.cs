@@ -201,7 +201,7 @@ public class GenerationNotificationAccessorTests
      }
 
      [Fact]
-     public async Task SendStatusUpdateAsync_ThrowsArgumentOutOfRangeException_ForUnknownStatus()
+     public async Task SendStatusUpdateAsync_LogsArgumentOutOfRangeException_ForUnknownStatus()
      {
          // Arrange
          var userId = Guid.NewGuid();
@@ -213,9 +213,45 @@ public class GenerationNotificationAccessorTests
              .Returns(Task.CompletedTask);
 
          // Act
-         var act = async () => await _accessor.SendStatusUpdateAsync(userId, generationId, unknownStatus);
+         await _accessor.SendStatusUpdateAsync(userId, generationId, unknownStatus);
 
          // Assert
-         await act.Should().ThrowAsync<ArgumentOutOfRangeException>();
+         _mockLogger.Verify(
+             x => x.Log(
+                 LogLevel.Warning,
+                 It.IsAny<EventId>(),
+                 It.IsAny<It.IsAnyType>(),
+                 It.IsAny<ArgumentOutOfRangeException>(),
+                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+             Times.Once);
+     }
+
+     [Theory]
+     [InlineData(GenerationStatus.Pending, "queued")]
+     [InlineData(GenerationStatus.Analyzing, "processing")]
+     [InlineData(GenerationStatus.Chunking, "processing")]
+     [InlineData(GenerationStatus.Processing, "processing")]
+     [InlineData(GenerationStatus.Merging, "processing")]
+     [InlineData(GenerationStatus.Completed, "completed")]
+     [InlineData(GenerationStatus.Failed, "failed")]
+     [InlineData(GenerationStatus.Cancelled, "cancelled")]
+     public async Task SendStatusUpdateAsync_MapsAllEnumValues_Correctly(GenerationStatus status, string expectedMappedStatus)
+     {
+         // Arrange
+         var userId = Guid.NewGuid();
+         var generationId = Guid.NewGuid();
+         StatusUpdateNotification? capturedNotification = null;
+
+         _mockClientProxy
+             .Setup(x => x.StatusUpdate(It.IsAny<StatusUpdateNotification>()))
+             .Callback<StatusUpdateNotification>(n => capturedNotification = n)
+             .Returns(Task.CompletedTask);
+
+         // Act
+         await _accessor.SendStatusUpdateAsync(userId, generationId, status);
+
+         // Assert
+         capturedNotification.Should().NotBeNull();
+         capturedNotification!.Status.Should().Be(expectedMappedStatus);
      }
 }
