@@ -40,6 +40,7 @@ let connection: signalR.HubConnection | null = null;
 let refCount = 0;
 let isStarting = false;
 let handlersRegistered = false;
+let startPromise: Promise<void> | null = null;
 const stateChangeCallbacks: Array<(state: signalR.HubConnectionState) => void> = [];
 
 export function getConnection(): signalR.HubConnection {
@@ -62,17 +63,29 @@ export async function startConnection(): Promise<void> {
   
   const conn = getConnection();
   
-  if (refCount === 1 && conn.state === signalR.HubConnectionState.Disconnected && !isStarting) {
+  if (conn.state === signalR.HubConnectionState.Disconnected && !isStarting) {
     isStarting = true;
+    startPromise = conn.start()
+      .then(() => {
+        console.log("SignalR connected");
+      })
+      .catch((err) => {
+        console.error("SignalR connection failed:", err);
+        refCount = 0;
+        throw err;
+      })
+      .finally(() => {
+        isStarting = false;
+        startPromise = null;
+      });
+  }
+  
+  if (startPromise) {
     try {
-      await conn.start();
-      console.log("SignalR connected");
-    } catch (err) {
-      console.error("SignalR connection failed:", err);
-      refCount--;
-      throw err;
-    } finally {
-      isStarting = false;
+      await startPromise;
+    } catch {
+      refCount = Math.max(0, refCount - 1);
+      throw new Error("SignalR connection failed");
     }
   }
 }
@@ -139,5 +152,6 @@ export function __resetForTesting(): void {
   refCount = 0;
   isStarting = false;
   handlersRegistered = false;
+  startPromise = null;
   stateChangeCallbacks.length = 0;
 }
