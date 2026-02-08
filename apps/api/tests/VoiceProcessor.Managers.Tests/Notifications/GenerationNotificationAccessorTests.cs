@@ -8,7 +8,7 @@ using VoiceProcessor.Domain.Contracts.Hubs;
 using VoiceProcessor.Domain.DTOs.Notifications;
 using VoiceProcessor.Domain.Enums;
 
-namespace VoiceProcessor.Managers.Tests.Notifications;
+namespace VoiceProcessor.Clients.Api.Tests.Notifications;
 
 public class GenerationNotificationAccessorTests
 {
@@ -182,21 +182,40 @@ public class GenerationNotificationAccessorTests
         await act.Should().NotThrowAsync();
     }
 
-    [Fact]
-    public async Task SendCompletedAsync_SwallowsException_WhenHubThrows()
-    {
-        // Arrange
-        var userId = Guid.NewGuid();
-        var generationId = Guid.NewGuid();
+     [Fact]
+     public async Task SendCompletedAsync_SwallowsException_WhenHubThrows()
+     {
+         // Arrange
+         var userId = Guid.NewGuid();
+         var generationId = Guid.NewGuid();
 
-        _mockClientProxy
-            .Setup(x => x.Completed(It.IsAny<CompletedNotification>()))
-            .ThrowsAsync(new Exception("Hub connection failed"));
+         _mockClientProxy
+             .Setup(x => x.Completed(It.IsAny<CompletedNotification>()))
+             .ThrowsAsync(new Exception("Hub connection failed"));
 
-        // Act
-        var act = async () => await _accessor.SendCompletedAsync(userId, generationId, "url", 1000);
+         // Act
+         var act = async () => await _accessor.SendCompletedAsync(userId, generationId, "url", 1000);
 
-        // Assert
-        await act.Should().NotThrowAsync();
-    }
+         // Assert
+         await act.Should().NotThrowAsync();
+     }
+
+     [Fact]
+     public async Task SendStatusUpdateAsync_ThrowsArgumentOutOfRangeException_ForUnknownStatus()
+     {
+         // Arrange
+         var userId = Guid.NewGuid();
+         var generationId = Guid.NewGuid();
+         var unknownStatus = (GenerationStatus)999;
+
+         _mockClientProxy
+             .Setup(x => x.StatusUpdate(It.IsAny<StatusUpdateNotification>()))
+             .Returns(Task.CompletedTask);
+
+         // Act
+         var act = async () => await _accessor.SendStatusUpdateAsync(userId, generationId, unknownStatus);
+
+         // Assert
+         await act.Should().ThrowAsync<ArgumentOutOfRangeException>();
+     }
 }

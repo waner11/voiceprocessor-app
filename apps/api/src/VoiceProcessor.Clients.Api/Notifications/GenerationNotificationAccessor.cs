@@ -7,6 +7,11 @@ using VoiceProcessor.Domain.Enums;
 
 namespace VoiceProcessor.Clients.Api.Notifications;
 
+/// <summary>
+/// Implements notification delivery via SignalR hub context.
+/// Lives in Clients.Api (not Accessors project) because it requires
+/// IHubContext which is a Clients-layer infrastructure concern.
+/// </summary>
 public class GenerationNotificationAccessor : INotificationAccessor
 {
     private readonly IHubContext<GenerationHub, IGenerationClient> _hubContext;
@@ -24,13 +29,13 @@ public class GenerationNotificationAccessor : INotificationAccessor
     {
         try
         {
-            var notification = new StatusUpdateNotification
-            {
-                GenerationId = generationId.ToString(),
-                Status = MapStatus(status),
-                Message = message
-            };
-            await _hubContext.Clients.User(userId.ToString()).StatusUpdate(notification);
+             var notification = new StatusUpdateNotification
+             {
+                 GenerationId = generationId,
+                 Status = MapStatus(status),
+                 Message = message
+             };
+             await _hubContext.Clients.User(userId.ToString()).StatusUpdate(notification);
         }
         catch (Exception ex)
         {
@@ -42,14 +47,14 @@ public class GenerationNotificationAccessor : INotificationAccessor
     {
         try
         {
-            var notification = new ProgressNotification
-            {
-                GenerationId = generationId.ToString(),
-                Progress = progress,
-                CurrentChunk = currentChunk,
-                TotalChunks = totalChunks
-            };
-            await _hubContext.Clients.User(userId.ToString()).Progress(notification);
+             var notification = new ProgressNotification
+             {
+                 GenerationId = generationId,
+                 Progress = progress,
+                 CurrentChunk = currentChunk,
+                 TotalChunks = totalChunks
+             };
+             await _hubContext.Clients.User(userId.ToString()).Progress(notification);
         }
         catch (Exception ex)
         {
@@ -61,13 +66,13 @@ public class GenerationNotificationAccessor : INotificationAccessor
     {
         try
         {
-            var notification = new CompletedNotification
-            {
-                GenerationId = generationId.ToString(),
-                AudioUrl = audioUrl,
-                Duration = durationMs
-            };
-            await _hubContext.Clients.User(userId.ToString()).Completed(notification);
+             var notification = new CompletedNotification
+             {
+                 GenerationId = generationId,
+                 AudioUrl = audioUrl,
+                 Duration = durationMs
+             };
+             await _hubContext.Clients.User(userId.ToString()).Completed(notification);
         }
         catch (Exception ex)
         {
@@ -79,12 +84,12 @@ public class GenerationNotificationAccessor : INotificationAccessor
     {
         try
         {
-            var notification = new FailedNotification
-            {
-                GenerationId = generationId.ToString(),
-                Error = error
-            };
-            await _hubContext.Clients.User(userId.ToString()).Failed(notification);
+             var notification = new FailedNotification
+             {
+                 GenerationId = generationId,
+                 Error = error
+             };
+             await _hubContext.Clients.User(userId.ToString()).Failed(notification);
         }
         catch (Exception ex)
         {
@@ -92,16 +97,16 @@ public class GenerationNotificationAccessor : INotificationAccessor
         }
     }
 
-    private static string MapStatus(GenerationStatus status) => status switch
-    {
-        GenerationStatus.Pending => "queued",
-        GenerationStatus.Analyzing => "processing",
-        GenerationStatus.Chunking => "processing",
-        GenerationStatus.Processing => "processing",
-        GenerationStatus.Merging => "processing",
-        GenerationStatus.Completed => "completed",
-        GenerationStatus.Failed => "failed",
-        GenerationStatus.Cancelled => "cancelled",
-        _ => "queued"
-    };
+     private static string MapStatus(GenerationStatus status) => status switch
+     {
+         GenerationStatus.Pending => "queued",
+         GenerationStatus.Analyzing => "processing",
+         GenerationStatus.Chunking => "processing",
+         GenerationStatus.Processing => "processing",
+         GenerationStatus.Merging => "processing",
+         GenerationStatus.Completed => "completed",
+         GenerationStatus.Failed => "failed",
+         GenerationStatus.Cancelled => "cancelled",
+         _ => throw new ArgumentOutOfRangeException(nameof(status), status, "Unknown generation status")
+     };
 }
