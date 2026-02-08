@@ -74,7 +74,9 @@ export function useGenerationHub() {
   );
 
   useEffect(() => {
-    startConnection();
+    startConnection().catch((err) => {
+      console.error("Failed to establish SignalR connection:", err);
+    });
 
     onEvent("StatusUpdate", handleStatusUpdate);
     onEvent("Progress", handleProgress);
