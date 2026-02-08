@@ -256,7 +256,7 @@ public class GenerationNotificationAccessorTests
      }
 
      [Fact]
-     public async Task SendStatusUpdateAsync_ThrowsOperationCanceledException_WhenTokenCancelled()
+     public async Task SendStatusUpdateAsync_DoesNotCallHub_WhenTokenCancelled()
      {
          // Arrange
          var userId = Guid.NewGuid();
@@ -273,7 +273,7 @@ public class GenerationNotificationAccessorTests
      }
 
      [Fact]
-     public async Task SendProgressAsync_ThrowsOperationCanceledException_WhenTokenCancelled()
+     public async Task SendProgressAsync_DoesNotCallHub_WhenTokenCancelled()
      {
          // Arrange
          var userId = Guid.NewGuid();
@@ -289,7 +289,7 @@ public class GenerationNotificationAccessorTests
      }
 
      [Fact]
-     public async Task SendCompletedAsync_ThrowsOperationCanceledException_WhenTokenCancelled()
+     public async Task SendCompletedAsync_DoesNotCallHub_WhenTokenCancelled()
      {
          // Arrange
          var userId = Guid.NewGuid();
@@ -305,7 +305,7 @@ public class GenerationNotificationAccessorTests
      }
 
      [Fact]
-     public async Task SendFailedAsync_ThrowsOperationCanceledException_WhenTokenCancelled()
+     public async Task SendFailedAsync_DoesNotCallHub_WhenTokenCancelled()
      {
          // Arrange
          var userId = Guid.NewGuid();
@@ -319,4 +319,4 @@ public class GenerationNotificationAccessorTests
          // Assert
          _mockClientProxy.Verify(x => x.Failed(It.IsAny<FailedNotification>()), Times.Never);
      }
-}
+ }
