@@ -254,4 +254,69 @@ public class GenerationNotificationAccessorTests
          capturedNotification.Should().NotBeNull();
          capturedNotification!.Status.Should().Be(expectedMappedStatus);
      }
+
+     [Fact]
+     public async Task SendStatusUpdateAsync_ThrowsOperationCanceledException_WhenTokenCancelled()
+     {
+         // Arrange
+         var userId = Guid.NewGuid();
+         var generationId = Guid.NewGuid();
+         var status = GenerationStatus.Processing;
+         var cts = new CancellationTokenSource();
+         cts.Cancel();
+
+         // Act
+         await _accessor.SendStatusUpdateAsync(userId, generationId, status, cancellationToken: cts.Token);
+
+         // Assert
+         _mockClientProxy.Verify(x => x.StatusUpdate(It.IsAny<StatusUpdateNotification>()), Times.Never);
+     }
+
+     [Fact]
+     public async Task SendProgressAsync_ThrowsOperationCanceledException_WhenTokenCancelled()
+     {
+         // Arrange
+         var userId = Guid.NewGuid();
+         var generationId = Guid.NewGuid();
+         var cts = new CancellationTokenSource();
+         cts.Cancel();
+
+         // Act
+         await _accessor.SendProgressAsync(userId, generationId, 50, cancellationToken: cts.Token);
+
+         // Assert
+         _mockClientProxy.Verify(x => x.Progress(It.IsAny<ProgressNotification>()), Times.Never);
+     }
+
+     [Fact]
+     public async Task SendCompletedAsync_ThrowsOperationCanceledException_WhenTokenCancelled()
+     {
+         // Arrange
+         var userId = Guid.NewGuid();
+         var generationId = Guid.NewGuid();
+         var cts = new CancellationTokenSource();
+         cts.Cancel();
+
+         // Act
+         await _accessor.SendCompletedAsync(userId, generationId, "url", 1000, cancellationToken: cts.Token);
+
+         // Assert
+         _mockClientProxy.Verify(x => x.Completed(It.IsAny<CompletedNotification>()), Times.Never);
+     }
+
+     [Fact]
+     public async Task SendFailedAsync_ThrowsOperationCanceledException_WhenTokenCancelled()
+     {
+         // Arrange
+         var userId = Guid.NewGuid();
+         var generationId = Guid.NewGuid();
+         var cts = new CancellationTokenSource();
+         cts.Cancel();
+
+         // Act
+         await _accessor.SendFailedAsync(userId, generationId, "error", cancellationToken: cts.Token);
+
+         // Assert
+         _mockClientProxy.Verify(x => x.Failed(It.IsAny<FailedNotification>()), Times.Never);
+     }
 }

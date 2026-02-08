@@ -29,13 +29,15 @@ public class GenerationNotificationAccessor : INotificationAccessor
     {
         try
         {
+             cancellationToken.ThrowIfCancellationRequested();
+             
              var notification = new StatusUpdateNotification
              {
                  GenerationId = generationId,
                  Status = MapStatus(status),
                  Message = message
              };
-             await _hubContext.Clients.User(userId.ToString()).StatusUpdate(notification);
+             await _hubContext.Clients.User(userId.ToString()).StatusUpdate(notification).WaitAsync(cancellationToken);
         }
         catch (Exception ex)
         {
@@ -47,6 +49,8 @@ public class GenerationNotificationAccessor : INotificationAccessor
     {
         try
         {
+             cancellationToken.ThrowIfCancellationRequested();
+             
              var notification = new ProgressNotification
              {
                  GenerationId = generationId,
@@ -54,7 +58,7 @@ public class GenerationNotificationAccessor : INotificationAccessor
                  CurrentChunk = currentChunk,
                  TotalChunks = totalChunks
              };
-             await _hubContext.Clients.User(userId.ToString()).Progress(notification);
+             await _hubContext.Clients.User(userId.ToString()).Progress(notification).WaitAsync(cancellationToken);
         }
         catch (Exception ex)
         {
@@ -66,13 +70,15 @@ public class GenerationNotificationAccessor : INotificationAccessor
     {
         try
         {
+             cancellationToken.ThrowIfCancellationRequested();
+             
              var notification = new CompletedNotification
              {
                  GenerationId = generationId,
                  AudioUrl = audioUrl,
                  Duration = durationMs
              };
-             await _hubContext.Clients.User(userId.ToString()).Completed(notification);
+             await _hubContext.Clients.User(userId.ToString()).Completed(notification).WaitAsync(cancellationToken);
         }
         catch (Exception ex)
         {
@@ -84,12 +90,14 @@ public class GenerationNotificationAccessor : INotificationAccessor
     {
         try
         {
+             cancellationToken.ThrowIfCancellationRequested();
+             
              var notification = new FailedNotification
              {
                  GenerationId = generationId,
                  Error = error
              };
-             await _hubContext.Clients.User(userId.ToString()).Failed(notification);
+             await _hubContext.Clients.User(userId.ToString()).Failed(notification).WaitAsync(cancellationToken);
         }
         catch (Exception ex)
         {
