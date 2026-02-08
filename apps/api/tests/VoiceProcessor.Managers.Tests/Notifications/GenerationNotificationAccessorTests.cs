@@ -65,7 +65,7 @@ public class GenerationNotificationAccessorTests
 
         // Assert
         capturedNotification.Should().NotBeNull();
-        capturedNotification!.GenerationId.Should().Be(generationId.ToString());
+        capturedNotification!.GenerationId.Should().Be(generationId);
         capturedNotification.Status.Should().Be("processing");
         capturedNotification.Message.Should().Be("Test message");
     }
@@ -91,7 +91,7 @@ public class GenerationNotificationAccessorTests
 
         // Assert
         capturedNotification.Should().NotBeNull();
-        capturedNotification!.GenerationId.Should().Be(generationId.ToString());
+        capturedNotification!.GenerationId.Should().Be(generationId);
         capturedNotification.Progress.Should().Be(progress);
         capturedNotification.CurrentChunk.Should().Be(currentChunk);
         capturedNotification.TotalChunks.Should().Be(totalChunks);
@@ -117,7 +117,7 @@ public class GenerationNotificationAccessorTests
 
         // Assert
         capturedNotification.Should().NotBeNull();
-        capturedNotification!.GenerationId.Should().Be(generationId.ToString());
+        capturedNotification!.GenerationId.Should().Be(generationId);
         capturedNotification.AudioUrl.Should().Be(audioUrl);
         capturedNotification.Duration.Should().Be(durationMs);
     }
@@ -141,7 +141,7 @@ public class GenerationNotificationAccessorTests
 
         // Assert
         capturedNotification.Should().NotBeNull();
-        capturedNotification!.GenerationId.Should().Be(generationId.ToString());
+        capturedNotification!.GenerationId.Should().Be(generationId);
         capturedNotification.Error.Should().Be(error);
     }
 
