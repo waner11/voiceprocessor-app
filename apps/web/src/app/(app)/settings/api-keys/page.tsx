@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useApiAccess } from "@/lib/posthog/use-api-access";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -19,6 +21,14 @@ interface ApiKeyCreated extends ApiKey {
 }
 
 export default function ApiKeysSettingsPage() {
+  const router = useRouter();
+  const hasApiAccess = useApiAccess();
+
+  if (!hasApiAccess) {
+    router.replace("/settings/profile");
+    return null;
+  }
+
   const [keys, setKeys] = useState<ApiKey[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);

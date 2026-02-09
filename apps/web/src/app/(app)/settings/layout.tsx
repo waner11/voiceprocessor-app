@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useApiAccess } from "@/lib/posthog/use-api-access";
 
 const settingsNav = [
   { href: "/settings/profile", label: "Profile", icon: "👤" },
@@ -17,6 +18,11 @@ export default function SettingsLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const hasApiAccess = useApiAccess();
+
+  const filteredNav = settingsNav.filter(
+    (item) => item.href !== "/settings/api-keys" || hasApiAccess
+  );
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -26,7 +32,7 @@ export default function SettingsLayout({
         {/* Sidebar Navigation */}
         <nav className="md:w-64 flex-shrink-0">
           <ul className="space-y-1">
-            {settingsNav.map((item) => (
+            {filteredNav.map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}
