@@ -19,7 +19,12 @@ describe("ApiDocsPage", () => {
     vi.clearAllMocks();
     vi.mocked(useRouter).mockReturnValue({
       replace: mockReplace,
-    } as any);
+      push: vi.fn(),
+      back: vi.fn(),
+      forward: vi.fn(),
+      refresh: vi.fn(),
+      prefetch: vi.fn(),
+    });
   });
 
   it("redirects to / when useApiAccess returns false", () => {

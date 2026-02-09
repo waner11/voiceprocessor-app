@@ -17,13 +17,18 @@ describe("ApiKeysSettingsPage", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (useRouter as any).mockReturnValue({
+    vi.mocked(useRouter).mockReturnValue({
       replace: mockReplace,
+      push: vi.fn(),
+      back: vi.fn(),
+      forward: vi.fn(),
+      refresh: vi.fn(),
+      prefetch: vi.fn(),
     });
   });
 
   it("redirects to /settings/profile when useApiAccess returns false", () => {
-    (useApiAccess as any).mockReturnValue(false);
+    vi.mocked(useApiAccess).mockReturnValue(false);
 
     const { container } = render(<ApiKeysSettingsPage />);
 
@@ -32,7 +37,7 @@ describe("ApiKeysSettingsPage", () => {
   });
 
   it("renders page content when useApiAccess returns true", () => {
-    (useApiAccess as any).mockReturnValue(true);
+    vi.mocked(useApiAccess).mockReturnValue(true);
 
     render(<ApiKeysSettingsPage />);
 
@@ -41,7 +46,7 @@ describe("ApiKeysSettingsPage", () => {
   });
 
   it("returns null when access is denied", () => {
-    (useApiAccess as any).mockReturnValue(false);
+    vi.mocked(useApiAccess).mockReturnValue(false);
 
     const { container } = render(<ApiKeysSettingsPage />);
 
@@ -49,7 +54,7 @@ describe("ApiKeysSettingsPage", () => {
   });
 
   it("renders the create API key section when access is granted", () => {
-    (useApiAccess as any).mockReturnValue(true);
+    vi.mocked(useApiAccess).mockReturnValue(true);
 
     render(<ApiKeysSettingsPage />);
 

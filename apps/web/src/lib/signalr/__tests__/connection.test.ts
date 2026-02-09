@@ -1,11 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import * as signalR from "@microsoft/signalr";
 import {
   startConnection,
   stopConnection,
   getConnection,
   onStateChange,
-  getConnectionState,
   __resetForTesting,
 } from "../connection";
 

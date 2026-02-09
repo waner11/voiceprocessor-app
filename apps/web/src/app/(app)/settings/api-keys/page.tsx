@@ -23,12 +23,8 @@ interface ApiKeyCreated extends ApiKey {
 export default function ApiKeysSettingsPage() {
   const router = useRouter();
   const hasApiAccess = useApiAccess();
-
-  if (!hasApiAccess) {
-    router.replace("/settings/profile");
-    return null;
-  }
-
+  
+  // All hooks must be called before conditional returns
   const [keys, setKeys] = useState<ApiKey[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
@@ -39,6 +35,8 @@ export default function ApiKeysSettingsPage() {
 
   // Fetch existing API keys on mount
   useEffect(() => {
+    if (!hasApiAccess) return;
+    
     const fetchKeys = async () => {
       try {
         const response = await fetch(`${API_URL}/api/v1/Auth/api-keys`, {
@@ -57,7 +55,13 @@ export default function ApiKeysSettingsPage() {
     };
 
     fetchKeys();
-  }, []);
+  }, [hasApiAccess]);
+  
+  // Redirect guard after all hooks
+  if (!hasApiAccess) {
+    router.replace("/settings/profile");
+    return null;
+  }
 
   const handleCreateKey = async () => {
     if (!newKeyName.trim()) return;

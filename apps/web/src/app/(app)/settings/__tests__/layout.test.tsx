@@ -17,11 +17,11 @@ vi.mock("@/lib/posthog/use-api-access", () => ({
 describe("SettingsLayout", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (usePathname as any).mockReturnValue("/settings/profile");
+    vi.mocked(usePathname).mockReturnValue("/settings/profile");
   });
 
   it("renders all nav items when useApiAccess returns true", () => {
-    (useApiAccess as any).mockReturnValue(true);
+    vi.mocked(useApiAccess).mockReturnValue(true);
 
     render(
       <SettingsLayout>
@@ -36,7 +36,7 @@ describe("SettingsLayout", () => {
   });
 
   it("hides API Keys nav item when useApiAccess returns false", () => {
-    (useApiAccess as any).mockReturnValue(false);
+    vi.mocked(useApiAccess).mockReturnValue(false);
 
     render(
       <SettingsLayout>
@@ -51,7 +51,7 @@ describe("SettingsLayout", () => {
   });
 
   it("renders children content", () => {
-    (useApiAccess as any).mockReturnValue(true);
+    vi.mocked(useApiAccess).mockReturnValue(true);
 
     render(
       <SettingsLayout>
@@ -63,7 +63,7 @@ describe("SettingsLayout", () => {
   });
 
   it("renders Settings heading", () => {
-    (useApiAccess as any).mockReturnValue(true);
+    vi.mocked(useApiAccess).mockReturnValue(true);
 
     render(
       <SettingsLayout>
@@ -75,10 +75,10 @@ describe("SettingsLayout", () => {
   });
 
   it("applies active state styling to current pathname", () => {
-    (useApiAccess as any).mockReturnValue(true);
-    (usePathname as any).mockReturnValue("/settings/api-keys");
+    vi.mocked(useApiAccess).mockReturnValue(true);
+    vi.mocked(usePathname).mockReturnValue("/settings/api-keys");
 
-    const { container } = render(
+    render(
       <SettingsLayout>
         <div>Test Content</div>
       </SettingsLayout>
