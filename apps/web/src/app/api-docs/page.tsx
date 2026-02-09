@@ -1,4 +1,17 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useApiAccess } from "@/lib/posthog/use-api-access";
+
 export default function ApiDocsPage() {
+  const router = useRouter();
+  const hasAccess = useApiAccess();
+
+  if (!hasAccess) {
+    router.replace("/");
+    return null;
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="mb-8 text-3xl font-bold">API Documentation</h1>
