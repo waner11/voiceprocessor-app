@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useApiAccess } from "@/lib/posthog/use-api-access";
 
@@ -7,8 +8,13 @@ export default function ApiDocsPage() {
   const router = useRouter();
   const hasAccess = useApiAccess();
 
+  useEffect(() => {
+    if (!hasAccess) {
+      router.replace("/");
+    }
+  }, [hasAccess, router]);
+
   if (!hasAccess) {
-    router.replace("/");
     return null;
   }
 
