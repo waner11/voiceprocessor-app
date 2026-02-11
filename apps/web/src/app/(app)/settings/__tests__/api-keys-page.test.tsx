@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { useRouter } from "next/navigation";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import ApiKeysSettingsPage from "../api-keys/page";
@@ -27,12 +27,14 @@ describe("ApiKeysSettingsPage", () => {
     });
   });
 
-  it("redirects to /settings/profile when useApiAccess returns false", () => {
+  it("redirects to /settings/profile when useApiAccess returns false", async () => {
     vi.mocked(useApiAccess).mockReturnValue(false);
 
     const { container } = render(<ApiKeysSettingsPage />);
 
-    expect(mockReplace).toHaveBeenCalledWith("/settings/profile");
+    await waitFor(() => {
+      expect(mockReplace).toHaveBeenCalledWith("/settings/profile");
+    });
     expect(container.firstChild).toBeNull();
   });
 
@@ -42,22 +44,6 @@ describe("ApiKeysSettingsPage", () => {
     render(<ApiKeysSettingsPage />);
 
     expect(mockReplace).not.toHaveBeenCalled();
-    expect(screen.getByText("API Keys")).toBeInTheDocument();
-  });
-
-  it("returns null when access is denied", () => {
-    vi.mocked(useApiAccess).mockReturnValue(false);
-
-    const { container } = render(<ApiKeysSettingsPage />);
-
-    expect(container.firstChild).toBeNull();
-  });
-
-  it("renders the create API key section when access is granted", () => {
-    vi.mocked(useApiAccess).mockReturnValue(true);
-
-    render(<ApiKeysSettingsPage />);
-
     expect(screen.getByText("API Keys")).toBeInTheDocument();
   });
 });
