@@ -52,22 +52,23 @@ const pricingPlans = [
     href: "/signup",
     highlighted: false,
   },
-   {
-     name: "Pro",
-     price: "$29",
-     period: "/month",
-     description: "For content creators and podcasters",
-     features: [
-       "500,000 characters/month",
-       "All voice providers",
-       "Premium quality voices",
-       "Priority generation",
-       "Priority support",
-     ],
-     cta: "Start Free Trial",
-     href: "/signup?plan=pro",
-     highlighted: true,
-   },
+    {
+      name: "Pro",
+      price: "$29",
+      period: "/month",
+      description: "For content creators and podcasters",
+      features: [
+        "500,000 characters/month",
+        "All voice providers",
+        "Premium quality voices",
+        "Priority generation",
+        "Priority support",
+        "API access",
+      ],
+      cta: "Start Free Trial",
+      href: "/signup?plan=pro",
+      highlighted: true,
+    },
   {
     name: "Enterprise",
     price: "Custom",
@@ -246,28 +247,31 @@ export default function LandingPage() {
                     <span className="text-4xl font-bold text-gray-900 dark:text-white">{plan.price}</span>
                     <span className="text-gray-500 dark:text-gray-400">{plan.period}</span>
                   </div>
-                  <p className="mb-6 text-gray-600 dark:text-gray-400">{plan.description}</p>
-                   <ul className="mb-8 space-y-3">
-                     {plan.features.map((feature) => (
-                       <li key={feature} className="flex items-center gap-2">
-                         <svg
-                           className="h-5 w-5 text-green-500"
-                           fill="none"
-                           viewBox="0 0 24 24"
-                           stroke="currentColor"
-                         >
-                           <path
-                             strokeLinecap="round"
-                             strokeLinejoin="round"
-                             strokeWidth={2}
-                             d="M5 13l4 4L19 7"
-                           />
-                         </svg>
-                         <span className="text-sm text-gray-700 dark:text-gray-300">{feature}</span>
-                       </li>
-                     ))}
-                     {plan.name === "Pro" && <ApiGatedPricingFeature />}
-                   </ul>
+                   <p className="mb-6 text-gray-600 dark:text-gray-400">{plan.description}</p>
+                    <ul className="mb-8 space-y-3">
+                      {plan.features.map((feature) => (
+                        feature === "API access" && plan.name === "Pro" ? (
+                          <ApiGatedPricingFeature key={feature} />
+                        ) : (
+                          <li key={feature} className="flex items-center gap-2">
+                            <svg
+                              className="h-5 w-5 text-green-500"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M5 13l4 4L19 7"
+                              />
+                            </svg>
+                            <span className="text-sm text-gray-700 dark:text-gray-300">{feature}</span>
+                          </li>
+                        )
+                      ))}
+                    </ul>
                   <Link
                     href={plan.href}
                     className={`block w-full rounded-lg py-3 text-center ${
@@ -314,24 +318,22 @@ export default function LandingPage() {
                 content.
               </p>
             </div>
-             <div>
-               <h4 className="mb-4 font-semibold text-gray-900 dark:text-white">Product</h4>
-               <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                 <li>
-                   <a href="#features" className="hover:text-gray-900 dark:hover:text-white">
-                     Features
-                   </a>
-                 </li>
-                 <li>
-                   <a href="#pricing" className="hover:text-gray-900 dark:hover:text-white">
-                     Pricing
-                   </a>
-                 </li>
-                 <li>
-                   <ApiGatedLinks type="footer" />
-                 </li>
-               </ul>
-             </div>
+              <div>
+                <h4 className="mb-4 font-semibold text-gray-900 dark:text-white">Product</h4>
+                <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                  <li>
+                    <a href="#features" className="hover:text-gray-900 dark:hover:text-white">
+                      Features
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#pricing" className="hover:text-gray-900 dark:hover:text-white">
+                      Pricing
+                    </a>
+                  </li>
+                  <ApiGatedLinks type="footer" />
+                </ul>
+              </div>
             <div>
               <h4 className="mb-4 font-semibold text-gray-900 dark:text-white">Company</h4>
               <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">

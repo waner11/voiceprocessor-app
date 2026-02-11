@@ -33,13 +33,15 @@ export function ApiGatedLinks({ type }: ApiGatedLinksProps) {
     );
   }
 
-  if (type === 'footer') {
-    return (
-      <Link href="/api-docs" className="hover:text-gray-900 dark:hover:text-white">
-        API Documentation
-      </Link>
-    );
-  }
+   if (type === 'footer') {
+     return (
+       <li>
+         <Link href="/api-docs" className="hover:text-gray-900 dark:hover:text-white">
+           API Documentation
+         </Link>
+       </li>
+     );
+   }
 
   return null;
 }
