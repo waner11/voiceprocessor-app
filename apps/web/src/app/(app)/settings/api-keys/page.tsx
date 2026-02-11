@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useApiAccess } from "@/lib/posthog/use-api-access";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -19,6 +21,10 @@ interface ApiKeyCreated extends ApiKey {
 }
 
 export default function ApiKeysSettingsPage() {
+  const router = useRouter();
+  const hasApiAccess = useApiAccess();
+  
+  // All hooks must be called before conditional returns
   const [keys, setKeys] = useState<ApiKey[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
@@ -27,27 +33,41 @@ export default function ApiKeysSettingsPage() {
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch existing API keys on mount
-  useEffect(() => {
-    const fetchKeys = async () => {
-      try {
-        const response = await fetch(`${API_URL}/api/v1/Auth/api-keys`, {
-          credentials: "include",
-        });
+   // Fetch existing API keys on mount
+   useEffect(() => {
+     if (!hasApiAccess) return;
+     
+     const fetchKeys = async () => {
+       try {
+         const response = await fetch(`${API_URL}/api/v1/Auth/api-keys`, {
+           credentials: "include",
+         });
 
-        if (response.ok) {
-          const data = await response.json();
-          setKeys(data);
-        }
-      } catch (err) {
-        console.error("Failed to fetch API keys:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+         if (response.ok) {
+           const data = await response.json();
+           setKeys(data);
+         }
+       } catch (err) {
+         console.error("Failed to fetch API keys:", err);
+       } finally {
+         setIsLoading(false);
+       }
+     };
 
-    fetchKeys();
-  }, []);
+     fetchKeys();
+   }, [hasApiAccess]);
+
+   // Redirect if no API access
+   useEffect(() => {
+     if (!hasApiAccess) {
+       router.replace("/settings/profile");
+     }
+   }, [hasApiAccess, router]);
+   
+   // Redirect guard after all hooks
+   if (!hasApiAccess) {
+     return null;
+   }
 
   const handleCreateKey = async () => {
     if (!newKeyName.trim()) return;

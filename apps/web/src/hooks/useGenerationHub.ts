@@ -94,12 +94,11 @@ export function useGenerationHub() {
 }
 
 export function useSignalRStatus() {
-  const [state, setState] = useState<signalR.HubConnectionState>(
-    signalR.HubConnectionState.Disconnected
+  const [state, setState] = useState<signalR.HubConnectionState>(() => 
+    getConnectionState()
   );
 
   useEffect(() => {
-    setState(getConnectionState());
     const cleanup = onStateChange(setState);
     return cleanup;
   }, []);

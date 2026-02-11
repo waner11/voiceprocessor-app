@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { ApiGatedFeatureCard } from "./(landing)/api-gated-features";
+import { ApiGatedPricingFeature } from "./(landing)/api-gated-pricing";
+import { ApiGatedLinks } from "./(landing)/api-gated-links";
 
 const features = [
   {
@@ -31,12 +34,6 @@ const features = [
     description:
       "Track generation progress in real-time with live updates and notifications.",
   },
-  {
-    icon: "🔌",
-    title: "Developer API",
-    description:
-      "Full REST API with webhooks for seamless integration into your applications.",
-  },
 ];
 
 const pricingPlans = [
@@ -55,23 +52,23 @@ const pricingPlans = [
     href: "/signup",
     highlighted: false,
   },
-  {
-    name: "Pro",
-    price: "$29",
-    period: "/month",
-    description: "For content creators and podcasters",
-    features: [
-      "500,000 characters/month",
-      "All voice providers",
-      "Premium quality voices",
-      "Priority generation",
-      "API access",
-      "Priority support",
-    ],
-    cta: "Start Free Trial",
-    href: "/signup?plan=pro",
-    highlighted: true,
-  },
+    {
+      name: "Pro",
+      price: "$29",
+      period: "/month",
+      description: "For content creators and podcasters",
+      features: [
+        "500,000 characters/month",
+        "All voice providers",
+        "Premium quality voices",
+        "Priority generation",
+        "Priority support",
+        "API access",
+      ],
+      cta: "Start Free Trial",
+      href: "/signup?plan=pro",
+      highlighted: true,
+    },
   {
     name: "Enterprise",
     price: "Custom",
@@ -100,19 +97,17 @@ export default function LandingPage() {
           <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">
             VoiceProcessor
           </Link>
-          <nav className="hidden md:flex items-center gap-6">
-            <a href="#features" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
-              Features
-            </a>
-            <a href="#pricing" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
-              Pricing
-            </a>
-            <Link href="/api-docs" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
-              API Docs
-            </Link>
-            <Link href="/login" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
-              Sign In
-            </Link>
+           <nav className="hidden md:flex items-center gap-6">
+             <a href="#features" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+               Features
+             </a>
+             <a href="#pricing" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+               Pricing
+             </a>
+             <ApiGatedLinks type="nav" />
+             <Link href="/login" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+               Sign In
+             </Link>
             <Link
               href="/signup"
               className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
@@ -137,20 +132,15 @@ export default function LandingPage() {
                 podcasts, and voiceovers using the best AI voices from
                 ElevenLabs, OpenAI, Google, and Amazon Polly.
               </p>
-              <div className="flex flex-col sm:flex-row justify-center gap-4">
-                <Link
-                  href="/signup"
-                  className="rounded-lg bg-blue-600 px-8 py-3 text-lg text-white hover:bg-blue-700 shadow-lg shadow-blue-600/25"
-                >
-                  Start Free Trial
-                </Link>
-                <Link
-                  href="/api-docs"
-                  className="rounded-lg border border-gray-300 dark:border-gray-700 px-8 py-3 text-lg text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800"
-                >
-                  View API Docs
-                </Link>
-              </div>
+               <div className="flex flex-col sm:flex-row justify-center gap-4">
+                 <Link
+                   href="/signup"
+                   className="rounded-lg bg-blue-600 px-8 py-3 text-lg text-white hover:bg-blue-700 shadow-lg shadow-blue-600/25"
+                 >
+                   Start Free Trial
+                 </Link>
+                 <ApiGatedLinks type="hero" />
+               </div>
               <p className="mt-4 text-sm text-gray-500 dark:text-gray-500">
                 10,000 free characters. No credit card required.
               </p>
@@ -210,18 +200,19 @@ export default function LandingPage() {
                 Powerful features to create professional audio at scale
               </p>
             </div>
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {features.map((feature) => (
-                <div
-                  key={feature.title}
-                  className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 transition-shadow hover:shadow-md"
-                >
-                  <div className="mb-4 text-4xl">{feature.icon}</div>
-                  <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">{feature.title}</h3>
-                  <p className="text-gray-600 dark:text-gray-400">{feature.description}</p>
-                </div>
-              ))}
-            </div>
+             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+               {features.map((feature) => (
+                 <div
+                   key={feature.title}
+                   className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 transition-shadow hover:shadow-md"
+                 >
+                   <div className="mb-4 text-4xl">{feature.icon}</div>
+                   <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">{feature.title}</h3>
+                   <p className="text-gray-600 dark:text-gray-400">{feature.description}</p>
+                 </div>
+               ))}
+               <ApiGatedFeatureCard />
+             </div>
           </div>
         </section>
 
@@ -256,27 +247,31 @@ export default function LandingPage() {
                     <span className="text-4xl font-bold text-gray-900 dark:text-white">{plan.price}</span>
                     <span className="text-gray-500 dark:text-gray-400">{plan.period}</span>
                   </div>
-                  <p className="mb-6 text-gray-600 dark:text-gray-400">{plan.description}</p>
-                  <ul className="mb-8 space-y-3">
-                    {plan.features.map((feature) => (
-                      <li key={feature} className="flex items-center gap-2">
-                        <svg
-                          className="h-5 w-5 text-green-500"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                        <span className="text-sm text-gray-700 dark:text-gray-300">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
+                   <p className="mb-6 text-gray-600 dark:text-gray-400">{plan.description}</p>
+                    <ul className="mb-8 space-y-3">
+                      {plan.features.map((feature) => (
+                        feature === "API access" && plan.name === "Pro" ? (
+                          <ApiGatedPricingFeature key={feature} />
+                        ) : (
+                          <li key={feature} className="flex items-center gap-2">
+                            <svg
+                              className="h-5 w-5 text-green-500"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M5 13l4 4L19 7"
+                              />
+                            </svg>
+                            <span className="text-sm text-gray-700 dark:text-gray-300">{feature}</span>
+                          </li>
+                        )
+                      ))}
+                    </ul>
                   <Link
                     href={plan.href}
                     className={`block w-full rounded-lg py-3 text-center ${
@@ -323,26 +318,22 @@ export default function LandingPage() {
                 content.
               </p>
             </div>
-            <div>
-              <h4 className="mb-4 font-semibold text-gray-900 dark:text-white">Product</h4>
-              <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                <li>
-                  <a href="#features" className="hover:text-gray-900 dark:hover:text-white">
-                    Features
-                  </a>
-                </li>
-                <li>
-                  <a href="#pricing" className="hover:text-gray-900 dark:hover:text-white">
-                    Pricing
-                  </a>
-                </li>
-                <li>
-                  <Link href="/api-docs" className="hover:text-gray-900 dark:hover:text-white">
-                    API Documentation
-                  </Link>
-                </li>
-              </ul>
-            </div>
+              <div>
+                <h4 className="mb-4 font-semibold text-gray-900 dark:text-white">Product</h4>
+                <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                  <li>
+                    <a href="#features" className="hover:text-gray-900 dark:hover:text-white">
+                      Features
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#pricing" className="hover:text-gray-900 dark:hover:text-white">
+                      Pricing
+                    </a>
+                  </li>
+                  <ApiGatedLinks type="footer" />
+                </ul>
+              </div>
             <div>
               <h4 className="mb-4 font-semibold text-gray-900 dark:text-white">Company</h4>
               <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">

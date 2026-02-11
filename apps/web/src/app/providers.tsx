@@ -5,6 +5,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useState, Suspense, type ReactNode } from "react";
 import { AuthProvider } from "@/components/AuthProvider";
 import { NavigationProgress } from "@/components/NavigationProgress";
+import { PostHogProvider } from "@/lib/posthog";
 
 interface ProvidersProps {
   children: ReactNode;
@@ -25,11 +26,13 @@ export function Providers({ children }: ProvidersProps) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Suspense fallback={null}>
-        <NavigationProgress />
-      </Suspense>
-      <AuthProvider>{children}</AuthProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
+      <PostHogProvider>
+        <Suspense fallback={null}>
+          <NavigationProgress />
+        </Suspense>
+        <AuthProvider>{children}</AuthProvider>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </PostHogProvider>
     </QueryClientProvider>
   );
 }
