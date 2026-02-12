@@ -28,9 +28,29 @@ builder.Services.AddControllers()
 // Memory cache for caching (used by StripeAccessor)
 builder.Services.AddMemoryCache();
 
+// Get and convert connection string early (Railway provides PostgreSQL URI format)
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException(
+        "Database connection string 'ConnectionStrings:DefaultConnection' is not configured. " +
+        "Please set the ConnectionStrings__DefaultConnection environment variable.");
+}
+
+// Convert PostgreSQL URI format to ADO.NET connection string format if needed
+// Railway provides: postgresql://user:pass@host:port/db
+// Npgsql/Hangfire need: Host=host;Port=port;Database=db;Username=user;Password=pass
+if (connectionString.StartsWith("postgresql://") || connectionString.StartsWith("postgres://"))
+{
+    var uri = new Uri(connectionString);
+    var userInfo = uri.UserInfo.Split(':');
+    connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]}";
+    Console.WriteLine($"[INFO] Converted PostgreSQL URI to ADO.NET format");
+}
+
 // Database
 builder.Services.AddDbContext<VoiceProcessorDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(connectionString));
 
 // Accessors (database, TTS providers, storage)
 builder.Services.AddAccessors(builder.Configuration);
@@ -68,26 +88,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Hangfire for background jobs
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-if (string.IsNullOrWhiteSpace(connectionString))
-{
-    throw new InvalidOperationException(
-        "Database connection string 'ConnectionStrings:DefaultConnection' is not configured. " +
-        "Please set the ConnectionStrings__DefaultConnection environment variable.");
-}
-
-// Convert PostgreSQL URI format to ADO.NET connection string format if needed
-// Railway provides: postgresql://user:pass@host:port/db
-// Hangfire needs: Host=host;Port=port;Database=db;Username=user;Password=pass
-if (connectionString.StartsWith("postgresql://") || connectionString.StartsWith("postgres://"))
-{
-    var uri = new Uri(connectionString);
-    var userInfo = uri.UserInfo.Split(':');
-    connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]}";
-    Console.WriteLine($"[INFO] Converted PostgreSQL URI to ADO.NET format");
-}
-
+// Hangfire for background jobs (uses the converted connection string from above)
 builder.Services.AddHangfire(config => config
     .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
     .UseSimpleAssemblyNameTypeSerializer()
