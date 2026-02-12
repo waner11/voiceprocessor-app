@@ -54,7 +54,7 @@ builder.Services.AddHostedService<VoiceSeedingService>();
 
 // CORS
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
-    ?? ["http://localhost:3000"];
+    ?? new[] { "http://localhost:3000" };
 
 builder.Services.AddCors(options =>
 {
@@ -78,7 +78,7 @@ builder.Services.AddHangfire(config => config
 builder.Services.AddHangfireServer(options =>
 {
     options.WorkerCount = Environment.ProcessorCount * 2;
-    options.Queues = ["default", "generation"];
+    options.Queues = new[] { "default", "generation" };
 });
 
 // OpenAPI/Swagger
