@@ -70,6 +70,13 @@ builder.Services.AddCors(options =>
 
 // Hangfire for background jobs
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException(
+        "Database connection string 'ConnectionStrings:DefaultConnection' is not configured. " +
+        "Please set the ConnectionStrings__DefaultConnection environment variable.");
+}
+
 builder.Services.AddHangfire(config => config
     .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
     .UseSimpleAssemblyNameTypeSerializer()
