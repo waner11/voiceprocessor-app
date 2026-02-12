@@ -1,0 +1,11 @@
+**/bin/
+**/obj/
+**/.vs/
+**/node_modules/
+.git/
+.github/
+.beads/
+.sisyphus/
+.opencode/
+docs/
+*.md

@@ -1,9 +1,9 @@
 [build]
-builder = "NIXPACKS"
-buildCommand = "cd apps/api && dotnet publish src/VoiceProcessor.Clients.Api/VoiceProcessor.Clients.Api.csproj -c Release -o /app/publish"
+builder = "DOCKERFILE"
+dockerfilePath = "apps/api/Dockerfile"
+dockerContext = "apps/api"
 
 [deploy]
-startCommand = "cd /app/publish && dotnet VoiceProcessor.Clients.Api.dll"
 healthcheckPath = "/health"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
