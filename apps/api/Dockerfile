@@ -25,8 +25,8 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/publish .
 
-# Railway injects PORT env var
-ENV ASPNETCORE_URLS=http://+:${PORT:-8080}
+# Railway injects PORT env var at runtime
+# ASP.NET Core will use PORT if set, otherwise defaults to 8080
 ENV ASPNETCORE_ENVIRONMENT=Production
 
 EXPOSE 8080
