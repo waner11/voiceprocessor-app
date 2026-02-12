@@ -70,8 +70,26 @@ builder.Services.AddCors(options =>
 
 // Hangfire for background jobs
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+Console.WriteLine($"[DEBUG] Connection string from config: '{connectionString}'");
+Console.WriteLine($"[DEBUG] Connection string length: {connectionString?.Length ?? 0}");
+Console.WriteLine($"[DEBUG] Connection string is null: {connectionString == null}");
+Console.WriteLine($"[DEBUG] Connection string is empty: {string.IsNullOrEmpty(connectionString)}");
+Console.WriteLine($"[DEBUG] Connection string is whitespace: {string.IsNullOrWhiteSpace(connectionString)}");
+
 if (string.IsNullOrWhiteSpace(connectionString))
 {
+    Console.WriteLine("[ERROR] Connection string is null or whitespace!");
+    Console.WriteLine($"[DEBUG] Environment variable ConnectionStrings__DefaultConnection: '{Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")}'");
+    Console.WriteLine($"[DEBUG] All environment variables starting with 'Connection':");
+    foreach (var key in Environment.GetEnvironmentVariables().Keys)
+    {
+        var keyStr = key.ToString();
+        if (keyStr != null && keyStr.StartsWith("Connection", StringComparison.OrdinalIgnoreCase))
+        {
+            Console.WriteLine($"  {keyStr} = {Environment.GetEnvironmentVariable(keyStr)}");
+        }
+    }
+    
     throw new InvalidOperationException(
         "Database connection string 'ConnectionStrings:DefaultConnection' is not configured. " +
         "Please set the ConnectionStrings__DefaultConnection environment variable.");
