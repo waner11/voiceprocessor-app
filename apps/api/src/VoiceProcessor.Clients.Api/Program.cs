@@ -180,13 +180,14 @@ if (app.Environment.IsDevelopment())
     app.MapHangfireDashboard("/hangfire");
 }
 
-// Configure recurring jobs
-RecurringJob.AddOrUpdate<IVoiceManager>(
+app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }))
+    .WithName("HealthCheck");
+
+// Configure recurring jobs after app is built
+var recurringJobManager = app.Services.GetRequiredService<IRecurringJobManager>();
+recurringJobManager.AddOrUpdate<IVoiceManager>(
     "refresh-voice-catalog",
     manager => manager.RefreshVoiceCatalogAsync(CancellationToken.None),
     Cron.Daily(3)); // Run at 3 AM daily
-
-app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }))
-    .WithName("HealthCheck");
 
 app.Run();
