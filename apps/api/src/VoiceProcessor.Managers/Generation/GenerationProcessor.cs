@@ -13,11 +13,12 @@ namespace VoiceProcessor.Managers.Generation;
 public class GenerationProcessor : IGenerationProcessor
 {
     private const int MaxChunkRetries = 3;
-    private static readonly TimeSpan[] RetryDelays = [
+    private static readonly TimeSpan[] RetryDelays = new[]
+    {
         TimeSpan.FromSeconds(1),
         TimeSpan.FromSeconds(3),
         TimeSpan.FromSeconds(10)
-    ];
+    };
 
     private readonly IGenerationAccessor _generationAccessor;
     private readonly IGenerationChunkAccessor _chunkAccessor;
