@@ -49,7 +49,7 @@ public class StripeAccessor : IStripeAccessor
                 {
                     Active = true,
                     Type = "one_time",
-                    Expand = ["data.product"]
+                    Expand = new List<string> { "data.product" }
                 },
                 cancellationToken: cancellationToken);
 
@@ -120,7 +120,7 @@ public class StripeAccessor : IStripeAccessor
             var priceService = new PriceService();
             var price = await priceService.GetAsync(
                 priceId,
-                new PriceGetOptions { Expand = ["product"] },
+                new PriceGetOptions { Expand = new List<string> { "product" } },
                 cancellationToken: cancellationToken);
 
             var product = price.Product;
@@ -148,14 +148,14 @@ public class StripeAccessor : IStripeAccessor
                 new SessionCreateOptions
                 {
                     Mode = "payment",
-                    LineItems =
-                    [
+                    LineItems = new List<SessionLineItemOptions>
+                    {
                         new SessionLineItemOptions
                         {
                             Price = priceId,
                             Quantity = 1
                         }
-                    ],
+                    },
                     SuccessUrl = successUrl,
                     CancelUrl = cancelUrl,
                     Metadata = new Dictionary<string, string>

@@ -14,7 +14,7 @@ public class OpenAiTtsAccessor : ITtsProviderAccessor
 
     // Available voices for tts-1 and tts-1-hd models
     private static readonly string[] AvailableVoices =
-        ["alloy", "ash", "coral", "echo", "fable", "onyx", "nova", "sage", "shimmer"];
+        new[] { "alloy", "ash", "coral", "echo", "fable", "onyx", "nova", "sage", "shimmer" };
 
     public OpenAiTtsAccessor(
         HttpClient httpClient,

@@ -58,7 +58,7 @@ public partial class ChapterDetectionEngine : IChapterDetectionEngine
     public IReadOnlyList<DetectedChapter> DetectChapters(string text)
     {
         if (string.IsNullOrEmpty(text))
-            return [];
+            return new List<DetectedChapter>();
 
         var chapters = new List<ChapterMatch>();
 
@@ -73,7 +73,7 @@ public partial class ChapterDetectionEngine : IChapterDetectionEngine
         FindMatches(text, DividerRegex(), chapters, isNumbered: false, isDivider: true);
 
         if (chapters.Count == 0)
-            return [];
+            return new List<DetectedChapter>();
 
         // Sort by position
         chapters.Sort((a, b) => a.StartPosition.CompareTo(b.StartPosition));

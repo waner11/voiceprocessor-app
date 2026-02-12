@@ -59,7 +59,7 @@ public class ExternalLoginAccessor : IExternalLoginAccessor
         Guid id,
         CancellationToken cancellationToken = default)
     {
-        var externalLogin = await _context.ExternalLogins.FindAsync([id], cancellationToken);
+        var externalLogin = await _context.ExternalLogins.FindAsync(new object[] { id }, cancellationToken);
         if (externalLogin is not null)
         {
             _context.ExternalLogins.Remove(externalLogin);

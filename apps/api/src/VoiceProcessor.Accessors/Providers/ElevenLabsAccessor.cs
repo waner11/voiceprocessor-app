@@ -121,12 +121,12 @@ public class ElevenLabsAccessor : ITtsProviderAccessor
                 AgeGroup = v.Labels?.GetValueOrDefault("age"),
                 UseCase = v.Labels?.GetValueOrDefault("use_case"),
                 PreviewUrl = v.PreviewUrl
-            }).ToList() ?? [];
+            }).ToList() ?? new();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to fetch ElevenLabs voices");
-            return [];
+            return new List<ProviderVoice>();
         }
     }
 
@@ -163,7 +163,7 @@ internal class VoiceSettings
 
 internal class ElevenLabsVoicesResponse
 {
-    public List<ElevenLabsVoice> Voices { get; set; } = [];
+    public List<ElevenLabsVoice> Voices { get; set; } = new();
 }
 
 internal class ElevenLabsVoice

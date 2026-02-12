@@ -10,19 +10,22 @@ public partial class ChunkingEngine : IChunkingEngine
     public IReadOnlyList<TextChunk> SplitText(string text, ChunkingOptions? options = null)
     {
         if (string.IsNullOrEmpty(text))
-            return [];
+            return new List<TextChunk>();
 
         options ??= DefaultOptions;
 
         if (text.Length <= options.MaxChunkSize)
         {
-            return [new TextChunk
+            return new List<TextChunk>
             {
-                Index = 0,
-                Text = text,
-                StartPosition = 0,
-                EndPosition = text.Length
-            }];
+                new TextChunk
+                {
+                    Index = 0,
+                    Text = text,
+                    StartPosition = 0,
+                    EndPosition = text.Length
+                }
+            };
         }
 
         var chunks = new List<TextChunk>();

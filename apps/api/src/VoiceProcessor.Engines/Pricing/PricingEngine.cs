@@ -109,5 +109,5 @@ public class PricingOptions
 
     public string Currency { get; set; } = "USD";
     public decimal CostPerCredit { get; set; } = 0.01m;
-    public Dictionary<Provider, decimal> ProviderRateOverrides { get; set; } = [];
+    public Dictionary<Provider, decimal> ProviderRateOverrides { get; set; } = new();
 }

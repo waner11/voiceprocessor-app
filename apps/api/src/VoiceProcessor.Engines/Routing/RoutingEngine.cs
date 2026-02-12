@@ -175,5 +175,5 @@ public class RoutingOptions
     public const string SectionName = "Routing";
 
     public double PreferredProviderBonus { get; set; } = 0.1;
-    public Dictionary<Provider, ProviderCharacteristics> ProviderOverrides { get; set; } = [];
+    public Dictionary<Provider, ProviderCharacteristics> ProviderOverrides { get; set; } = new();
 }
