@@ -10,7 +10,7 @@ public record CostEstimateResponse
     public required int CreditsRequired { get; init; }
     public required string Currency { get; init; } = "USD";
     public Provider? RecommendedProvider { get; init; }
-    public IReadOnlyList<ProviderEstimate> ProviderEstimates { get; init; } = [];
+    public IReadOnlyList<ProviderEstimate> ProviderEstimates { get; init; } = new List<ProviderEstimate>();
 }
 
 public record ProviderEstimate

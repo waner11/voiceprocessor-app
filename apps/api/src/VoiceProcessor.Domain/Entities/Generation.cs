@@ -31,6 +31,6 @@ public class Generation
     // Navigation properties
     public User User { get; set; } = null!;
     public Voice Voice { get; set; } = null!;
-    public ICollection<GenerationChunk> Chunks { get; set; } = [];
-    public ICollection<Feedback> Feedbacks { get; set; } = [];
+    public ICollection<GenerationChunk> Chunks { get; set; } = new List<GenerationChunk>();
+    public ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();
 }

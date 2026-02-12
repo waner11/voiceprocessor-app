@@ -22,10 +22,10 @@ public class User
     public DateTime? LastLoginAt { get; set; }
 
     // Navigation properties
-    public ICollection<Generation> Generations { get; set; } = [];
-    public ICollection<Feedback> Feedbacks { get; set; } = [];
-    public ICollection<RefreshToken> RefreshTokens { get; set; } = [];
-    public ICollection<ApiKey> ApiKeys { get; set; } = [];
-    public ICollection<ExternalLogin> ExternalLogins { get; set; } = [];
-    public ICollection<PaymentHistory> PaymentHistories { get; set; } = [];
+    public ICollection<Generation> Generations { get; set; } = new List<Generation>();
+    public ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();
+    public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+    public ICollection<ApiKey> ApiKeys { get; set; } = new List<ApiKey>();
+    public ICollection<ExternalLogin> ExternalLogins { get; set; } = new List<ExternalLogin>();
+    public ICollection<PaymentHistory> PaymentHistories { get; set; } = new List<PaymentHistory>();
 }

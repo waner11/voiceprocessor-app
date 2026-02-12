@@ -21,5 +21,5 @@ public class Voice
     public DateTime? UpdatedAt { get; set; }
 
     // Navigation properties
-    public ICollection<Generation> Generations { get; set; } = [];
+    public ICollection<Generation> Generations { get; set; } = new List<Generation>();
 }
