@@ -4,6 +4,7 @@ using Hangfire;
 using Hangfire.PostgreSql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
+using Microsoft.OpenApi.Models;
 using VoiceProcessor.Accessors.Data.DbContext;
 using VoiceProcessor.Accessors.DependencyInjection;
 using VoiceProcessor.Clients.Api.Authentication;
@@ -115,15 +116,31 @@ builder.Services.AddSwaggerGen(options =>
         Type = SecuritySchemeType.ApiKey
     });
 
-    // Security requirements - function that returns the requirement from the document
-    options.AddSecurityRequirement(document =>
+    // Security requirements
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
-        var requirement = new OpenApiSecurityRequirement
         {
-            { new OpenApiSecuritySchemeReference("Bearer", document), new List<string>() },
-            { new OpenApiSecuritySchemeReference("ApiKey", document), new List<string>() }
-        };
-        return requirement;
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        },
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "ApiKey"
+                }
+            },
+            new string[] {}
+        }
     });
 
     // Include XML comments for API documentation
