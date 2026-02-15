@@ -4,6 +4,7 @@
 **/Debug/
 **/Release/
 **/bin\\Debug/
+**/bin_Debug/
 
 # Test artifacts
 playwright-report/
