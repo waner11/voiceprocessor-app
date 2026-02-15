@@ -13,7 +13,7 @@ public static class AuthCookieExtensions
         return new CookieOptions
         {
             HttpOnly = true,
-            SameSite = SameSiteMode.Lax,
+            SameSite = isDevelopment ? SameSiteMode.Lax : SameSiteMode.None,
             Secure = !isDevelopment,
             MaxAge = TimeSpan.FromMinutes(expiryMinutes),
             Path = "/",
@@ -26,7 +26,7 @@ public static class AuthCookieExtensions
         return new CookieOptions
         {
             HttpOnly = true,
-            SameSite = SameSiteMode.Lax,
+            SameSite = isDevelopment ? SameSiteMode.Lax : SameSiteMode.None,
             Secure = !isDevelopment,
             MaxAge = TimeSpan.FromDays(expiryDays),
             Path = RefreshTokenCookiePath,
