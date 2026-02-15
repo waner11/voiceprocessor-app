@@ -4,24 +4,72 @@ import { useAuthStore } from "@/stores";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
-// Flag to prevent multiple simultaneous logout calls on 401
-let isLoggingOut = false;
+let refreshPromise: Promise<boolean> | null = null;
 
-// Auth middleware - handles 401 responses (logout on unauthorized)
-const authMiddleware: Middleware = {
-  async onResponse({ response }) {
-    // Handle 401 Unauthorized - logout user
-    if (response.status === 401 && !isLoggingOut) {
-      isLoggingOut = true;
-      const { logout } = useAuthStore.getState();
-      logout();
-      // Optionally redirect to login
-      if (typeof window !== "undefined") {
-        window.location.href = "/login";
+function logoutAndRedirect(): void {
+  const { logout } = useAuthStore.getState();
+  logout();
+  if (typeof window !== "undefined") {
+    window.location.href = "/login";
+  }
+}
+
+async function attemptRefresh(): Promise<boolean> {
+  if (refreshPromise) {
+    return refreshPromise;
+  }
+
+  refreshPromise = (async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/v1/Auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({}),
+      });
+
+      if (response.ok) {
+        return true;
       }
-      // Reset flag after a short delay
-      setTimeout(() => { isLoggingOut = false; }, 1000);
+
+      logoutAndRedirect();
+      return false;
+    } catch {
+      logoutAndRedirect();
+      return false;
+    } finally {
+      refreshPromise = null;
     }
+  })();
+
+  return refreshPromise;
+}
+
+async function retryRequest(request: Request): Promise<Response> {
+  const retryResponse = await fetch(request.url, {
+    method: request.method,
+    headers: request.headers,
+    body: request.method !== 'GET' && request.method !== 'HEAD' ? await request.clone().text() : undefined,
+    credentials: 'include',
+  });
+
+  if (retryResponse.status === 401) {
+    logoutAndRedirect();
+  }
+
+  return retryResponse;
+}
+
+const authMiddleware: Middleware = {
+  async onResponse({ request, response }) {
+    if (response.status === 401) {
+      const refreshSuccess = await attemptRefresh();
+      
+      if (refreshSuccess) {
+        return retryRequest(request);
+      }
+    }
+    
     return response;
   },
 };
