@@ -129,7 +129,7 @@ ASP.NET Core 8 (LTS)
     <PackageReference Include="Azure.AI.TextAnalytics" Version="5.3.*" />
 
     <!-- Audio Processing -->
-    <PackageReference Include="NAudio" Version="2.2.*" />
+    <PackageReference Include="FFMpegCore" Version="5.4.0" />
 
     <!-- Storage -->
     <PackageReference Include="Azure.Storage.Blobs" Version="12.19.*" />
