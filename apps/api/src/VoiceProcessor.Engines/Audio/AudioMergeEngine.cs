@@ -8,6 +8,7 @@ namespace VoiceProcessor.Engines.Audio;
 
 public class AudioMergeEngine : IAudioMergeEngine
 {
+    private const int FfmpegProcessTimeoutMs = 120_000;
     private readonly ILogger<AudioMergeEngine> _logger;
 
     public AudioMergeEngine(ILogger<AudioMergeEngine> logger)
@@ -40,10 +41,13 @@ public class AudioMergeEngine : IAudioMergeEngine
             };
         }
 
-        return await Task.Run(() => MergeChunksInternal(audioChunks, options), cancellationToken);
+        return await Task.Run(() => MergeChunksInternal(audioChunks, options, cancellationToken), cancellationToken);
     }
 
-    private AudioMergeResult MergeChunksInternal(IReadOnlyList<byte[]> audioChunks, AudioMergeOptions options)
+    private AudioMergeResult MergeChunksInternal(
+        IReadOnlyList<byte[]> audioChunks,
+        AudioMergeOptions options,
+        CancellationToken cancellationToken)
     {
         var tempDir = Path.Combine(Path.GetTempPath(), $"vp-merge-{Guid.NewGuid()}");
         Directory.CreateDirectory(tempDir);
@@ -77,6 +81,7 @@ public class AudioMergeEngine : IAudioMergeEngine
 
                 RunFfmpeg(
                     tempDir,
+                    cancellationToken,
                     "-y",
                     "-f", "lavfi",
                     "-i", $"anullsrc=r={sampleRate}:cl={channelLayout}",
@@ -106,6 +111,7 @@ public class AudioMergeEngine : IAudioMergeEngine
             if (!TryRunFfmpeg(
                     tempDir,
                     out var concatCopyError,
+                    cancellationToken,
                     "-y",
                     "-f", "concat",
                     "-safe", "0",
@@ -116,6 +122,7 @@ public class AudioMergeEngine : IAudioMergeEngine
                 var fallbackSucceeded = TryRunFfmpeg(
                     tempDir,
                     out var concatReencodeError,
+                    cancellationToken,
                     "-y",
                     "-f", "concat",
                     "-safe", "0",
@@ -166,7 +173,7 @@ public class AudioMergeEngine : IAudioMergeEngine
         {
             var inputPath = Path.Combine(tempDir, "input.mp3");
             await File.WriteAllBytesAsync(inputPath, audioData, cancellationToken);
-            var probe = await FFProbe.AnalyseAsync(inputPath);
+            var probe = await FFProbe.AnalyseAsync(inputPath, cancellationToken: cancellationToken);
             return (int)probe.Duration.TotalMilliseconds;
         }
         finally
@@ -178,23 +185,29 @@ public class AudioMergeEngine : IAudioMergeEngine
         }
     }
 
-    private static void RunFfmpeg(string workingDirectory, params string[] args)
+    private static void RunFfmpeg(string workingDirectory, CancellationToken cancellationToken, params string[] args)
     {
-        if (!TryRunFfmpeg(workingDirectory, out var errorOutput, args))
+        if (!TryRunFfmpeg(workingDirectory, out var errorOutput, cancellationToken, args))
         {
             throw new InvalidOperationException($"FFmpeg process failed: {errorOutput}");
         }
     }
 
-    private static bool TryRunFfmpeg(string workingDirectory, out string errorOutput, params string[] args)
+    private static bool TryRunFfmpeg(
+        string workingDirectory,
+        out string errorOutput,
+        CancellationToken cancellationToken,
+        params string[] args)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         using var process = new Process();
         process.StartInfo = new ProcessStartInfo
         {
             FileName = "ffmpeg",
             WorkingDirectory = workingDirectory,
             RedirectStandardError = true,
-            RedirectStandardOutput = true,
+            RedirectStandardOutput = false,
             UseShellExecute = false,
             CreateNoWindow = true
         };
@@ -205,9 +218,40 @@ public class AudioMergeEngine : IAudioMergeEngine
         }
 
         process.Start();
-        var standardError = process.StandardError.ReadToEnd();
-        process.WaitForExit();
-        errorOutput = standardError;
+        var standardErrorTask = process.StandardError.ReadToEndAsync();
+
+        using var registration = cancellationToken.Register(() =>
+        {
+            try
+            {
+                process.Kill(entireProcessTree: true);
+            }
+            catch (InvalidOperationException)
+            {
+                return;
+            }
+        });
+
+        var processExited = process.WaitForExit(FfmpegProcessTimeoutMs);
+        if (!processExited)
+        {
+            try
+            {
+                process.Kill(entireProcessTree: true);
+            }
+            catch (InvalidOperationException)
+            {
+                errorOutput = "FFmpeg process timed out and exited during cancellation";
+                return false;
+            }
+
+            errorOutput = $"FFmpeg process timed out after {FfmpegProcessTimeoutMs}ms";
+            return false;
+        }
+
+        cancellationToken.ThrowIfCancellationRequested();
+
+        errorOutput = standardErrorTask.GetAwaiter().GetResult();
         return process.ExitCode == 0;
     }
 
