@@ -43,12 +43,13 @@ public static class AuthCookieExtensions
         };
     }
 
-    private static CookieOptions CreateDeleteCookieOptions(string path)
+    private static CookieOptions CreateDeleteCookieOptions(string path, bool isDevelopment)
     {
         return new CookieOptions
         {
             Path = path,
-            SameSite = SameSiteMode.Lax
+            SameSite = isDevelopment ? SameSiteMode.Lax : SameSiteMode.None,
+            Secure = !isDevelopment
         };
     }
 
@@ -80,9 +81,10 @@ public static class AuthCookieExtensions
     /// Clears authentication cookies.
     /// </summary>
     /// <param name="response">The HTTP response.</param>
-    public static void ClearAuthCookies(this HttpResponse response)
+    /// <param name="isDevelopment">Whether the app is running in development mode.</param>
+    public static void ClearAuthCookies(this HttpResponse response, bool isDevelopment)
     {
-        response.Cookies.Delete(AccessTokenCookieName, CreateDeleteCookieOptions("/"));
-        response.Cookies.Delete(RefreshTokenCookieName, CreateDeleteCookieOptions(RefreshTokenCookiePath));
+        response.Cookies.Delete(AccessTokenCookieName, CreateDeleteCookieOptions("/", isDevelopment));
+        response.Cookies.Delete(RefreshTokenCookieName, CreateDeleteCookieOptions(RefreshTokenCookiePath, isDevelopment));
     }
 }

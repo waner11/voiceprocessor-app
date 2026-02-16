@@ -169,7 +169,7 @@ public class AuthController : ControllerBase
 
         await _authManager.LogoutAsync(userId, request?.RefreshToken, cancellationToken);
         
-        Response.ClearAuthCookies();
+        Response.ClearAuthCookies(_environment.IsDevelopment());
         
         return NoContent();
     }
