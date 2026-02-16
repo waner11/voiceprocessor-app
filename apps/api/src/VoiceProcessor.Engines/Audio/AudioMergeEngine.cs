@@ -1,6 +1,7 @@
+using System.Diagnostics;
+using System.Globalization;
+using FFMpegCore;
 using Microsoft.Extensions.Logging;
-using NAudio.Lame;
-using NAudio.Wave;
 using VoiceProcessor.Engines.Contracts;
 
 namespace VoiceProcessor.Engines.Audio;
@@ -44,101 +45,170 @@ public class AudioMergeEngine : IAudioMergeEngine
 
     private AudioMergeResult MergeChunksInternal(IReadOnlyList<byte[]> audioChunks, AudioMergeOptions options)
     {
-        // Decode all MP3 chunks to PCM
-        var pcmChunks = new List<byte[]>();
-        WaveFormat? targetFormat = null;
-        var totalDurationMs = 0;
+        var tempDir = Path.Combine(Path.GetTempPath(), $"vp-merge-{Guid.NewGuid()}");
+        Directory.CreateDirectory(tempDir);
 
-        foreach (var chunk in audioChunks)
-        {
-            using var ms = new MemoryStream(chunk);
-            using var mp3Reader = new Mp3FileReader(ms);
-
-            // Use the format of the first chunk as target
-            targetFormat ??= mp3Reader.WaveFormat;
-
-            // Read all PCM data
-            var pcmData = new byte[mp3Reader.Length];
-            var bytesRead = mp3Reader.Read(pcmData, 0, pcmData.Length);
-            if (bytesRead < pcmData.Length)
-            {
-                Array.Resize(ref pcmData, bytesRead);
-            }
-
-            pcmChunks.Add(pcmData);
-            totalDurationMs += (int)mp3Reader.TotalTime.TotalMilliseconds;
-        }
-
-        if (targetFormat is null)
-        {
-            throw new InvalidOperationException("Could not determine audio format from chunks");
-        }
-
-        // Generate silence samples if needed
-        byte[]? silenceSamples = null;
-        if (options.SilenceBetweenChunksMs > 0)
-        {
-            var silenceByteCount = (int)(targetFormat.AverageBytesPerSecond * options.SilenceBetweenChunksMs / 1000.0);
-            silenceSamples = new byte[silenceByteCount];
-            totalDurationMs += options.SilenceBetweenChunksMs * (audioChunks.Count - 1);
-        }
-
-        // Calculate total size
-        var totalPcmSize = pcmChunks.Sum(c => c.Length);
-        if (silenceSamples is not null)
-        {
-            totalPcmSize += silenceSamples.Length * (pcmChunks.Count - 1);
-        }
-
-        // Merge PCM chunks
-        var mergedPcm = new byte[totalPcmSize];
-        var offset = 0;
-        for (var i = 0; i < pcmChunks.Count; i++)
-        {
-            Array.Copy(pcmChunks[i], 0, mergedPcm, offset, pcmChunks[i].Length);
-            offset += pcmChunks[i].Length;
-
-            if (silenceSamples is not null && i < pcmChunks.Count - 1)
-            {
-                Array.Copy(silenceSamples, 0, mergedPcm, offset, silenceSamples.Length);
-                offset += silenceSamples.Length;
-            }
-        }
-
-        // Encode back to MP3
-        byte[] outputData;
-        using (var pcmStream = new RawSourceWaveStream(new MemoryStream(mergedPcm), targetFormat))
-        using (var outputStream = new MemoryStream())
+        try
         {
             var bitRate = options.BitRate ?? 128;
-            using (var mp3Writer = new LameMP3FileWriter(outputStream, targetFormat, bitRate))
+            var chunkFileNames = new List<string>(audioChunks.Count);
+            for (var i = 0; i < audioChunks.Count; i++)
             {
-                pcmStream.CopyTo(mp3Writer);
+                var chunkFileName = $"chunk_{i}.mp3";
+                File.WriteAllBytes(Path.Combine(tempDir, chunkFileName), audioChunks[i]);
+                chunkFileNames.Add(chunkFileName);
             }
-            outputData = outputStream.ToArray();
+
+            var mergeSequence = new List<string>();
+            if (options.SilenceBetweenChunksMs > 0 && chunkFileNames.Count > 1)
+            {
+                var firstChunkPath = Path.Combine(tempDir, chunkFileNames[0]);
+                var probe = FFProbe.Analyse(firstChunkPath);
+                var sampleRate = probe.PrimaryAudioStream?.SampleRateHz ?? 24000;
+                var channelLayout = probe.PrimaryAudioStream?.ChannelLayout;
+                if (string.IsNullOrWhiteSpace(channelLayout))
+                {
+                    channelLayout = probe.PrimaryAudioStream?.Channels == 2 ? "stereo" : "mono";
+                }
+
+                var silenceFileName = "silence.mp3";
+                var silenceDuration = (options.SilenceBetweenChunksMs / 1000d)
+                    .ToString("0.###", CultureInfo.InvariantCulture);
+
+                RunFfmpeg(
+                    tempDir,
+                    "-y",
+                    "-f", "lavfi",
+                    "-i", $"anullsrc=r={sampleRate}:cl={channelLayout}",
+                    "-t", silenceDuration,
+                    "-codec:a", "libmp3lame",
+                    "-b:a", $"{bitRate}k",
+                    silenceFileName);
+
+                for (var i = 0; i < chunkFileNames.Count; i++)
+                {
+                    mergeSequence.Add(chunkFileNames[i]);
+                    if (i < chunkFileNames.Count - 1)
+                    {
+                        mergeSequence.Add(silenceFileName);
+                    }
+                }
+            }
+            else
+            {
+                mergeSequence.AddRange(chunkFileNames);
+            }
+
+            var listFilePath = Path.Combine(tempDir, "list.txt");
+            var concatLines = mergeSequence.Select(fileName => $"file '{fileName.Replace("'", "''")}'");
+            File.WriteAllLines(listFilePath, concatLines);
+
+            if (!TryRunFfmpeg(
+                    tempDir,
+                    out var concatCopyError,
+                    "-y",
+                    "-f", "concat",
+                    "-safe", "0",
+                    "-i", "list.txt",
+                    "-c", "copy",
+                    "output.mp3"))
+            {
+                var fallbackSucceeded = TryRunFfmpeg(
+                    tempDir,
+                    out var concatReencodeError,
+                    "-y",
+                    "-f", "concat",
+                    "-safe", "0",
+                    "-i", "list.txt",
+                    "-codec:a", "libmp3lame",
+                    "-b:a", $"{bitRate}k",
+                    "output.mp3");
+
+                if (!fallbackSucceeded)
+                {
+                    throw new InvalidOperationException(
+                        $"FFmpeg concat failed. Copy mode error: {concatCopyError}. Re-encode fallback error: {concatReencodeError}");
+                }
+            }
+
+            var outputPath = Path.Combine(tempDir, "output.mp3");
+            var outputData = File.ReadAllBytes(outputPath);
+            var outputProbe = FFProbe.Analyse(outputPath);
+            var totalDurationMs = (int)outputProbe.Duration.TotalMilliseconds;
+
+            _logger.LogInformation(
+                "Merged audio: {Duration}ms, {Size} bytes",
+                totalDurationMs, outputData.Length);
+
+            return new AudioMergeResult
+            {
+                AudioData = outputData,
+                ContentType = GetContentType(options.OutputFormat),
+                DurationMs = totalDurationMs,
+                SizeBytes = outputData.Length
+            };
         }
-
-        _logger.LogInformation(
-            "Merged audio: {Duration}ms, {Size} bytes",
-            totalDurationMs, outputData.Length);
-
-        return new AudioMergeResult
+        finally
         {
-            AudioData = outputData,
-            ContentType = GetContentType(options.OutputFormat),
-            DurationMs = totalDurationMs,
-            SizeBytes = outputData.Length
-        };
+            if (Directory.Exists(tempDir))
+            {
+                Directory.Delete(tempDir, recursive: true);
+            }
+        }
     }
 
     private static async Task<int> GetAudioDurationAsync(byte[] audioData, CancellationToken cancellationToken)
     {
-        return await Task.Run(() =>
+        var tempDir = Path.Combine(Path.GetTempPath(), $"vp-merge-{Guid.NewGuid()}");
+        Directory.CreateDirectory(tempDir);
+
+        try
         {
-            using var ms = new MemoryStream(audioData);
-            using var mp3Reader = new Mp3FileReader(ms);
-            return (int)mp3Reader.TotalTime.TotalMilliseconds;
-        }, cancellationToken);
+            var inputPath = Path.Combine(tempDir, "input.mp3");
+            await File.WriteAllBytesAsync(inputPath, audioData, cancellationToken);
+            var probe = await FFProbe.AnalyseAsync(inputPath);
+            return (int)probe.Duration.TotalMilliseconds;
+        }
+        finally
+        {
+            if (Directory.Exists(tempDir))
+            {
+                Directory.Delete(tempDir, recursive: true);
+            }
+        }
+    }
+
+    private static void RunFfmpeg(string workingDirectory, params string[] args)
+    {
+        if (!TryRunFfmpeg(workingDirectory, out var errorOutput, args))
+        {
+            throw new InvalidOperationException($"FFmpeg process failed: {errorOutput}");
+        }
+    }
+
+    private static bool TryRunFfmpeg(string workingDirectory, out string errorOutput, params string[] args)
+    {
+        using var process = new Process();
+        process.StartInfo = new ProcessStartInfo
+        {
+            FileName = "ffmpeg",
+            WorkingDirectory = workingDirectory,
+            RedirectStandardError = true,
+            RedirectStandardOutput = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+
+        foreach (var arg in args)
+        {
+            process.StartInfo.ArgumentList.Add(arg);
+        }
+
+        process.Start();
+        var standardError = process.StandardError.ReadToEnd();
+        process.WaitForExit();
+        errorOutput = standardError;
+        return process.ExitCode == 0;
     }
 
     private static string GetContentType(string format) => format.ToLowerInvariant() switch

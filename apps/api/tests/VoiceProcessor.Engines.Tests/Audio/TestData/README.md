@@ -1,22 +1,22 @@
 # MP3 Test Fixtures
 
-This directory contains test helpers and fixtures for MP3 audio testing.
+This directory contains test helpers for MP3 audio testing.
 
 ## Files
 
 - **Mp3TestHelper.cs** - Helper class for generating MP3 test data
 - **Mp3TestHelperTests.cs** - Unit tests for the helper
-- **short_chunk_1s.mp3** - Embedded MP3 fixture (~1 second, 3.8KB)
+- **short_chunk_1s.mp3** - Legacy embedded fixture (kept for compatibility)
 
 ## Usage
 
 ```csharp
 using VoiceProcessor.Engines.Tests.Audio.TestData;
 
-// Get a short MP3 chunk for testing
+// Get a short MP3 chunk for testing (generated via ffmpeg)
 var mp3Data = Mp3TestHelper.CreateShortMp3Chunk();
 
-// Or use the parameterized version (currently returns same fixture)
+// Or use the parameterized version
 var mp3Data = Mp3TestHelper.CreateMinimalMp3(1000);
 
 // Validate MP3 data
@@ -45,10 +45,10 @@ var result = await audioMergeEngine.MergeAudioChunksAsync(chunks, options);
 
 ## Implementation Notes
 
-- MP3 fixtures are embedded resources (no file I/O needed)
-- Generated programmatically using Python (raw MP3 frame construction)
-- Validation uses MP3 sync word check (0xFF 0xE0 header)
-- NAudio.Lame not used due to platform limitations on Linux
+- MP3 fixtures are generated at test runtime using `ffmpeg` (`anullsrc` + `libmp3lame`)
+- Tests require `ffmpeg` to be installed on the machine/container running tests
+- Validation supports both raw frame start and ID3-prefixed MP3 files
+- NAudio.Lame is not used due to platform limitations on Linux
 
 ## Adding New Fixtures
 
