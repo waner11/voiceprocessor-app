@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import type { paths } from '../types';
 
 const mockLogout = vi.fn();
 const mockGetState = vi.fn(() => ({ logout: mockLogout }));
@@ -184,5 +183,38 @@ describe('401 Refresh Interceptor', () => {
       typeof call[0] === 'string' && call[0].includes('/api/v1/Auth/refresh')
     );
     expect(refreshCalls).toHaveLength(0);
+  });
+
+  it('should retry POST request with original body after 401 refresh', async () => {
+    const testBody = { username: 'test', password: 'secret' };
+    const mockFetch = vi.fn();
+    
+    mockFetch
+      .mockResolvedValueOnce(new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ user: { id: '1', email: 'test@example.com' } }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ success: true }), { status: 200 }));
+
+    global.fetch = mockFetch;
+
+    const { api } = await import('../client');
+
+    const response = await api.POST('/api/v1/auth/login', { body: testBody });
+
+    expect(response.response.status).toBe(200);
+    expect(response.data).toEqual({ success: true });
+
+    expect(mockFetch).toHaveBeenCalledTimes(3);
+    
+    const call1 = mockFetch.mock.calls[0][0];
+    expect(call1).toBeInstanceOf(Request);
+    expect(call1.url).toContain('/api/v1/auth/login');
+    
+    const call2 = mockFetch.mock.calls[1][0];
+    expect(call2).toContain('/api/v1/Auth/refresh');
+    
+    const retryCall = mockFetch.mock.calls[2];
+    const retryInit = retryCall[1] as RequestInit;
+    expect(retryInit.body).toBe(JSON.stringify(testBody));
+    expect(mockLogout).not.toHaveBeenCalled();
   });
 });
