@@ -1,6 +1,6 @@
 # Agent Instructions
 
-This repository defines the **VoiceProcessor API**, a multi-provider Text-to-Speech platform built with **ASP.NET Core 10** and **C# 14**.
+This repository defines the **VoiceProcessor API**, a multi-provider Text-to-Speech platform built with **ASP.NET Core 8** and **C# 12**.
 It strictly follows the **iDesign (Volatility-Based Decomposition)** architecture.
 
 ## 1. Quick Reference
@@ -80,7 +80,7 @@ dotnet ef database update --project src/VoiceProcessor.Accessors --startup-proje
 ## 4. Code Style & Conventions
 
 ### General Guidelines
-- **Framework**: Use C# 14 features. Target `.net10.0`.
+- **Framework**: Use C# 12 features. Target `.net8.0`.
 - **Namespaces**: Use file-scoped namespaces (e.g., `namespace VoiceProcessor.Managers;`).
 - **Nullability**: Enable nullable reference types. Explicitly handle `null`.
 - **Async/Await**: Use `async` all the way down. Always pass `CancellationToken` to async methods.

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-VoiceProcessor API is a multi-provider Text-to-Speech SaaS platform built with ASP.NET Core 10 / C# 14. It abstracts multiple TTS providers (ElevenLabs, OpenAI, Google Cloud TTS, Amazon Polly, Fish Audio, Cartesia) behind a unified API with intelligent routing, text chunking, and cost optimization.
+VoiceProcessor API is a multi-provider Text-to-Speech SaaS platform built with ASP.NET Core 8 / C# 12. It abstracts multiple TTS providers (ElevenLabs, OpenAI, Google Cloud TTS, Amazon Polly, Fish Audio, Cartesia) behind a unified API with intelligent routing, text chunking, and cost optimization.
 
 **Current Status:** Design phase - comprehensive documentation exists but source code has not yet been implemented.
 
@@ -108,7 +108,7 @@ See **AGENTS.md Section 4** for the complete git workflow including:
 
 | Component | Technology |
 |-----------|------------|
-| Backend | ASP.NET Core 10 / C# 14 (LTS until Nov 2028) |
+| Backend | ASP.NET Core 8 / C# 12 (LTS until Nov 2026) |
 | Database | PostgreSQL 16 with pgvector extension |
 | Cache | Redis 7 |
 | Background Jobs | Hangfire |
@@ -195,7 +195,7 @@ VoiceProcessorException (base)
 - `Pgvector.EntityFrameworkCore` - Vector embeddings for ML features
 - `Hangfire.PostgreSql` - Background job storage
 - `Azure.AI.OpenAI` - OpenAI integration
-- `NAudio` - Audio processing/merging
+- `FFMpegCore` + `ffmpeg` - Audio processing/merging
 - `FluentValidation.AspNetCore` - Request validation
 
 ## Environment Variables

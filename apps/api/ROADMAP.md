@@ -181,7 +181,7 @@ flowchart LR
 
 | Component | Technology |
 |-----------|------------|
-| **Backend API** | ASP.NET Core 10 / C# 14 |
+| **Backend API** | ASP.NET Core 8 / C# 12 |
 | **Frontend** | Next.js 16 + React 19 + TanStack Query |
 | **Database** | PostgreSQL 16 |
 | **Cache & Jobs** | Redis + Hangfire |
@@ -199,7 +199,7 @@ flowchart LR
                               v REST API + SignalR
 +-------------------------------------------------------------+
 |                    voiceprocessor-api                       |
-|                  ASP.NET Core 10 / C# 14                    |
+|                  ASP.NET Core 8 / C# 12                    |
 |  +---------+ +---------+ +---------+ +---------------------+
 |  | Managers|>| Engines |>|Accessors|>| PostgreSQL + Redis  |
 |  +---------+ +---------+ +---------+ | Hangfire, SignalR   |

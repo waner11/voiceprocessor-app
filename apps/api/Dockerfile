@@ -23,6 +23,7 @@ RUN dotnet publish src/VoiceProcessor.Clients.Api/VoiceProcessor.Clients.Api.csp
 # Stage 2: Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg && rm -rf /var/lib/apt/lists/*
 COPY --from=build /app/publish .
 
 # Railway injects PORT env var at runtime
