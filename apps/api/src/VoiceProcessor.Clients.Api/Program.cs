@@ -217,3 +217,6 @@ recurringJobManager.AddOrUpdate<IVoiceManager>(
     Cron.Daily(3)); // Run at 3 AM daily
 
 app.Run();
+
+// Make Program class accessible for WebApplicationFactory
+public partial class Program { }

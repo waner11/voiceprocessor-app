@@ -1,121 +1,62 @@
 using FluentAssertions;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 namespace VoiceProcessor.Managers.Tests.Auth;
 
 public class CorsConfigurationTests
 {
     [Fact]
-    public async Task CorsPolicy_ShouldReadFromConfiguration()
+    public async Task ConfiguredOrigin_ReturnsAccessControlAllowOriginHeader()
     {
-        var testOrigin = "https://test.example.com";
+        await using var factory = new CustomWebApplicationFactory();
+        var client = factory.CreateClient();
         
-        var configData = new Dictionary<string, string?>
-        {
-            ["Cors:AllowedOrigins:0"] = testOrigin
-        };
-
-        var host = await new HostBuilder()
-            .ConfigureWebHost(webBuilder =>
-            {
-                webBuilder
-                    .UseTestServer()
-                    .ConfigureAppConfiguration((context, config) =>
-                    {
-                        config.AddInMemoryCollection(configData);
-                    })
-                    .ConfigureServices((context, services) =>
-                    {
-                        var allowedOrigins = context.Configuration
-                            .GetSection("Cors:AllowedOrigins")
-                            .Get<string[]>() ?? new[] { "http://localhost:3000" };
-
-                        services.AddCors(options =>
-                        {
-                            options.AddPolicy("Frontend", policy =>
-                            {
-                                policy.WithOrigins(allowedOrigins)
-                                    .AllowAnyHeader()
-                                    .AllowAnyMethod()
-                                    .AllowCredentials();
-                            });
-                        });
-                    })
-                    .Configure(app =>
-                    {
-                        app.UseCors("Frontend");
-                        app.UseRouting();
-                    });
-            })
-            .StartAsync();
-
-        var server = host.GetTestServer();
-        var client = server.CreateClient();
-        client.DefaultRequestHeaders.Add("Origin", testOrigin);
-
-        var response = await client.GetAsync("/");
-
-        response.Headers.Should().ContainKey("Access-Control-Allow-Origin");
-        response.Headers.GetValues("Access-Control-Allow-Origin").Should().Contain(testOrigin);
+        client.DefaultRequestHeaders.Add("Origin", "https://voiceprocessor.com");
+        
+        var response = await client.GetAsync("/health");
+        
+        response.Headers.Should().Contain(h => 
+            h.Key == "Access-Control-Allow-Origin" && 
+            h.Value.Contains("https://voiceprocessor.com"));
     }
 
     [Fact]
-    public async Task CorsPolicy_ShouldSupportEnvironmentVariableOverride()
+    public async Task EnvironmentVariableOverride_ReturnsCorrectOrigin()
     {
         var productionOrigin = "https://voiceprocessor.vercel.app";
         
-        var configData = new Dictionary<string, string?>
-        {
-            ["Cors:AllowedOrigins:0"] = "http://localhost:3000",
-            ["Cors:AllowedOrigins:1"] = productionOrigin
-        };
-
-        var host = await new HostBuilder()
-            .ConfigureWebHost(webBuilder =>
-            {
-                webBuilder
-                    .UseTestServer()
-                    .ConfigureAppConfiguration((context, config) =>
-                    {
-                        config.AddInMemoryCollection(configData);
-                    })
-                    .ConfigureServices((context, services) =>
-                    {
-                        var allowedOrigins = context.Configuration
-                            .GetSection("Cors:AllowedOrigins")
-                            .Get<string[]>() ?? new[] { "http://localhost:3000" };
-
-                        services.AddCors(options =>
-                        {
-                            options.AddPolicy("Frontend", policy =>
-                            {
-                                policy.WithOrigins(allowedOrigins)
-                                    .AllowAnyHeader()
-                                    .AllowAnyMethod()
-                                    .AllowCredentials();
-                            });
-                        });
-                    })
-                    .Configure(app =>
-                    {
-                        app.UseCors("Frontend");
-                        app.UseRouting();
-                    });
-            })
-            .StartAsync();
-
-        var server = host.GetTestServer();
-        var client = server.CreateClient();
+        await using var factory = new CustomWebApplicationFactoryWithOrigin(productionOrigin);
+        var client = factory.CreateClient();
+        
         client.DefaultRequestHeaders.Add("Origin", productionOrigin);
+        
+        var response = await client.GetAsync("/health");
+        
+        response.Headers.Should().Contain(h => 
+            h.Key == "Access-Control-Allow-Origin" && 
+            h.Value.Contains(productionOrigin));
+    }
+}
 
-        var response = await client.GetAsync("/");
+public class CustomWebApplicationFactoryWithOrigin : CustomWebApplicationFactory
+{
+    private readonly string _allowedOrigin;
 
-        response.Headers.Should().ContainKey("Access-Control-Allow-Origin");
-        response.Headers.GetValues("Access-Control-Allow-Origin").Should().Contain(productionOrigin);
+    public CustomWebApplicationFactoryWithOrigin(string allowedOrigin)
+    {
+        _allowedOrigin = allowedOrigin;
+    }
+
+    protected override void ConfigureWebHost(Microsoft.AspNetCore.Hosting.IWebHostBuilder builder)
+    {
+        base.ConfigureWebHost(builder);
+        
+        builder.ConfigureAppConfiguration((context, config) =>
+        {
+            config.AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["Cors:AllowedOrigins:0"] = _allowedOrigin
+            });
+        });
     }
 }
