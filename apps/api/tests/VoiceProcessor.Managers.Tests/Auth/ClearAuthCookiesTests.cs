@@ -12,7 +12,7 @@ public class ClearAuthCookiesTests
         var httpContext = new DefaultHttpContext();
         var response = httpContext.Response;
         
-        response.ClearAuthCookies();
+        response.ClearAuthCookies(isDevelopment: true);
         
         var cookies = response.Headers.SetCookie.ToString();
         
@@ -28,7 +28,7 @@ public class ClearAuthCookiesTests
         var httpContext = new DefaultHttpContext();
         var response = httpContext.Response;
         
-        response.ClearAuthCookies();
+        response.ClearAuthCookies(isDevelopment: true);
         
         var cookies = response.Headers.SetCookie.ToString();
         
@@ -36,5 +36,19 @@ public class ClearAuthCookiesTests
         cookies.Should().Contain("path=/api/v1/Auth", "refresh token delete cookie must have same path as set cookie");
         cookies.Should().Contain("samesite=lax", "refresh token delete cookie must have same samesite as set cookie");
         cookies.Should().MatchRegex("max-age=0|expires=", "refresh token delete cookie must expire immediately");
+    }
+
+    [Fact]
+    public void ClearAuthCookies_Production_HasMatchingSameSiteNoneAndSecure()
+    {
+        var httpContext = new DefaultHttpContext();
+        var response = httpContext.Response;
+        
+        response.ClearAuthCookies(isDevelopment: false);
+        
+        var cookies = response.Headers.SetCookie.ToString();
+        
+        cookies.Should().Contain("samesite=none");
+        cookies.Should().Contain("secure");
     }
 }

@@ -49,7 +49,7 @@ async function retryRequest(request: Request): Promise<Response> {
   const retryResponse = await fetch(request.url, {
     method: request.method,
     headers: request.headers,
-    body: request.method !== 'GET' && request.method !== 'HEAD' ? await request.clone().text() : undefined,
+    body: (request as any).__bodyText ?? undefined,
     credentials: 'include',
   });
 
@@ -61,6 +61,12 @@ async function retryRequest(request: Request): Promise<Response> {
 }
 
 const authMiddleware: Middleware = {
+  async onRequest({ request }) {
+    if (request.method !== 'GET' && request.method !== 'HEAD') {
+      (request as any).__bodyText = await request.clone().text();
+    }
+    return request;
+  },
   async onResponse({ request, response }) {
     if (response.status === 401) {
       const refreshSuccess = await attemptRefresh();
