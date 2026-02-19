@@ -6,6 +6,7 @@ import { useGenerations } from "@/hooks";
 import { useGenerationHub } from "@/hooks/useGenerationHub";
 import type { components } from "@/lib/api/types";
 import { formatNumber } from "@/utils/formatNumber";
+import { formatCredits } from "@/utils/formatCredits";
 
 type GenerationStatus = components["schemas"]["GenerationStatus"];
 
@@ -186,10 +187,10 @@ export default function GenerationsPage() {
                       {generation.status}
                     </span>
 
-                    {/* Cost */}
-                    {generation.actualCost !== undefined && generation.actualCost !== null && (
+                    {/* Credits */}
+                    {(generation.creditsUsed != null || generation.actualCost != null) && (
                       <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">
-                        ${generation.actualCost.toFixed(4)}
+                        {formatCredits(generation.creditsUsed ?? Math.ceil((generation.actualCost ?? 0) * 100))}
                       </span>
                     )}
                   </Link>

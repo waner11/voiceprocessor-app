@@ -1,31 +1,24 @@
 import { describe, it, expect } from 'vitest';
+import { formatCredits } from '@/utils/formatCredits';
 
-/**
- * Format credits and cost display
- * Shows "X,XXX credits ($Y.YYYY)" when credits > 0
- * Shows "$Y.YYYY" when credits is 0, undefined, or null
- */
-const formatCostDisplay = (credits: number | undefined, cost: number) => {
-  if (credits && credits > 0) {
-    return `${credits.toLocaleString('en-US')} credits ($${cost.toFixed(4)})`;
-  }
-  return `$${cost.toFixed(4)}`;
-};
-
-describe('formatCostDisplay', () => {
-  it('formats credits and cost together for normal case', () => {
-    expect(formatCostDisplay(1234, 0.037)).toBe('1,234 credits ($0.0370)');
+describe('formatCredits', () => {
+  it('returns singular "credit" for exactly 1', () => {
+    expect(formatCredits(1)).toBe('1 credit');
   });
 
-  it('shows cost only when credits is zero', () => {
-    expect(formatCostDisplay(0, 0.037)).toBe('$0.0370');
+  it('returns plural "credits" for values other than 1', () => {
+    expect(formatCredits(2)).toBe('2 credits');
   });
 
-  it('shows cost only when credits is undefined', () => {
-    expect(formatCostDisplay(undefined, 0.037)).toBe('$0.0370');
+  it('returns "0 credits" for zero', () => {
+    expect(formatCredits(0)).toBe('0 credits');
   });
 
-  it('formats large credit numbers with commas', () => {
-    expect(formatCostDisplay(1234567, 37.037)).toBe('1,234,567 credits ($37.0370)');
+  it('formats numbers with comma separators', () => {
+    expect(formatCredits(1234)).toBe('1,234 credits');
+  });
+
+  it('formats large numbers with comma separators', () => {
+    expect(formatCredits(1234567)).toBe('1,234,567 credits');
   });
 });

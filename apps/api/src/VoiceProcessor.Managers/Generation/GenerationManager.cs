@@ -97,8 +97,10 @@ public class GenerationManager : IGenerationManager
             _logger.LogWarning(ex, "Could not determine recommended provider");
         }
 
-        // Find the best estimate
-        var bestEstimate = providerEstimates.First();
+        var bestEstimate = recommendedProvider.HasValue
+            ? providerEstimates.FirstOrDefault(e => e.Provider == recommendedProvider.Value)
+              ?? providerEstimates.First()
+            : providerEstimates.First();
 
         return new CostEstimateResponse
         {
@@ -313,6 +315,12 @@ public class GenerationManager : IGenerationManager
             AudioDurationMs = generation.AudioDurationMs,
             EstimatedCost = generation.EstimatedCost,
             ActualCost = generation.ActualCost,
+            CreditsUsed = generation.ActualCost.HasValue
+                ? (int)Math.Ceiling(generation.ActualCost.Value / 0.01m)
+                : null,
+            CreditsEstimated = generation.EstimatedCost.HasValue
+                ? (int)Math.Ceiling(generation.EstimatedCost.Value / 0.01m)
+                : null,
             ErrorMessage = generation.ErrorMessage,
             CreatedAt = generation.CreatedAt,
             StartedAt = generation.StartedAt,

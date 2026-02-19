@@ -751,6 +751,236 @@ public class GenerationManagerTests
     }
 
     [Fact]
+    public async Task EstimateCostAsync_WithRecommendedProvider_UsesRecommendedProviderEstimate()
+    {
+        // Arrange
+        var manager = CreateManager();
+        var voiceId = Guid.NewGuid();
+        var request = new EstimateCostRequest
+        {
+            Text = "This is a test text for cost estimation.",
+            VoiceId = voiceId,
+            Provider = Provider.ElevenLabs,
+            RoutingPreference = RoutingPreference.Balanced
+        };
+
+        var voice = new Domain.Entities.Voice
+        {
+            Id = voiceId,
+            Name = "Test Voice",
+            Provider = Provider.ElevenLabs,
+            ProviderVoiceId = "voice_123",
+            CostPerThousandChars = 0.30m,
+            IsActive = true
+        };
+
+        _mockVoiceAccessor.Setup(x => x.GetByIdAsync(voiceId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(voice);
+
+        _mockChunkingEngine.Setup(x => x.EstimateChunkCount(request.Text, It.IsAny<ChunkingOptions?>()))
+            .Returns(1);
+
+        // AmazonPolly is cheapest (first), but ElevenLabs is recommended
+        var providerEstimates = new List<ProviderPriceEstimate>
+        {
+            new ProviderPriceEstimate
+            {
+                Provider = Provider.AmazonPolly,
+                CostPerThousandChars = 0.004m,
+                TotalCost = 0.00016m,
+                Currency = "USD",
+                CreditsRequired = 1
+            },
+            new ProviderPriceEstimate
+            {
+                Provider = Provider.ElevenLabs,
+                CostPerThousandChars = 0.30m,
+                TotalCost = 0.012m,
+                Currency = "USD",
+                CreditsRequired = 2
+            }
+        };
+
+        _mockPricingEngine.Setup(x => x.CalculateAllProviderEstimates(It.IsAny<PricingContext>()))
+            .Returns(providerEstimates);
+
+        var mockProvider = new Mock<ITtsProviderAccessor>();
+        mockProvider.Setup(x => x.Provider).Returns(Provider.ElevenLabs);
+
+        _mockProviderFactory.Setup(x => x.GetAllProviders())
+            .Returns(new List<ITtsProviderAccessor> { mockProvider.Object });
+
+        // Routing recommends ElevenLabs (not the cheapest AmazonPolly)
+        _mockRoutingEngine.Setup(x => x.SelectProviderAsync(It.IsAny<RoutingContext>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new RoutingDecision
+            {
+                SelectedProvider = Provider.ElevenLabs,
+                Reason = "Best quality for balanced preference",
+                EstimatedCost = 0.012m,
+                EstimatedLatencyMs = 2000
+            });
+
+        // Act
+        var result = await manager.EstimateCostAsync(request);
+
+        // Assert: headline estimate should use ElevenLabs (recommended), not AmazonPolly (cheapest)
+        result.Should().NotBeNull();
+        result.EstimatedCost.Should().Be(0.012m); // ElevenLabs cost, not AmazonPolly's 0.00016m
+        result.CreditsRequired.Should().Be(2);    // ElevenLabs credits, not AmazonPolly's 1
+        result.RecommendedProvider.Should().Be(Provider.ElevenLabs);
+    }
+
+    [Fact]
+    public async Task EstimateCostAsync_WhenRoutingFails_FallsBackToCheapest()
+    {
+        // Arrange
+        var manager = CreateManager();
+        var voiceId = Guid.NewGuid();
+        var request = new EstimateCostRequest
+        {
+            Text = "This is a test text for cost estimation.",
+            VoiceId = voiceId,
+            Provider = Provider.ElevenLabs,
+            RoutingPreference = RoutingPreference.Balanced
+        };
+
+        var voice = new Domain.Entities.Voice
+        {
+            Id = voiceId,
+            Name = "Test Voice",
+            Provider = Provider.ElevenLabs,
+            ProviderVoiceId = "voice_123",
+            CostPerThousandChars = 0.30m,
+            IsActive = true
+        };
+
+        _mockVoiceAccessor.Setup(x => x.GetByIdAsync(voiceId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(voice);
+
+        _mockChunkingEngine.Setup(x => x.EstimateChunkCount(request.Text, It.IsAny<ChunkingOptions?>()))
+            .Returns(1);
+
+        // AmazonPolly is cheapest (first)
+        var providerEstimates = new List<ProviderPriceEstimate>
+        {
+            new ProviderPriceEstimate
+            {
+                Provider = Provider.AmazonPolly,
+                CostPerThousandChars = 0.004m,
+                TotalCost = 0.00016m,
+                Currency = "USD",
+                CreditsRequired = 1
+            },
+            new ProviderPriceEstimate
+            {
+                Provider = Provider.ElevenLabs,
+                CostPerThousandChars = 0.30m,
+                TotalCost = 0.012m,
+                Currency = "USD",
+                CreditsRequired = 2
+            }
+        };
+
+        _mockPricingEngine.Setup(x => x.CalculateAllProviderEstimates(It.IsAny<PricingContext>()))
+            .Returns(providerEstimates);
+
+        var mockProvider = new Mock<ITtsProviderAccessor>();
+        mockProvider.Setup(x => x.Provider).Returns(Provider.ElevenLabs);
+
+        _mockProviderFactory.Setup(x => x.GetAllProviders())
+            .Returns(new List<ITtsProviderAccessor> { mockProvider.Object });
+
+        // Routing fails
+        _mockRoutingEngine.Setup(x => x.SelectProviderAsync(It.IsAny<RoutingContext>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("Routing service unavailable"));
+
+        // Act
+        var result = await manager.EstimateCostAsync(request);
+
+        // Assert: when routing fails, fall back to cheapest (first in list = AmazonPolly)
+        result.Should().NotBeNull();
+        result.EstimatedCost.Should().Be(0.00016m); // AmazonPolly cost (cheapest fallback)
+        result.CreditsRequired.Should().Be(1);       // AmazonPolly credits
+        result.RecommendedProvider.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task GetGenerationAsync_WithActualCost_PopulatesCreditsUsed()
+    {
+        // Arrange
+        var manager = CreateManager();
+        var generationId = Guid.NewGuid();
+
+        var generation = new Domain.Entities.Generation
+        {
+            Id = generationId,
+            UserId = Guid.NewGuid(),
+            VoiceId = Guid.NewGuid(),
+            InputText = "Test text",
+            CharacterCount = 9,
+            Status = GenerationStatus.Completed,
+            RoutingPreference = RoutingPreference.Balanced,
+            SelectedProvider = Provider.ElevenLabs,
+            AudioFormat = "mp3",
+            EstimatedCost = 0.015m,  // 2 credits (ceiling of 1.5)
+            ActualCost = 0.025m,     // 3 credits (ceiling of 2.5)
+            ChunkCount = 1,
+            ChunksCompleted = 1,
+            Progress = 100,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generationId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(generation);
+
+        // Act
+        var result = await manager.GetGenerationAsync(generationId);
+
+        // Assert
+        result.Should().NotBeNull();
+        result!.CreditsUsed.Should().Be(3);       // ceiling(0.025 / 0.01) = ceiling(2.5) = 3
+        result.CreditsEstimated.Should().Be(2);    // ceiling(0.015 / 0.01) = ceiling(1.5) = 2
+    }
+
+    [Fact]
+    public async Task GetGenerationAsync_WithNoCosts_CreditsAreNull()
+    {
+        // Arrange
+        var manager = CreateManager();
+        var generationId = Guid.NewGuid();
+
+        var generation = new Domain.Entities.Generation
+        {
+            Id = generationId,
+            UserId = Guid.NewGuid(),
+            VoiceId = Guid.NewGuid(),
+            InputText = "Test text",
+            CharacterCount = 9,
+            Status = GenerationStatus.Pending,
+            RoutingPreference = RoutingPreference.Balanced,
+            SelectedProvider = Provider.ElevenLabs,
+            AudioFormat = "mp3",
+            EstimatedCost = null,
+            ActualCost = null,
+            ChunkCount = 1,
+            ChunksCompleted = 0,
+            Progress = 0,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generationId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(generation);
+
+        // Act
+        var result = await manager.GetGenerationAsync(generationId);
+
+        // Assert
+        result.Should().NotBeNull();
+        result!.CreditsUsed.Should().BeNull();
+        result.CreditsEstimated.Should().BeNull();
+    }
+
+    [Fact]
     public async Task EstimateCostAsync_RoutingFailure_GracefullyDegrades()
     {
         // Arrange

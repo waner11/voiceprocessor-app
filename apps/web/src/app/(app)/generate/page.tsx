@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { useVoices, useEstimateCost, useCreateGeneration } from "@/hooks";
 import type { components } from "@/lib/api/types";
 import { formatNumber } from "@/utils/formatNumber";
+import { formatCredits } from "@/utils/formatCredits";
 
 type RoutingPreference = components["schemas"]["RoutingPreference"];
 
@@ -87,13 +88,6 @@ export default function GeneratePage() {
   };
 
   const selectedVoiceData = voices.find((v) => v.id === selectedVoice);
-
-   const formatCostWithCredits = (credits: number | undefined, cost: number) => {
-     if (credits && credits > 0) {
-       return `${formatNumber(credits)} credits ($${cost.toFixed(4)})`;
-     }
-     return `$${cost.toFixed(4)}`;
-   };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900">
@@ -249,18 +243,18 @@ export default function GeneratePage() {
 
             {/* Cost Estimate */}
             <div className="rounded-xl bg-gradient-to-br from-gray-800 to-gray-900 dark:from-gray-800 dark:to-gray-950 p-6 text-white shadow-sm ring-1 ring-gray-700">
-              <h2 className="mb-4 text-lg font-semibold">Cost Estimate</h2>
+              <h2 className="mb-4 text-lg font-semibold">Estimated Credits</h2>
               {characterCount > 0 ? (
                 <div className="space-y-4">
                   <div className="flex items-baseline justify-between">
-                    <span className="text-gray-400">Estimated Cost</span>
+                    <span className="text-gray-400">Estimated Credits</span>
                     <span className="text-3xl font-bold">
                       {isEstimating ? (
                         <span className="text-xl">...</span>
                       ) : costEstimate ? (
-                        formatCostWithCredits(costEstimate.creditsRequired, costEstimate.estimatedCost)
+                        formatCredits(costEstimate.creditsRequired)
                       ) : (
-                        `$${(characterCount * 0.00003).toFixed(4)}`
+                        <span className="text-gray-400">—</span>
                       )}
                     </span>
                   </div>
@@ -293,7 +287,7 @@ export default function GeneratePage() {
                           >
                             <span>{estimate.provider}</span>
                             <span>
-                              {formatCostWithCredits(estimate.creditsRequired, estimate.cost)}
+                              {formatCredits(estimate.creditsRequired)}
                             </span>
                           </div>
                         ))}
