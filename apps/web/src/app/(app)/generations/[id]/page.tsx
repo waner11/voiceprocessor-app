@@ -147,18 +147,18 @@ export default function GenerationPage() {
             <dl className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <dt className="text-gray-500 dark:text-gray-400">Provider</dt>
-                <dd className="text-gray-900 dark:text-white">{generation.provider ?? '--'}</dd>
+                <dd className="text-gray-900 dark:text-white">{generation.provider ?? '—'}</dd>
               </div>
-               <div className="flex justify-between">
-                 <dt className="text-gray-500 dark:text-gray-400">Characters</dt>
-                 <dd className="text-gray-900 dark:text-white">{formatNumber(generation.characterCount ?? 0)}</dd>
-               </div>
+              <div className="flex justify-between">
+                <dt className="text-gray-500 dark:text-gray-400">Characters</dt>
+                <dd className="text-gray-900 dark:text-white">{formatNumber(generation.characterCount ?? 0)}</dd>
+              </div>
               <div className="flex justify-between">
                 <dt className="text-gray-500 dark:text-gray-400">Duration</dt>
                 <dd className="text-gray-900 dark:text-white">
                   {generation.audioDurationMs 
                     ? `${Math.floor(generation.audioDurationMs / 60000)}:${String(Math.floor((generation.audioDurationMs % 60000) / 1000)).padStart(2, '0')}`
-                    : '--'
+                    : '—'
                   }
                 </dd>
               </div>

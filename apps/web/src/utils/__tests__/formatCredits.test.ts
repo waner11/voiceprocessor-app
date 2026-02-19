@@ -21,4 +21,16 @@ describe('formatCredits', () => {
   it('formats large numbers with comma separators', () => {
     expect(formatCredits(1234567)).toBe('1,234,567 credits');
   });
+
+  it('returns "0 credits" for negative numbers', () => {
+    expect(formatCredits(-5)).toBe('0 credits');
+  });
+
+  it('rounds up float inputs', () => {
+    expect(formatCredits(1.3)).toBe('2 credits');
+  });
+
+  it('returns "0 credits" for NaN', () => {
+    expect(formatCredits(NaN)).toBe('0 credits');
+  });
 });

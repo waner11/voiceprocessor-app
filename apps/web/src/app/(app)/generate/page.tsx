@@ -247,7 +247,7 @@ export default function GeneratePage() {
               {characterCount > 0 ? (
                 <div className="space-y-4">
                   <div className="flex items-baseline justify-between">
-                    <span className="text-gray-400">Estimated Credits</span>
+                    <span className="text-gray-400">Credits</span>
                     <span className="text-3xl font-bold">
                       {isEstimating ? (
                         <span className="text-xl">...</span>

@@ -188,9 +188,9 @@ export default function GenerationsPage() {
                     </span>
 
                     {/* Credits */}
-                    {(generation.creditsUsed != null || generation.actualCost != null) && (
+                    {generation.creditsUsed != null && (
                       <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">
-                        {formatCredits(generation.creditsUsed ?? Math.ceil((generation.actualCost ?? 0) * 100))}
+                        {formatCredits(generation.creditsUsed)}
                       </span>
                     )}
                   </Link>

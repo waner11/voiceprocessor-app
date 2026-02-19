@@ -299,7 +299,7 @@ public class GenerationManager : IGenerationManager
         return true;
     }
 
-    private static GenerationResponse MapToResponse(Domain.Entities.Generation generation)
+    private GenerationResponse MapToResponse(Domain.Entities.Generation generation)
     {
         return new GenerationResponse
         {
@@ -316,11 +316,11 @@ public class GenerationManager : IGenerationManager
             EstimatedCost = generation.EstimatedCost,
             ActualCost = generation.ActualCost,
             CreditsUsed = generation.ActualCost.HasValue
-                ? (int)Math.Ceiling(generation.ActualCost.Value / 0.01m)
-                : null,
+                ? _pricingEngine.CalculateCreditsRequired(generation.ActualCost.Value)
+                : (int?)null,
             CreditsEstimated = generation.EstimatedCost.HasValue
-                ? (int)Math.Ceiling(generation.EstimatedCost.Value / 0.01m)
-                : null,
+                ? _pricingEngine.CalculateCreditsRequired(generation.EstimatedCost.Value)
+                : (int?)null,
             ErrorMessage = generation.ErrorMessage,
             CreatedAt = generation.CreatedAt,
             StartedAt = generation.StartedAt,

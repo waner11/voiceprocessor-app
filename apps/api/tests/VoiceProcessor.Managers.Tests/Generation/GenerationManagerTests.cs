@@ -933,6 +933,9 @@ public class GenerationManagerTests
         _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generationId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(generation);
 
+        _mockPricingEngine.Setup(x => x.CalculateCreditsRequired(0.025m)).Returns(3);
+        _mockPricingEngine.Setup(x => x.CalculateCreditsRequired(0.015m)).Returns(2);
+
         // Act
         var result = await manager.GetGenerationAsync(generationId);
 
@@ -940,6 +943,8 @@ public class GenerationManagerTests
         result.Should().NotBeNull();
         result!.CreditsUsed.Should().Be(3);       // ceiling(0.025 / 0.01) = ceiling(2.5) = 3
         result.CreditsEstimated.Should().Be(2);    // ceiling(0.015 / 0.01) = ceiling(1.5) = 2
+        _mockPricingEngine.Verify(x => x.CalculateCreditsRequired(0.025m), Times.Once());
+        _mockPricingEngine.Verify(x => x.CalculateCreditsRequired(0.015m), Times.Once());
     }
 
     [Fact]
@@ -978,6 +983,7 @@ public class GenerationManagerTests
         result.Should().NotBeNull();
         result!.CreditsUsed.Should().BeNull();
         result.CreditsEstimated.Should().BeNull();
+        _mockPricingEngine.Verify(x => x.CalculateCreditsRequired(It.IsAny<decimal>()), Times.Never());
     }
 
     [Fact]
