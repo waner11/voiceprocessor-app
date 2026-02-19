@@ -671,6 +671,10 @@ export interface components {
             estimatedCost?: number | null;
             /** Format: double */
             actualCost?: number | null;
+            /** Format: int32 */
+            creditsUsed?: number | null;
+            /** Format: int32 */
+            creditsEstimated?: number | null;
             errorMessage?: string | null;
             /** Format: date-time */
             createdAt: string;

@@ -16,6 +16,8 @@ public record GenerationResponse
     public int? AudioDurationMs { get; init; }
     public decimal? EstimatedCost { get; init; }
     public decimal? ActualCost { get; init; }
+    public int? CreditsUsed { get; init; }
+    public int? CreditsEstimated { get; init; }
     public string? ErrorMessage { get; init; }
     public required DateTime CreatedAt { get; init; }
     public DateTime? StartedAt { get; init; }

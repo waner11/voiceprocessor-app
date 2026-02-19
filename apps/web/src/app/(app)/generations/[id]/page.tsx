@@ -8,6 +8,7 @@ import { mapGenerationStatus } from '@/lib/utils/mapGenerationStatus';
 import { AudioPlayer } from '@/components/AudioPlayer/AudioPlayer';
 import { FeedbackForm, type FeedbackData } from '@/components/FeedbackForm/FeedbackForm';
 import { formatNumber } from '@/utils/formatNumber';
+import { formatCredits } from '@/utils/formatCredits';
 
 export default function GenerationPage() {
   const params = useParams();
@@ -146,29 +147,29 @@ export default function GenerationPage() {
             <dl className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <dt className="text-gray-500 dark:text-gray-400">Provider</dt>
-                <dd className="text-gray-900 dark:text-white">{generation.provider ?? '--'}</dd>
+                <dd className="text-gray-900 dark:text-white">{generation.provider ?? '—'}</dd>
               </div>
-               <div className="flex justify-between">
-                 <dt className="text-gray-500 dark:text-gray-400">Characters</dt>
-                 <dd className="text-gray-900 dark:text-white">{formatNumber(generation.characterCount ?? 0)}</dd>
-               </div>
+              <div className="flex justify-between">
+                <dt className="text-gray-500 dark:text-gray-400">Characters</dt>
+                <dd className="text-gray-900 dark:text-white">{formatNumber(generation.characterCount ?? 0)}</dd>
+              </div>
               <div className="flex justify-between">
                 <dt className="text-gray-500 dark:text-gray-400">Duration</dt>
                 <dd className="text-gray-900 dark:text-white">
                   {generation.audioDurationMs 
                     ? `${Math.floor(generation.audioDurationMs / 60000)}:${String(Math.floor((generation.audioDurationMs % 60000) / 1000)).padStart(2, '0')}`
-                    : '--'
+                    : '—'
                   }
                 </dd>
               </div>
               <div className="flex justify-between">
-                <dt className="text-gray-500 dark:text-gray-400">Cost</dt>
+                <dt className="text-gray-500 dark:text-gray-400">Credits Used</dt>
                 <dd className="text-gray-900 dark:text-white">
-                  {generation.actualCost != null 
-                    ? `$${generation.actualCost.toFixed(4)}`
-                    : generation.estimatedCost != null
-                    ? `~$${generation.estimatedCost.toFixed(4)}`
-                    : '--'
+                  {generation.creditsUsed != null
+                    ? formatCredits(generation.creditsUsed)
+                    : generation.creditsEstimated != null
+                    ? `~${formatCredits(generation.creditsEstimated)}`
+                    : '—'
                   }
                 </dd>
               </div>
