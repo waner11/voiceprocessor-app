@@ -607,7 +607,7 @@ export interface components {
             id: string;
             packName: string;
             creditsAdded: number;
-            amountPaid: number;
+            amount: number;
             currency: string;
             status: "completed" | "pending" | "failed" | "refunded";
             createdAt: string;
