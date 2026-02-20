@@ -177,7 +177,10 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<VoiceProcessorDbContext>();
-    await dbContext.Database.MigrateAsync();
+    if (dbContext.Database.IsRelational())
+    {
+        await dbContext.Database.MigrateAsync();
+    }
 }
 
 if (app.Environment.IsDevelopment())
@@ -190,7 +193,10 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsEnvironment("Testing"))
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseCors("Frontend");
 
@@ -210,11 +216,14 @@ app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = Dat
     .WithName("HealthCheck");
 
 // Configure recurring jobs after app is built
-var recurringJobManager = app.Services.GetRequiredService<IRecurringJobManager>();
-recurringJobManager.AddOrUpdate<IVoiceManager>(
-    "refresh-voice-catalog",
-    manager => manager.RefreshVoiceCatalogAsync(CancellationToken.None),
-    Cron.Daily(3)); // Run at 3 AM daily
+var recurringJobManager = app.Services.GetService<IRecurringJobManager>();
+if (recurringJobManager != null)
+{
+    recurringJobManager.AddOrUpdate<IVoiceManager>(
+        "refresh-voice-catalog",
+        manager => manager.RefreshVoiceCatalogAsync(CancellationToken.None),
+        Cron.Daily(3)); // Run at 3 AM daily
+}
 
 app.Run();
 
