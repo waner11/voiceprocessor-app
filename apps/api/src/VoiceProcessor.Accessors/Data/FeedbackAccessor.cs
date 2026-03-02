@@ -52,9 +52,6 @@ public class FeedbackAccessor : IFeedbackAccessor
 
         var result = results.FirstOrDefault()!;
         
-        // Preserve the original CreatedAt value to match test expectations
-        result.CreatedAt = feedback.CreatedAt;
-        
         return result;
     }
 }

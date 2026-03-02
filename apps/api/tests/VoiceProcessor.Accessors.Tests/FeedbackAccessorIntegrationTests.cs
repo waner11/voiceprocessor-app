@@ -127,7 +127,7 @@ public class FeedbackAccessorTests : IAsyncLifetime
         result.WasDownloaded.Should().BeTrue();
         result.PlaybackCount.Should().Be(5);
         result.PlaybackDurationMs.Should().Be(20000);
-        result.CreatedAt.Should().Be(originalFeedback.CreatedAt);
+        result.CreatedAt.Should().BeCloseTo(originalFeedback.CreatedAt, TimeSpan.FromMicroseconds(10));
         result.UpdatedAt.Should().NotBeNull();
         result.UpdatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
 
