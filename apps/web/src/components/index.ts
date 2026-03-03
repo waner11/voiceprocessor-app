@@ -6,3 +6,4 @@ export { FeedbackForm, type FeedbackData } from "./FeedbackForm";
 export { Header, MobileNav, AppLayout } from "./layout";
 export { PresetSelector, getPresetParams } from "./PresetSelector";
 export type { VoicePreset, VoiceParams } from "./PresetSelector";
+export { ChapterPreview } from "./ChapterPreview/ChapterPreview";

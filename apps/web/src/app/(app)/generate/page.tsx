@@ -9,6 +9,7 @@ import { formatNumber } from "@/utils/formatNumber";
 import { formatCredits } from "@/utils/formatCredits";
 import { PresetSelector, getPresetParams } from "@/components/PresetSelector";
 import type { VoicePreset, VoiceParams } from "@/components/PresetSelector";
+import { ChapterPreview } from "@/components/ChapterPreview/ChapterPreview";
 
 type RoutingPreference = components["schemas"]["RoutingPreference"];
 
@@ -75,6 +76,16 @@ export default function GeneratePage() {
   const isOverLimit = characterCount >= MAX_CHAR_LENGTH;
   const isNearLimit = characterCount >= WARNING_THRESHOLD && characterCount < MAX_CHAR_LENGTH;
   const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+
+  // Debounced text for chapter detection (300ms)
+  const [debouncedText, setDebouncedText] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedText(text);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [text]);
 
   const handleTextChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value);
@@ -310,6 +321,10 @@ export default function GeneratePage() {
                    </span>
                  </div>
               </div>
+              <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">
+                Tip: Use <code className="rounded bg-gray-200 dark:bg-gray-700 px-1 py-0.5 font-mono text-xs">---</code> on its own line to mark chapter breaks
+              </p>
+              <ChapterPreview text={debouncedText} />
             </div>
             {/* Voice Selection */}
             <div className="rounded-xl bg-white dark:bg-gray-900 p-6 shadow-sm ring-1 ring-gray-200 dark:ring-gray-800">
