@@ -217,8 +217,8 @@ public class GenerationManager : IGenerationManager
         Guid generationId,
         CancellationToken cancellationToken = default)
     {
-        var generation = await _generationAccessor.GetByIdAsync(generationId, cancellationToken);
-        return generation is null ? null : MapToResponse(generation);
+        var generation = await _generationAccessor.GetByIdWithChunksAsync(generationId, cancellationToken);
+        return generation is null ? null : MapToResponse(generation, includeChapters: true);
     }
 
     public async Task<PagedResponse<GenerationResponse>> GetGenerationsAsync(
@@ -235,7 +235,7 @@ public class GenerationManager : IGenerationManager
 
         return new PagedResponse<GenerationResponse>
         {
-            Items = items.Select(MapToResponse).ToList(),
+            Items = items.Select(g => MapToResponse(g)).ToList(),
             TotalCount = totalCount,
             Page = page,
             PageSize = pageSize
@@ -304,20 +304,11 @@ public class GenerationManager : IGenerationManager
         return true;
     }
 
-    private GenerationResponse MapToResponse(Domain.Entities.Generation generation)
+    private GenerationResponse MapToResponse(Domain.Entities.Generation generation, bool includeChapters = false)
     {
-        // Detect chapters from input text
-        var detectedChapters = _chapterDetectionEngine.DetectChapters(generation.InputText);
-        var chapters = detectedChapters
-            .Select(ch => new ChapterDto
-            {
-                Title = ch.Title,
-                Index = ch.ChapterNumber,
-                StartPosition = ch.StartPosition,
-                EndPosition = ch.EndPosition,
-                EstimatedWordCount = ch.EstimatedWordCount
-            })
-            .ToList();
+        var chapters = includeChapters
+            ? BuildChapters(generation)
+            : new List<ChapterDto>();
 
         return new GenerationResponse
         {
@@ -345,34 +336,116 @@ public class GenerationManager : IGenerationManager
             CompletedAt = generation.CompletedAt,
             Chapters = chapters
         };
+    }
+
+    private List<ChapterDto> BuildChapters(Domain.Entities.Generation generation)
     {
-        return new GenerationResponse
+        var detectedChapters = _chapterDetectionEngine.DetectChapters(generation.InputText);
+        if (detectedChapters.Count == 0)
         {
-            Id = generation.Id,
-            Status = generation.Status,
-            CharacterCount = generation.CharacterCount,
-            Progress = generation.Progress,
-            ChunkCount = generation.ChunkCount,
-            ChunksCompleted = generation.ChunksCompleted,
-            Provider = generation.SelectedProvider,
-            AudioUrl = generation.AudioUrl,
-            AudioFormat = generation.AudioFormat,
-            AudioDurationMs = generation.AudioDurationMs,
-            EstimatedCost = generation.EstimatedCost,
-            ActualCost = generation.ActualCost,
-            CreditsUsed = generation.ActualCost.HasValue
-                ? _pricingEngine.CalculateCreditsRequired(generation.ActualCost.Value)
-                : (int?)null,
-            CreditsEstimated = generation.EstimatedCost.HasValue
-                ? _pricingEngine.CalculateCreditsRequired(generation.EstimatedCost.Value)
-                : (int?)null,
-            ErrorMessage = generation.ErrorMessage,
-            CreatedAt = generation.CreatedAt,
-            StartedAt = generation.StartedAt,
-            CompletedAt = generation.CompletedAt
-        };
+            return new List<ChapterDto>();
+        }
+
+        var chunkRanges = BuildChunkRanges(generation.Chunks);
+        return detectedChapters
+            .Select(ch =>
+            {
+                var (startTimeMs, endTimeMs) = EstimateChapterTimes(ch.StartPosition, ch.EndPosition, chunkRanges);
+
+                return new ChapterDto
+                {
+                    Title = ch.Title,
+                    Index = ch.ChapterNumber,
+                    StartPosition = ch.StartPosition,
+                    EndPosition = ch.EndPosition,
+                    EstimatedWordCount = ch.EstimatedWordCount,
+                    StartTimeMs = startTimeMs,
+                    EndTimeMs = endTimeMs
+                };
+            })
+            .ToList();
     }
+
+    private static List<ChunkRange> BuildChunkRanges(ICollection<GenerationChunk> chunks)
+    {
+        var ranges = new List<ChunkRange>();
+        var currentTextPosition = 0;
+        var currentTimeMs = 0;
+
+        foreach (var chunk in chunks.OrderBy(c => c.Index))
+        {
+            var chunkLength = chunk.CharacterCount > 0
+                ? chunk.CharacterCount
+                : chunk.Text.Length;
+            var chunkDurationMs = Math.Max(chunk.AudioDurationMs ?? 0, 0);
+
+            var range = new ChunkRange(
+                StartPosition: currentTextPosition,
+                EndPosition: currentTextPosition + chunkLength,
+                StartTimeMs: currentTimeMs,
+                EndTimeMs: currentTimeMs + chunkDurationMs);
+
+            ranges.Add(range);
+
+            currentTextPosition = range.EndPosition;
+            currentTimeMs = range.EndTimeMs;
+        }
+
+        return ranges;
     }
+
+    private static (int StartTimeMs, int EndTimeMs) EstimateChapterTimes(
+        int chapterStartPosition,
+        int chapterEndPosition,
+        List<ChunkRange> chunkRanges)
+    {
+        if (chunkRanges.Count == 0)
+        {
+            return (0, 0);
+        }
+
+        var startTimeMs = EstimateTimestampAtPosition(chapterStartPosition, chunkRanges);
+        var endTimeMs = EstimateTimestampAtPosition(chapterEndPosition, chunkRanges);
+
+        return (startTimeMs, Math.Max(startTimeMs, endTimeMs));
+    }
+
+    private static int EstimateTimestampAtPosition(int position, List<ChunkRange> chunkRanges)
+    {
+        if (position <= 0)
+        {
+            return 0;
+        }
+
+        foreach (var chunkRange in chunkRanges)
+        {
+            if (position <= chunkRange.StartPosition)
+            {
+                return chunkRange.StartTimeMs;
+            }
+
+            if (position < chunkRange.EndPosition)
+            {
+                var chunkLength = chunkRange.EndPosition - chunkRange.StartPosition;
+                if (chunkLength <= 0)
+                {
+                    return chunkRange.StartTimeMs;
+                }
+
+                var elapsedCharacters = position - chunkRange.StartPosition;
+                var completionRatio = elapsedCharacters / (double)chunkLength;
+                var chunkDurationMs = chunkRange.EndTimeMs - chunkRange.StartTimeMs;
+
+                return chunkRange.StartTimeMs + (int)Math.Round(
+                    chunkDurationMs * completionRatio,
+                    MidpointRounding.AwayFromZero);
+            }
+        }
+
+        return chunkRanges[^1].EndTimeMs;
+    }
+
+    private sealed record ChunkRange(int StartPosition, int EndPosition, int StartTimeMs, int EndTimeMs);
 
     private static int EstimateDuration(int characterCount, Provider provider)
     {

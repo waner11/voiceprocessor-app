@@ -356,7 +356,7 @@ public class GenerationManagerTests
             CompletedAt = DateTime.UtcNow.AddMinutes(-5)
         };
 
-        _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generationId, It.IsAny<CancellationToken>()))
+        _mockGenerationAccessor.Setup(x => x.GetByIdWithChunksAsync(generationId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(generation);
 
         // Act
@@ -378,7 +378,7 @@ public class GenerationManagerTests
         var manager = CreateManager();
         var generationId = Guid.NewGuid();
 
-        _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generationId, It.IsAny<CancellationToken>()))
+        _mockGenerationAccessor.Setup(x => x.GetByIdWithChunksAsync(generationId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((Domain.Entities.Generation?)null);
 
         // Act
@@ -937,7 +937,7 @@ public class GenerationManagerTests
             CreatedAt = DateTime.UtcNow
         };
 
-        _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generationId, It.IsAny<CancellationToken>()))
+        _mockGenerationAccessor.Setup(x => x.GetByIdWithChunksAsync(generationId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(generation);
 
         _mockPricingEngine.Setup(x => x.CalculateCreditsRequired(0.025m)).Returns(3);
@@ -980,7 +980,7 @@ public class GenerationManagerTests
             CreatedAt = DateTime.UtcNow
         };
 
-        _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generationId, It.IsAny<CancellationToken>()))
+        _mockGenerationAccessor.Setup(x => x.GetByIdWithChunksAsync(generationId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(generation);
 
         // Act
@@ -1092,10 +1092,25 @@ More content follows.";
             ActualCost = 0.05m,
             CreatedAt = DateTime.UtcNow,
             StartedAt = DateTime.UtcNow.AddSeconds(-10),
-            CompletedAt = DateTime.UtcNow
+            CompletedAt = DateTime.UtcNow,
+            Chunks = new List<GenerationChunk>
+            {
+                new()
+                {
+                    Index = 0,
+                    Text = textWithChapters[..textWithChapters.IndexOf("Chapter 2", StringComparison.Ordinal)],
+                    AudioDurationMs = 3000
+                },
+                new()
+                {
+                    Index = 1,
+                    Text = textWithChapters[textWithChapters.IndexOf("Chapter 2", StringComparison.Ordinal)..],
+                    AudioDurationMs = 5000
+                }
+            }
         };
 
-        _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generationId, It.IsAny<CancellationToken>()))
+        _mockGenerationAccessor.Setup(x => x.GetByIdWithChunksAsync(generationId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(generation);
 
         // Setup chapter detection mock
@@ -1134,17 +1149,21 @@ More content follows.";
         result.Chapters[0].StartPosition.Should().Be(0);
         result.Chapters[0].EndPosition.Should().BeGreaterThan(0);
         result.Chapters[0].EstimatedWordCount.Should().BeGreaterThan(0);
+        result.Chapters[0].StartTimeMs.Should().Be(0);
+        result.Chapters[0].EndTimeMs.Should().Be(3000);
         result.Chapters[1].Title.Should().Be("Chapter 2: The Middle");
         result.Chapters[1].Index.Should().Be(2);
+        result.Chapters[1].StartTimeMs.Should().Be(3000);
+        result.Chapters[1].EndTimeMs.Should().Be(8000);
     }
 
     [Fact]
-    public async Task GetGenerationAsync_WithoutChapters_ReturnsEmptyChaptersList()
+    public async Task GetGenerationAsync_ShortTextWithoutChapters_ReturnsEmptyChaptersList()
     {
         // Arrange
         var manager = CreateManager();
         var generationId = Guid.NewGuid();
-        var plainText = "This is just plain text without any chapter markers. It has multiple paragraphs. But no chapter indicators.";
+        var plainText = "Short text.";
 
         var generation = new Domain.Entities.Generation
         {
@@ -1167,7 +1186,7 @@ More content follows.";
             CompletedAt = DateTime.UtcNow
         };
 
-        _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generationId, It.IsAny<CancellationToken>()))
+        _mockGenerationAccessor.Setup(x => x.GetByIdWithChunksAsync(generationId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(generation);
 
         // Setup chapter detection mock to return empty list

@@ -7,4 +7,6 @@ public record ChapterDto
     public required int StartPosition { get; init; }
     public required int EndPosition { get; init; }
     public required int EstimatedWordCount { get; init; }
+    public required int StartTimeMs { get; init; }
+    public required int EndTimeMs { get; init; }
 }
