@@ -7,6 +7,8 @@ import { useVoices, useEstimateCost, useCreateGeneration } from "@/hooks";
 import type { components } from "@/lib/api/types";
 import { formatNumber } from "@/utils/formatNumber";
 import { formatCredits } from "@/utils/formatCredits";
+import { PresetSelector, getPresetParams } from "@/components/PresetSelector";
+import type { VoicePreset, VoiceParams } from "@/components/PresetSelector";
 
 type RoutingPreference = components["schemas"]["RoutingPreference"];
 
@@ -52,6 +54,13 @@ export default function GeneratePage() {
   const [routing, setRouting] = useState<RoutingPreference>("Balanced");
   const [audioFormat, setAudioFormat] = useState<string>("mp3");
   const [pasteNotification, setPasteNotification] = useState<string | null>(null);
+  const [selectedPreset, setSelectedPreset] = useState<VoicePreset | null>(null);
+  const [voiceParams, setVoiceParams] = useState<VoiceParams>({
+    speed: 1.0,
+    stability: 0.5,
+    similarityBoost: 0.75,
+    style: 0.0,
+  });
 
   const { data: voicesData, isLoading: voicesLoading } = useVoices({ pageSize: 20 });
   const { mutate: estimateCost, data: costEstimate, isPending: isEstimating } = useEstimateCost();
@@ -100,6 +109,29 @@ export default function GeneratePage() {
     }
   }, [text, selectedVoice, routing, estimateCost]);
 
+  const selectedVoiceData = voices.find((v) => v.id === selectedVoice);
+
+  const selectedProvider = (selectedVoiceData?.provider ?? "ElevenLabs") as
+    | "ElevenLabs"
+    | "OpenAI"
+    | "GoogleCloud"
+    | "AmazonPolly"
+    | "FishAudio"
+    | "Cartesia"
+    | "Deepgram";
+
+  const handlePresetChange = useCallback(
+    (preset: VoicePreset) => {
+      setSelectedPreset(preset);
+      setVoiceParams(getPresetParams(preset, selectedProvider));
+    },
+    [selectedProvider]
+  );
+
+  const handleParamsChange = useCallback((params: VoiceParams) => {
+    setVoiceParams(params);
+  }, []);
+
   const handleGenerate = () => {
     if (!text || !selectedVoice) return;
 
@@ -109,6 +141,11 @@ export default function GeneratePage() {
         voiceId: selectedVoice,
         routingPreference: routing,
         audioFormat,
+        ...(selectedPreset && { preset: selectedPreset }),
+        speed: voiceParams.speed,
+        stability: voiceParams.stability,
+        similarityBoost: voiceParams.similarityBoost,
+        style: voiceParams.style,
       },
       {
         onSuccess: (data) => {
@@ -118,7 +155,6 @@ export default function GeneratePage() {
     );
   };
 
-  const selectedVoiceData = voices.find((v) => v.id === selectedVoice);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900">
@@ -296,6 +332,18 @@ export default function GeneratePage() {
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* Voice Preset */}
+            <div className="rounded-xl bg-white dark:bg-gray-900 p-6 shadow-sm ring-1 ring-gray-200 dark:ring-gray-800">
+              <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Voice Preset</h2>
+              <PresetSelector
+                provider={selectedProvider}
+                selectedPreset={selectedPreset}
+                params={voiceParams}
+                onPresetChange={handlePresetChange}
+                onParamsChange={handleParamsChange}
+              />
             </div>
 
             {/* Output Format Selection */}
