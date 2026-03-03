@@ -5,6 +5,7 @@ using Polly;
 using Polly.Extensions.Http;
 using VoiceProcessor.Accessors.Contracts;
 using VoiceProcessor.Accessors.Data;
+using VoiceProcessor.Accessors.Documents;
 using VoiceProcessor.Accessors.Payments;
 using VoiceProcessor.Accessors.Providers;
 using VoiceProcessor.Accessors.Storage;
@@ -37,6 +38,10 @@ public static class ServiceCollectionExtensions
         services.Configure<LocalStorageOptions>(
             configuration.GetSection(LocalStorageOptions.SectionName));
         services.AddScoped<IStorageAccessor, LocalStorageAccessor>();
+
+        services.AddScoped<IDocumentFormatParser, PdfDocumentParserAccessor>();
+        services.AddScoped<IDocumentFormatParser, DocxDocumentParserAccessor>();
+        services.AddScoped<IDocumentParserAccessor, DocumentParserAccessor>();
 
         // TTS Provider accessors with IHttpClientFactory
         AddElevenLabsAccessor(services, configuration);
