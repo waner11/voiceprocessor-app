@@ -21,6 +21,7 @@ public class GenerationManager : IGenerationManager
     private readonly IChunkingEngine _chunkingEngine;
     private readonly IPricingEngine _pricingEngine;
     private readonly IRoutingEngine _routingEngine;
+    private readonly IChapterDetectionEngine _chapterDetectionEngine;
     private readonly IBackgroundJobClient _backgroundJobClient;
     private readonly ILogger<GenerationManager> _logger;
 
@@ -33,6 +34,7 @@ public class GenerationManager : IGenerationManager
         IChunkingEngine chunkingEngine,
         IPricingEngine pricingEngine,
         IRoutingEngine routingEngine,
+        IChapterDetectionEngine chapterDetectionEngine,
         IBackgroundJobClient backgroundJobClient,
         ILogger<GenerationManager> logger)
     {
@@ -44,6 +46,7 @@ public class GenerationManager : IGenerationManager
         _chunkingEngine = chunkingEngine;
         _pricingEngine = pricingEngine;
         _routingEngine = routingEngine;
+        _chapterDetectionEngine = chapterDetectionEngine;
         _backgroundJobClient = backgroundJobClient;
         _logger = logger;
     }
@@ -223,10 +226,12 @@ public class GenerationManager : IGenerationManager
         int page = 1,
         int pageSize = 20,
         GenerationStatus? status = null,
+        string? search = null,
+        Provider? provider = null,
         CancellationToken cancellationToken = default)
     {
         var (items, totalCount) = await _generationAccessor.GetByUserPagedAsync(
-            userId, page, pageSize, status, cancellationToken);
+            userId, page, pageSize, status, search, provider, cancellationToken);
 
         return new PagedResponse<GenerationResponse>
         {
@@ -301,6 +306,46 @@ public class GenerationManager : IGenerationManager
 
     private GenerationResponse MapToResponse(Domain.Entities.Generation generation)
     {
+        // Detect chapters from input text
+        var detectedChapters = _chapterDetectionEngine.DetectChapters(generation.InputText);
+        var chapters = detectedChapters
+            .Select(ch => new ChapterDto
+            {
+                Title = ch.Title,
+                Index = ch.ChapterNumber,
+                StartPosition = ch.StartPosition,
+                EndPosition = ch.EndPosition,
+                EstimatedWordCount = ch.EstimatedWordCount
+            })
+            .ToList();
+
+        return new GenerationResponse
+        {
+            Id = generation.Id,
+            Status = generation.Status,
+            CharacterCount = generation.CharacterCount,
+            Progress = generation.Progress,
+            ChunkCount = generation.ChunkCount,
+            ChunksCompleted = generation.ChunksCompleted,
+            Provider = generation.SelectedProvider,
+            AudioUrl = generation.AudioUrl,
+            AudioFormat = generation.AudioFormat,
+            AudioDurationMs = generation.AudioDurationMs,
+            EstimatedCost = generation.EstimatedCost,
+            ActualCost = generation.ActualCost,
+            CreditsUsed = generation.ActualCost.HasValue
+                ? _pricingEngine.CalculateCreditsRequired(generation.ActualCost.Value)
+                : (int?)null,
+            CreditsEstimated = generation.EstimatedCost.HasValue
+                ? _pricingEngine.CalculateCreditsRequired(generation.EstimatedCost.Value)
+                : (int?)null,
+            ErrorMessage = generation.ErrorMessage,
+            CreatedAt = generation.CreatedAt,
+            StartedAt = generation.StartedAt,
+            CompletedAt = generation.CompletedAt,
+            Chapters = chapters
+        };
+    {
         return new GenerationResponse
         {
             Id = generation.Id,
@@ -326,6 +371,7 @@ public class GenerationManager : IGenerationManager
             StartedAt = generation.StartedAt,
             CompletedAt = generation.CompletedAt
         };
+    }
     }
 
     private static int EstimateDuration(int characterCount, Provider provider)

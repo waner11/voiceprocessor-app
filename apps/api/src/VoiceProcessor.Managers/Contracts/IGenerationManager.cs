@@ -24,6 +24,8 @@ public interface IGenerationManager
         int page = 1,
         int pageSize = 20,
         GenerationStatus? status = null,
+        string? search = null,
+        Provider? provider = null,
         CancellationToken cancellationToken = default);
 
     Task SubmitFeedbackAsync(

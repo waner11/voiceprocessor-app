@@ -14,6 +14,8 @@ public interface IGenerationAccessor
         int page,
         int pageSize,
         GenerationStatus? status = null,
+        string? search = null,
+        Provider? provider = null,
         CancellationToken cancellationToken = default);
 
     Task<Generation> CreateAsync(Generation generation, CancellationToken cancellationToken = default);
