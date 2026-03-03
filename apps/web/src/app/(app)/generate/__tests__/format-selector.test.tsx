@@ -45,10 +45,12 @@ describe("Format Selector on Generate Page", () => {
     render(<GeneratePage />);
     const formatLabel = screen.getByText("Output Format");
     expect(formatLabel).toBeInTheDocument();
-    expect(screen.getByText(/MP3/)).toBeInTheDocument();
-    expect(screen.getByText(/WAV/)).toBeInTheDocument();
-    expect(screen.getByText(/OGG/)).toBeInTheDocument();
-    expect(screen.getByText(/FLAC/)).toBeInTheDocument();
+    const options = screen.getAllByRole("option");
+    const optionValues = options.map(o => o.textContent);
+    expect(optionValues.some(v => v?.includes("MP3"))).toBe(true);
+    expect(optionValues.some(v => v?.includes("WAV"))).toBe(true);
+    expect(optionValues.some(v => v?.includes("OGG"))).toBe(true);
+    expect(optionValues.some(v => v?.includes("FLAC"))).toBe(true);
   });
 
   it("has MP3 selected by default", () => {
