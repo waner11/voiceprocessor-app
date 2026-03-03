@@ -25,6 +25,7 @@ public class GenerationManagerTests
     private readonly Mock<IRoutingEngine> _mockRoutingEngine;
     private readonly Mock<IBackgroundJobClient> _mockJobClient;
     private readonly Mock<ILogger<GenerationManager>> _mockLogger;
+    private readonly Mock<IChapterDetectionEngine> _mockChapterDetectionEngine;
 
     public GenerationManagerTests()
     {
@@ -38,9 +39,16 @@ public class GenerationManagerTests
         _mockRoutingEngine = new Mock<IRoutingEngine>();
         _mockJobClient = new Mock<IBackgroundJobClient>();
         _mockLogger = new Mock<ILogger<GenerationManager>>();
+        _mockChapterDetectionEngine = new Mock<IChapterDetectionEngine>();
     }
 
     private GenerationManager CreateManager()
+    {
+        // Set up default mock for ChapterDetectionEngine to return empty list
+        _mockChapterDetectionEngine.Setup(x => x.DetectChapters(It.IsAny<string>()))
+            .Returns(new List<DetectedChapter>());
+
+        return new GenerationManager(
     {
         return new GenerationManager(
             _mockGenerationAccessor.Object,
@@ -51,6 +59,7 @@ public class GenerationManagerTests
             _mockChunkingEngine.Object,
             _mockPricingEngine.Object,
             _mockRoutingEngine.Object,
+            _mockChapterDetectionEngine.Object,
             _mockJobClient.Object,
             _mockLogger.Object
         );
@@ -1050,5 +1059,130 @@ public class GenerationManagerTests
         result.EstimatedCost.Should().Be(0.012m);
         result.RecommendedProvider.Should().BeNull();
         result.ProviderEstimates.Should().HaveCount(1);
+    }
+
+
+    [Fact]
+    public async Task GetGenerationAsync_WithChapters_ReturnsChaptersInResponse()
+    {
+        // Arrange
+        var manager = CreateManager();
+        var generationId = Guid.NewGuid();
+        var textWithChapters = @"Chapter 1: The Beginning
+This is the first chapter content.
+Some more text here.
+
+Chapter 2: The Middle
+This is the second chapter content.
+More content follows.";
+
+        var generation = new Domain.Entities.Generation
+        {
+            Id = generationId,
+            UserId = Guid.NewGuid(),
+            InputText = textWithChapters,
+            Status = GenerationStatus.Completed,
+            CharacterCount = textWithChapters.Length,
+            Progress = 100,
+            ChunkCount = 2,
+            ChunksCompleted = 2,
+            SelectedProvider = Provider.ElevenLabs,
+            AudioUrl = "https://example.com/audio.mp3",
+            AudioFormat = "mp3",
+            AudioDurationMs = 5000,
+            EstimatedCost = 0.05m,
+            ActualCost = 0.05m,
+            CreatedAt = DateTime.UtcNow,
+            StartedAt = DateTime.UtcNow.AddSeconds(-10),
+            CompletedAt = DateTime.UtcNow
+        };
+
+        _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generationId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(generation);
+
+        // Setup chapter detection mock
+        var detectedChapters = new List<DetectedChapter>
+        {
+            new DetectedChapter
+            {
+                ChapterNumber = 1,
+                Title = "Chapter 1: The Beginning",
+                StartPosition = 0,
+                EndPosition = textWithChapters.IndexOf("Chapter 2"),
+                EstimatedWordCount = 10
+            },
+            new DetectedChapter
+            {
+                ChapterNumber = 2,
+                Title = "Chapter 2: The Middle",
+                StartPosition = textWithChapters.IndexOf("Chapter 2"),
+                EndPosition = textWithChapters.Length,
+                EstimatedWordCount = 10
+            }
+        };
+        _mockChapterDetectionEngine.Setup(x => x.DetectChapters(textWithChapters))
+            .Returns(detectedChapters);
+
+
+        // Act
+        var result = await manager.GetGenerationAsync(generationId);
+
+        // Assert
+        result.Should().NotBeNull();
+        result!.Chapters.Should().NotBeNull();
+        result.Chapters.Should().HaveCount(2);
+        result.Chapters[0].Title.Should().Be("Chapter 1: The Beginning");
+        result.Chapters[0].Index.Should().Be(1);
+        result.Chapters[0].StartPosition.Should().Be(0);
+        result.Chapters[0].EndPosition.Should().BeGreaterThan(0);
+        result.Chapters[0].EstimatedWordCount.Should().BeGreaterThan(0);
+        result.Chapters[1].Title.Should().Be("Chapter 2: The Middle");
+        result.Chapters[1].Index.Should().Be(2);
+    }
+
+    [Fact]
+    public async Task GetGenerationAsync_WithoutChapters_ReturnsEmptyChaptersList()
+    {
+        // Arrange
+        var manager = CreateManager();
+        var generationId = Guid.NewGuid();
+        var plainText = "This is just plain text without any chapter markers. It has multiple paragraphs. But no chapter indicators.";
+
+        var generation = new Domain.Entities.Generation
+        {
+            Id = generationId,
+            UserId = Guid.NewGuid(),
+            InputText = plainText,
+            Status = GenerationStatus.Completed,
+            CharacterCount = plainText.Length,
+            Progress = 100,
+            ChunkCount = 1,
+            ChunksCompleted = 1,
+            SelectedProvider = Provider.ElevenLabs,
+            AudioUrl = "https://example.com/audio.mp3",
+            AudioFormat = "mp3",
+            AudioDurationMs = 2000,
+            EstimatedCost = 0.02m,
+            ActualCost = 0.02m,
+            CreatedAt = DateTime.UtcNow,
+            StartedAt = DateTime.UtcNow.AddSeconds(-5),
+            CompletedAt = DateTime.UtcNow
+        };
+
+        _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generationId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(generation);
+
+        // Setup chapter detection mock to return empty list
+        _mockChapterDetectionEngine.Setup(x => x.DetectChapters(plainText))
+            .Returns(new List<DetectedChapter>());
+
+
+        // Act
+        var result = await manager.GetGenerationAsync(generationId);
+
+        // Assert
+        result.Should().NotBeNull();
+        result!.Chapters.Should().NotBeNull();
+        result.Chapters.Should().BeEmpty();
     }
 }

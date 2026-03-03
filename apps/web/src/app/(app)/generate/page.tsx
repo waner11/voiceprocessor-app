@@ -47,6 +47,7 @@ export default function GeneratePage() {
   const [text, setText] = useState("");
   const [selectedVoice, setSelectedVoice] = useState<string | null>(null);
   const [routing, setRouting] = useState<RoutingPreference>("Balanced");
+  const [audioFormat, setAudioFormat] = useState<string>("mp3");
 
   const { data: voicesData, isLoading: voicesLoading } = useVoices({ pageSize: 20 });
   const { mutate: estimateCost, data: costEstimate, isPending: isEstimating } = useEstimateCost();
@@ -78,6 +79,7 @@ export default function GeneratePage() {
         text,
         voiceId: selectedVoice,
         routingPreference: routing,
+        audioFormat,
       },
       {
         onSuccess: (data) => {
@@ -238,6 +240,24 @@ export default function GeneratePage() {
                     )}
                   </button>
                 ))}
+              </div>
+            </div>
+
+            {/* Output Format Selection */}
+            <div className="rounded-xl bg-white dark:bg-gray-900 p-6 shadow-sm ring-1 ring-gray-200 dark:ring-gray-800">
+              <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Output Format</h2>
+              <div className="space-y-3">
+                <select
+                  name="audioFormat"
+                  value={audioFormat}
+                  onChange={(e) => setAudioFormat(e.target.value)}
+                  className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-gray-900 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                >
+                  <option value="mp3">MP3 (Recommended) - Best compatibility, smaller file size</option>
+                  <option value="wav">WAV - Lossless, larger file size</option>
+                  <option value="ogg">OGG - Good compression, smaller than WAV</option>
+                  <option value="flac">FLAC - Lossless, best quality</option>
+                </select>
               </div>
             </div>
 

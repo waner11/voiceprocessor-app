@@ -22,4 +22,5 @@ public record GenerationResponse
     public required DateTime CreatedAt { get; init; }
     public DateTime? StartedAt { get; init; }
     public DateTime? CompletedAt { get; init; }
+    public List<ChapterDto> Chapters { get; init; } = new();
 }
