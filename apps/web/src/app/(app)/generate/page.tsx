@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useVoices, useEstimateCost, useCreateGeneration } from "@/hooks";
@@ -61,6 +61,10 @@ export default function GeneratePage() {
     similarityBoost: 0.75,
     style: 0.0,
   });
+  const [isExtracting, setIsExtracting] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploadWarning, setUploadWarning] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: voicesData, isLoading: voicesLoading } = useVoices({ pageSize: 20 });
   const { mutate: estimateCost, data: costEstimate, isPending: isEstimating } = useEstimateCost();
@@ -94,6 +98,58 @@ export default function GeneratePage() {
       setTimeout(() => setPasteNotification(null), 5000);
     }
   }, [text]);
+
+  const handleUploadClick = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
+
+  const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Reset input so same file can be re-selected
+    e.target.value = "";
+
+    setIsExtracting(true);
+    setUploadError(null);
+    setUploadWarning(null);
+
+    try {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch(`${API_URL}/api/v1/Documents/extract`, {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const message = (errorData as { message?: string }).message || `Extraction failed (${response.status})`;
+        throw new Error(message);
+      }
+
+      const data = await response.json() as { text?: string; pageCount?: number; wordCount?: number; characterCount?: number };
+      const extractedText: string = data.text ?? "";
+
+      if (extractedText.length > MAX_CHAR_LENGTH) {
+        setUploadWarning(
+          `Document text exceeds the ${MAX_CHAR_LENGTH.toLocaleString()} character limit. ` +
+          `Only the first ${MAX_CHAR_LENGTH.toLocaleString()} characters will be used.`
+        );
+        setText(extractedText.slice(0, MAX_CHAR_LENGTH));
+      } else {
+        setText(extractedText);
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      setUploadError(`Failed to extract text: ${message}`);
+    } finally {
+      setIsExtracting(false);
+    }
+  }, []);
 
   // Estimate cost when text or voice changes
   useEffect(() => {
@@ -174,8 +230,21 @@ export default function GeneratePage() {
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Text Input</h2>
                 <div className="flex gap-2">
-                  <button className="rounded-lg bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-                    Upload File
+                  {/* Hidden file input */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".pdf,.docx"
+                    className="hidden"
+                    onChange={handleFileChange}
+                    aria-label="Upload document file"
+                  />
+                  <button
+                    onClick={handleUploadClick}
+                    disabled={isExtracting}
+                    className="rounded-lg bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {isExtracting ? "Extracting..." : "Upload File"}
                   </button>
                   <button
                     onClick={() => navigator.clipboard.readText().then(setText)}
@@ -195,6 +264,16 @@ export default function GeneratePage() {
               {pasteNotification && (
                 <div className="mt-2 rounded-lg bg-amber-50 dark:bg-amber-950 px-3 py-2 text-sm text-amber-700 dark:text-amber-300">
                   {pasteNotification}
+                </div>
+              )}
+              {uploadWarning && (
+                <div className="mt-2 rounded-lg bg-amber-50 dark:bg-amber-950 px-3 py-2 text-sm text-amber-700 dark:text-amber-300">
+                  {uploadWarning}
+                </div>
+              )}
+              {uploadError && (
+                <div className="mt-2 rounded-lg bg-red-50 dark:bg-red-950 px-3 py-2 text-sm text-red-700 dark:text-red-300">
+                  {uploadError}
                 </div>
               )}
               <div className="mt-3 flex items-center justify-between text-sm">
