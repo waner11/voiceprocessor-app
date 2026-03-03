@@ -49,8 +49,6 @@ public class GenerationManagerTests
             .Returns(new List<DetectedChapter>());
 
         return new GenerationManager(
-    {
-        return new GenerationManager(
             _mockGenerationAccessor.Object,
             _mockVoiceAccessor.Object,
             _mockUserAccessor.Object,
