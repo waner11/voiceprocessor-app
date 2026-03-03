@@ -69,6 +69,8 @@ export interface paths {
                     page?: number;
                     pageSize?: number;
                     status?: components["schemas"]["GenerationStatus"];
+                    search?: string;
+                    provider?: components["schemas"]["Provider"];
                 };
                 header?: never;
                 path?: never;

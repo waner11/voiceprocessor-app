@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useGenerations } from "@/hooks";
 import { useGenerationHub } from "@/hooks/useGenerationHub";
@@ -19,6 +19,14 @@ const statusOptions: { value: GenerationStatus | ""; label: string }[] = [
   { value: "Cancelled", label: "Cancelled" },
 ];
 
+const providerOptions: { value: string; label: string }[] = [
+  { value: "", label: "All Providers" },
+  { value: "ElevenLabs", label: "ElevenLabs" },
+  { value: "OpenAI", label: "OpenAI" },
+  { value: "GoogleCloud", label: "Google Cloud" },
+  { value: "AmazonPolly", label: "Amazon Polly" },
+];
+
 const statusColors: Record<GenerationStatus, string> = {
   Pending: "bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300",
   Analyzing: "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300",
@@ -31,22 +39,42 @@ const statusColors: Record<GenerationStatus, string> = {
 };
 
 export default function GenerationsPage() {
-  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [status, setStatus] = useState<GenerationStatus | "">("");
+  const [provider, setProvider] = useState("");
   const [page, setPage] = useState(1);
+
+  // Debounce search input by 300ms
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchInput);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   const { data, isLoading, error } = useGenerations({
     page,
     pageSize: 10,
     status: status || undefined,
+    search: debouncedSearch || undefined,
+    provider: provider || undefined,
   });
   useGenerationHub();
 
   const generations = data?.items || [];
 
-  const filteredGenerations = generations.filter((gen) =>
-    search ? gen.id.toLowerCase().includes(search.toLowerCase()) : true
-  );
+  const handleClearSearch = useCallback(() => {
+    setSearchInput("");
+    setDebouncedSearch("");
+    setPage(1);
+  }, []);
+
+  const handleProviderChange = useCallback((value: string) => {
+    setProvider(value);
+    setPage(1);
+  }, []);
 
   const formatDuration = (ms?: number | null) => {
     if (!ms) return "--";
@@ -66,6 +94,8 @@ export default function GenerationsPage() {
     });
   };
 
+  const hasActiveFilters = debouncedSearch || status || provider;
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8 flex items-center justify-between">
@@ -82,13 +112,38 @@ export default function GenerationsPage() {
         {/* Filters */}
         <div className="border-b border-gray-200 dark:border-gray-800 p-4">
           <div className="flex gap-4">
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by ID..."
-              className="flex-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
-            />
+            <div className="relative flex-1">
+              <input
+                type="text"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                placeholder="Search generations..."
+                className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 pr-10 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+              />
+              {searchInput && (
+                <button
+                  type="button"
+                  aria-label="Clear search"
+                  onClick={handleClearSearch}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              )}
+            </div>
+            <select
+              value={provider}
+              onChange={(e) => handleProviderChange(e.target.value)}
+              className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-gray-900 dark:text-white"
+            >
+              {providerOptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
             <select
               value={status}
               onChange={(e) => {
@@ -134,9 +189,9 @@ export default function GenerationsPage() {
         {/* Generations List */}
         {!isLoading && !error && (
           <>
-            {filteredGenerations.length > 0 ? (
+            {generations.length > 0 ? (
               <div className="divide-y divide-gray-200 dark:divide-gray-800">
-                {filteredGenerations.map((generation) => (
+                {generations.map((generation) => (
                   <Link
                     key={generation.id}
                     href={`/generations/${generation.id}`}
@@ -198,7 +253,9 @@ export default function GenerationsPage() {
               </div>
             ) : (
               <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-                No generations yet. Create your first audiobook to get started.
+                {hasActiveFilters
+                  ? "No generations found matching your filters. Try adjusting your search or filters."
+                  : "No generations yet. Create your first audiobook to get started."}
               </div>
             )}
 
