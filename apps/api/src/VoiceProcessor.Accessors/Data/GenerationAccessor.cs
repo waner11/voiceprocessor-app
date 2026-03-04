@@ -47,6 +47,7 @@ public class GenerationAccessor : IGenerationAccessor
 
         if (provider.HasValue)
             query = query.Where(g => g.SelectedProvider == provider.Value);
+
         var totalCount = await query.CountAsync(cancellationToken);
 
         var items = await query
