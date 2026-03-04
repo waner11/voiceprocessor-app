@@ -23,6 +23,8 @@ public static class ServiceCollectionExtensions
         // Chapter Detection Engine (stateless, can be singleton)
         services.AddSingleton<IChapterDetectionEngine, ChapterDetectionEngine>();
 
+        services.AddSingleton<IChapterTimingEngine, ChapterTimingEngine>();
+
         // Audio Merge Engine (stateless, can be singleton)
         services.AddSingleton<IAudioMergeEngine, AudioMergeEngine>();
 

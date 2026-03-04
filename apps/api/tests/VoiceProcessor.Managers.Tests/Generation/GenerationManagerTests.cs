@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using VoiceProcessor.Accessors.Contracts;
 using VoiceProcessor.Accessors.Providers;
+using VoiceProcessor.Domain.DTOs.Responses;
 using VoiceProcessor.Domain.DTOs.Requests;
 using VoiceProcessor.Domain.Entities;
 using VoiceProcessor.Domain.Enums;
@@ -26,6 +27,7 @@ public class GenerationManagerTests
     private readonly Mock<IBackgroundJobClient> _mockJobClient;
     private readonly Mock<ILogger<GenerationManager>> _mockLogger;
     private readonly Mock<IChapterDetectionEngine> _mockChapterDetectionEngine;
+    private readonly Mock<IChapterTimingEngine> _mockChapterTimingEngine;
 
     public GenerationManagerTests()
     {
@@ -40,6 +42,7 @@ public class GenerationManagerTests
         _mockJobClient = new Mock<IBackgroundJobClient>();
         _mockLogger = new Mock<ILogger<GenerationManager>>();
         _mockChapterDetectionEngine = new Mock<IChapterDetectionEngine>();
+        _mockChapterTimingEngine = new Mock<IChapterTimingEngine>();
     }
 
     private GenerationManager CreateManager()
@@ -47,6 +50,8 @@ public class GenerationManagerTests
         // Set up default mock for ChapterDetectionEngine to return empty list
         _mockChapterDetectionEngine.Setup(x => x.DetectChapters(It.IsAny<string>()))
             .Returns(new List<DetectedChapter>());
+        _mockChapterTimingEngine.Setup(x => x.MapChaptersToTimestamps(It.IsAny<IReadOnlyList<DetectedChapter>>(), It.IsAny<ICollection<GenerationChunk>>()))
+            .Returns(new List<ChapterDto>());
 
         return new GenerationManager(
             _mockGenerationAccessor.Object,
@@ -58,6 +63,7 @@ public class GenerationManagerTests
             _mockPricingEngine.Object,
             _mockRoutingEngine.Object,
             _mockChapterDetectionEngine.Object,
+            _mockChapterTimingEngine.Object,
             _mockJobClient.Object,
             _mockLogger.Object
         );
@@ -1135,6 +1141,30 @@ More content follows.";
         };
         _mockChapterDetectionEngine.Setup(x => x.DetectChapters(textWithChapters))
             .Returns(detectedChapters);
+        _mockChapterTimingEngine.Setup(x => x.MapChaptersToTimestamps(detectedChapters, generation.Chunks))
+            .Returns(new List<ChapterDto>
+            {
+                new()
+                {
+                    Title = "Chapter 1: The Beginning",
+                    Index = 1,
+                    StartPosition = 0,
+                    EndPosition = textWithChapters.IndexOf("Chapter 2"),
+                    EstimatedWordCount = 10,
+                    StartTimeMs = 0,
+                    EndTimeMs = 3000
+                },
+                new()
+                {
+                    Title = "Chapter 2: The Middle",
+                    Index = 2,
+                    StartPosition = textWithChapters.IndexOf("Chapter 2"),
+                    EndPosition = textWithChapters.Length,
+                    EstimatedWordCount = 10,
+                    StartTimeMs = 3000,
+                    EndTimeMs = 8000
+                }
+            });
 
 
         // Act
@@ -1155,6 +1185,7 @@ More content follows.";
         result.Chapters[1].Index.Should().Be(2);
         result.Chapters[1].StartTimeMs.Should().Be(3000);
         result.Chapters[1].EndTimeMs.Should().Be(8000);
+        _mockChapterTimingEngine.Verify(x => x.MapChaptersToTimestamps(detectedChapters, generation.Chunks), Times.Once);
     }
 
     [Fact]
@@ -1192,6 +1223,8 @@ More content follows.";
         // Setup chapter detection mock to return empty list
         _mockChapterDetectionEngine.Setup(x => x.DetectChapters(plainText))
             .Returns(new List<DetectedChapter>());
+        _mockChapterTimingEngine.Setup(x => x.MapChaptersToTimestamps(It.Is<IReadOnlyList<DetectedChapter>>(chapters => chapters.Count == 0), It.IsAny<ICollection<GenerationChunk>>()))
+            .Returns(new List<ChapterDto>());
 
 
         // Act
@@ -1201,5 +1234,10 @@ More content follows.";
         result.Should().NotBeNull();
         result!.Chapters.Should().NotBeNull();
         result.Chapters.Should().BeEmpty();
+        _mockChapterTimingEngine.Verify(
+            x => x.MapChaptersToTimestamps(
+                It.Is<IReadOnlyList<DetectedChapter>>(chapters => chapters.Count == 0),
+                generation.Chunks),
+            Times.Once);
     }
 }
