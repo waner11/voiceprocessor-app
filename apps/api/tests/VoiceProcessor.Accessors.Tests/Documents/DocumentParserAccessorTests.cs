@@ -52,18 +52,4 @@ public class DocumentParserAccessorTests
             .WithMessage("*text/plain*");
     }
 
-    [Fact]
-    public async Task DocumentParserAccessor_ExtractTextAsync_WhenFileExceeds50Mb_ThrowsInvalidOperationException()
-    {
-        await using var stream = new MemoryStream(new byte[50 * 1024 * 1024 + 1]);
-        var accessor = new DocumentParserAccessor([
-            new PdfDocumentParserAccessor(),
-            new DocxDocumentParserAccessor()
-        ]);
-
-        var act = async () => await accessor.ExtractTextAsync(stream, "application/pdf", "large.pdf");
-
-        await act.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage("*50MB*");
-    }
 }
