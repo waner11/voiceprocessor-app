@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useRef } from "react";
 import { useVoices } from "@/hooks";
 import type { components } from "@/lib/api/types";
+import { VoicePreviewPlayer } from "@/components/VoicePreviewPlayer/VoicePreviewPlayer";
 
 type Provider = components["schemas"]["Provider"];
 
@@ -43,6 +44,20 @@ export default function VoicesPage() {
   const [language, setLanguage] = useState("");
   const [gender, setGender] = useState("");
   const [page, setPage] = useState(1);
+
+  // Track stop functions for single-active-preview behavior
+  const stopFnsRef = useRef<Map<string, () => void>>(new Map());
+
+  const handlePlay = useCallback((voiceId: string) => {
+    // Stop all other previews before playing this one
+    stopFnsRef.current.forEach((stopFn, id) => {
+      if (id !== voiceId) stopFn();
+    });
+  }, []);
+
+  const registerStop = useCallback((voiceId: string, stopFn: () => void) => {
+    stopFnsRef.current.set(voiceId, stopFn);
+  }, []);
 
   const { data, isLoading, error } = useVoices({
     page,
@@ -174,14 +189,11 @@ export default function VoicesPage() {
                         )}
                       </div>
                     </div>
-                    {voice.previewUrl && (
-                      <button
-                        className="rounded-full p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
-                        title="Preview voice"
-                      >
-                        ▶
-                      </button>
-                    )}
+                    <VoicePreviewPlayer
+                      previewUrl={voice.previewUrl}
+                      onPlay={() => handlePlay(voice.id)}
+                      stopRef={(stop) => registerStop(voice.id, stop)}
+                    />
                   </div>
 
                   {voice.description && (

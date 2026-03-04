@@ -15,6 +15,11 @@ interface CreateGenerationParams {
   routingPreference?: RoutingPreference;
   audioFormat?: string;
   callbackUrl?: string;
+  preset?: string;
+  speed?: number;
+  stability?: number;
+  similarityBoost?: number;
+  style?: number;
 }
 
 interface EstimateCostParams {
@@ -28,17 +33,25 @@ interface UseGenerationsOptions {
   page?: number;
   pageSize?: number;
   status?: GenerationStatus;
+  search?: string;
+  provider?: string;
 }
 
 export function useGenerations(options: UseGenerationsOptions = {}) {
-  const { page, pageSize, status } = options;
+  const { page, pageSize, status, search, provider } = options;
 
   return useQuery({
-    queryKey: ["generations", { page, pageSize, status }],
+    queryKey: ["generations", { page, pageSize, status, search, provider }],
     queryFn: async () => {
       const { data, error } = await api.GET("/api/v1/Generations", {
         params: {
-          query: { page, pageSize, status },
+          query: {
+            page,
+            pageSize,
+            status,
+            search: search || undefined,
+            provider: (provider as components["schemas"]["Provider"] | undefined) || undefined,
+          },
         },
       });
       if (error) throw error;
@@ -83,14 +96,26 @@ export function useCreateGeneration() {
 
   return useMutation({
     mutationFn: async (params: CreateGenerationParams) => {
+      const body: components["schemas"]["CreateGenerationRequest"] & {
+        preset?: string;
+        speed?: number;
+        stability?: number;
+        similarityBoost?: number;
+        style?: number;
+      } = {
+        text: params.text,
+        voiceId: params.voiceId,
+        routingPreference: params.routingPreference,
+        audioFormat: params.audioFormat,
+        callbackUrl: params.callbackUrl,
+        ...(params.preset && { preset: params.preset }),
+        ...(params.speed !== undefined && { speed: params.speed }),
+        ...(params.stability !== undefined && { stability: params.stability }),
+        ...(params.similarityBoost !== undefined && { similarityBoost: params.similarityBoost }),
+        ...(params.style !== undefined && { style: params.style }),
+      };
       const { data, error } = await api.POST("/api/v1/Generations", {
-        body: {
-          text: params.text,
-          voiceId: params.voiceId,
-          routingPreference: params.routingPreference,
-          audioFormat: params.audioFormat,
-          callbackUrl: params.callbackUrl,
-        },
+        body,
       });
       if (error) throw error;
       return data;

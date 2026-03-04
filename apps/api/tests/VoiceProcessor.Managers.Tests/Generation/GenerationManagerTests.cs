@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using VoiceProcessor.Accessors.Contracts;
 using VoiceProcessor.Accessors.Providers;
+using VoiceProcessor.Domain.DTOs.Responses;
 using VoiceProcessor.Domain.DTOs.Requests;
 using VoiceProcessor.Domain.Entities;
 using VoiceProcessor.Domain.Enums;
@@ -25,6 +26,8 @@ public class GenerationManagerTests
     private readonly Mock<IRoutingEngine> _mockRoutingEngine;
     private readonly Mock<IBackgroundJobClient> _mockJobClient;
     private readonly Mock<ILogger<GenerationManager>> _mockLogger;
+    private readonly Mock<IChapterDetectionEngine> _mockChapterDetectionEngine;
+    private readonly Mock<IChapterTimingEngine> _mockChapterTimingEngine;
 
     public GenerationManagerTests()
     {
@@ -38,10 +41,18 @@ public class GenerationManagerTests
         _mockRoutingEngine = new Mock<IRoutingEngine>();
         _mockJobClient = new Mock<IBackgroundJobClient>();
         _mockLogger = new Mock<ILogger<GenerationManager>>();
+        _mockChapterDetectionEngine = new Mock<IChapterDetectionEngine>();
+        _mockChapterTimingEngine = new Mock<IChapterTimingEngine>();
     }
 
     private GenerationManager CreateManager()
     {
+        // Set up default mock for ChapterDetectionEngine to return empty list
+        _mockChapterDetectionEngine.Setup(x => x.DetectChapters(It.IsAny<string>()))
+            .Returns(new List<DetectedChapter>());
+        _mockChapterTimingEngine.Setup(x => x.MapChaptersToTimestamps(It.IsAny<IReadOnlyList<DetectedChapter>>(), It.IsAny<ICollection<GenerationChunk>>()))
+            .Returns(new List<ChapterDto>());
+
         return new GenerationManager(
             _mockGenerationAccessor.Object,
             _mockVoiceAccessor.Object,
@@ -51,6 +62,8 @@ public class GenerationManagerTests
             _mockChunkingEngine.Object,
             _mockPricingEngine.Object,
             _mockRoutingEngine.Object,
+            _mockChapterDetectionEngine.Object,
+            _mockChapterTimingEngine.Object,
             _mockJobClient.Object,
             _mockLogger.Object
         );
@@ -349,7 +362,7 @@ public class GenerationManagerTests
             CompletedAt = DateTime.UtcNow.AddMinutes(-5)
         };
 
-        _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generationId, It.IsAny<CancellationToken>()))
+        _mockGenerationAccessor.Setup(x => x.GetByIdWithChunksAsync(generationId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(generation);
 
         // Act
@@ -371,7 +384,7 @@ public class GenerationManagerTests
         var manager = CreateManager();
         var generationId = Guid.NewGuid();
 
-        _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generationId, It.IsAny<CancellationToken>()))
+        _mockGenerationAccessor.Setup(x => x.GetByIdWithChunksAsync(generationId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((Domain.Entities.Generation?)null);
 
         // Act
@@ -930,7 +943,7 @@ public class GenerationManagerTests
             CreatedAt = DateTime.UtcNow
         };
 
-        _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generationId, It.IsAny<CancellationToken>()))
+        _mockGenerationAccessor.Setup(x => x.GetByIdWithChunksAsync(generationId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(generation);
 
         _mockPricingEngine.Setup(x => x.CalculateCreditsRequired(0.025m)).Returns(3);
@@ -973,7 +986,7 @@ public class GenerationManagerTests
             CreatedAt = DateTime.UtcNow
         };
 
-        _mockGenerationAccessor.Setup(x => x.GetByIdAsync(generationId, It.IsAny<CancellationToken>()))
+        _mockGenerationAccessor.Setup(x => x.GetByIdWithChunksAsync(generationId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(generation);
 
         // Act
@@ -1050,5 +1063,181 @@ public class GenerationManagerTests
         result.EstimatedCost.Should().Be(0.012m);
         result.RecommendedProvider.Should().BeNull();
         result.ProviderEstimates.Should().HaveCount(1);
+    }
+
+
+    [Fact]
+    public async Task GetGenerationAsync_WithChapters_ReturnsChaptersInResponse()
+    {
+        // Arrange
+        var manager = CreateManager();
+        var generationId = Guid.NewGuid();
+        var textWithChapters = @"Chapter 1: The Beginning
+This is the first chapter content.
+Some more text here.
+
+Chapter 2: The Middle
+This is the second chapter content.
+More content follows.";
+
+        var generation = new Domain.Entities.Generation
+        {
+            Id = generationId,
+            UserId = Guid.NewGuid(),
+            InputText = textWithChapters,
+            Status = GenerationStatus.Completed,
+            CharacterCount = textWithChapters.Length,
+            Progress = 100,
+            ChunkCount = 2,
+            ChunksCompleted = 2,
+            SelectedProvider = Provider.ElevenLabs,
+            AudioUrl = "https://example.com/audio.mp3",
+            AudioFormat = "mp3",
+            AudioDurationMs = 5000,
+            EstimatedCost = 0.05m,
+            ActualCost = 0.05m,
+            CreatedAt = DateTime.UtcNow,
+            StartedAt = DateTime.UtcNow.AddSeconds(-10),
+            CompletedAt = DateTime.UtcNow,
+            Chunks = new List<GenerationChunk>
+            {
+                new()
+                {
+                    Index = 0,
+                    Text = textWithChapters[..textWithChapters.IndexOf("Chapter 2", StringComparison.Ordinal)],
+                    AudioDurationMs = 3000
+                },
+                new()
+                {
+                    Index = 1,
+                    Text = textWithChapters[textWithChapters.IndexOf("Chapter 2", StringComparison.Ordinal)..],
+                    AudioDurationMs = 5000
+                }
+            }
+        };
+
+        _mockGenerationAccessor.Setup(x => x.GetByIdWithChunksAsync(generationId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(generation);
+
+        // Setup chapter detection mock
+        var detectedChapters = new List<DetectedChapter>
+        {
+            new DetectedChapter
+            {
+                ChapterNumber = 1,
+                Title = "Chapter 1: The Beginning",
+                StartPosition = 0,
+                EndPosition = textWithChapters.IndexOf("Chapter 2"),
+                EstimatedWordCount = 10
+            },
+            new DetectedChapter
+            {
+                ChapterNumber = 2,
+                Title = "Chapter 2: The Middle",
+                StartPosition = textWithChapters.IndexOf("Chapter 2"),
+                EndPosition = textWithChapters.Length,
+                EstimatedWordCount = 10
+            }
+        };
+        _mockChapterDetectionEngine.Setup(x => x.DetectChapters(textWithChapters))
+            .Returns(detectedChapters);
+        _mockChapterTimingEngine.Setup(x => x.MapChaptersToTimestamps(detectedChapters, generation.Chunks))
+            .Returns(new List<ChapterDto>
+            {
+                new()
+                {
+                    Title = "Chapter 1: The Beginning",
+                    Index = 1,
+                    StartPosition = 0,
+                    EndPosition = textWithChapters.IndexOf("Chapter 2"),
+                    EstimatedWordCount = 10,
+                    StartTimeMs = 0,
+                    EndTimeMs = 3000
+                },
+                new()
+                {
+                    Title = "Chapter 2: The Middle",
+                    Index = 2,
+                    StartPosition = textWithChapters.IndexOf("Chapter 2"),
+                    EndPosition = textWithChapters.Length,
+                    EstimatedWordCount = 10,
+                    StartTimeMs = 3000,
+                    EndTimeMs = 8000
+                }
+            });
+
+
+        // Act
+        var result = await manager.GetGenerationAsync(generationId);
+
+        // Assert
+        result.Should().NotBeNull();
+        result!.Chapters.Should().NotBeNull();
+        result.Chapters.Should().HaveCount(2);
+        result.Chapters[0].Title.Should().Be("Chapter 1: The Beginning");
+        result.Chapters[0].Index.Should().Be(1);
+        result.Chapters[0].StartPosition.Should().Be(0);
+        result.Chapters[0].EndPosition.Should().BeGreaterThan(0);
+        result.Chapters[0].EstimatedWordCount.Should().BeGreaterThan(0);
+        result.Chapters[0].StartTimeMs.Should().Be(0);
+        result.Chapters[0].EndTimeMs.Should().Be(3000);
+        result.Chapters[1].Title.Should().Be("Chapter 2: The Middle");
+        result.Chapters[1].Index.Should().Be(2);
+        result.Chapters[1].StartTimeMs.Should().Be(3000);
+        result.Chapters[1].EndTimeMs.Should().Be(8000);
+        _mockChapterTimingEngine.Verify(x => x.MapChaptersToTimestamps(detectedChapters, generation.Chunks), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetGenerationAsync_ShortTextWithoutChapters_ReturnsEmptyChaptersList()
+    {
+        // Arrange
+        var manager = CreateManager();
+        var generationId = Guid.NewGuid();
+        var plainText = "Short text.";
+
+        var generation = new Domain.Entities.Generation
+        {
+            Id = generationId,
+            UserId = Guid.NewGuid(),
+            InputText = plainText,
+            Status = GenerationStatus.Completed,
+            CharacterCount = plainText.Length,
+            Progress = 100,
+            ChunkCount = 1,
+            ChunksCompleted = 1,
+            SelectedProvider = Provider.ElevenLabs,
+            AudioUrl = "https://example.com/audio.mp3",
+            AudioFormat = "mp3",
+            AudioDurationMs = 2000,
+            EstimatedCost = 0.02m,
+            ActualCost = 0.02m,
+            CreatedAt = DateTime.UtcNow,
+            StartedAt = DateTime.UtcNow.AddSeconds(-5),
+            CompletedAt = DateTime.UtcNow
+        };
+
+        _mockGenerationAccessor.Setup(x => x.GetByIdWithChunksAsync(generationId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(generation);
+
+        // Setup chapter detection mock to return empty list
+        _mockChapterDetectionEngine.Setup(x => x.DetectChapters(plainText))
+            .Returns(new List<DetectedChapter>());
+        _mockChapterTimingEngine.Setup(x => x.MapChaptersToTimestamps(It.Is<IReadOnlyList<DetectedChapter>>(chapters => chapters.Count == 0), It.IsAny<ICollection<GenerationChunk>>()))
+            .Returns(new List<ChapterDto>());
+
+
+        // Act
+        var result = await manager.GetGenerationAsync(generationId);
+
+        // Assert
+        result.Should().NotBeNull();
+        result!.Chapters.Should().NotBeNull();
+        result.Chapters.Should().BeEmpty();
+        _mockChapterTimingEngine.Verify(
+            x => x.MapChaptersToTimestamps(
+                It.Is<IReadOnlyList<DetectedChapter>>(chapters => chapters.Count == 0),
+                generation.Chunks),
+            Times.Once);
     }
 }

@@ -25,4 +25,10 @@
     <ProjectReference Include="..\..\src\VoiceProcessor.Accessors\VoiceProcessor.Accessors.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="TestData\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

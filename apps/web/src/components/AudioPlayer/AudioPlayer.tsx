@@ -14,6 +14,8 @@ interface AudioPlayerProps {
   audioUrl: string;
   chapters?: Chapter[];
   onDownload?: (format: "mp3" | "wav") => void;
+  onTimeUpdate?: (currentTimeMs: number) => void;
+  seekTimeMs?: number | null;
   className?: string;
 }
 
@@ -29,6 +31,8 @@ export function AudioPlayer({
   audioUrl,
   chapters = [],
   onDownload,
+  onTimeUpdate,
+  seekTimeMs,
   className,
 }: AudioPlayerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -39,6 +43,10 @@ export function AudioPlayer({
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [playbackRate, setPlaybackRate] = useState(1);
+
+  // Use ref to avoid stale closure in WaveSurfer event handlers
+  const onTimeUpdateRef = useRef(onTimeUpdate);
+  onTimeUpdateRef.current = onTimeUpdate;
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -65,11 +73,15 @@ export function AudioPlayer({
     });
 
     wavesurfer.on("audioprocess", () => {
-      setCurrentTime(wavesurfer.getCurrentTime());
+      const time = wavesurfer.getCurrentTime();
+      setCurrentTime(time);
+      onTimeUpdateRef.current?.(Math.round(time * 1000));
     });
 
     wavesurfer.on("seeking", () => {
-      setCurrentTime(wavesurfer.getCurrentTime());
+      const time = wavesurfer.getCurrentTime();
+      setCurrentTime(time);
+      onTimeUpdateRef.current?.(Math.round(time * 1000));
     });
 
     wavesurfer.on("play", () => setIsPlaying(true));
@@ -80,6 +92,14 @@ export function AudioPlayer({
       wavesurfer.destroy();
     };
   }, [audioUrl]);
+
+  // External seek via seekTimeMs prop
+  useEffect(() => {
+    if (seekTimeMs != null && wavesurferRef.current && duration > 0) {
+      const seekSeconds = seekTimeMs / 1000;
+      wavesurferRef.current.seekTo(seekSeconds / duration);
+    }
+  }, [seekTimeMs, duration]);
 
   const togglePlayPause = useCallback(() => {
     wavesurferRef.current?.playPause();

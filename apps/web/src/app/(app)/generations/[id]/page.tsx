@@ -1,20 +1,47 @@
 "use client";
 
+import { useState, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useGeneration, useSubmitFeedback } from '@/hooks/useGenerations';
 import { GenerationStatus } from '@/components/GenerationStatus/GenerationStatus';
 import { mapGenerationStatus } from '@/lib/utils/mapGenerationStatus';
 import { AudioPlayer } from '@/components/AudioPlayer/AudioPlayer';
+import { ChapterNavigation, type Chapter } from '@/components/ChapterNavigation/ChapterNavigation';
 import { FeedbackForm, type FeedbackData } from '@/components/FeedbackForm/FeedbackForm';
 import { formatNumber } from '@/utils/formatNumber';
 import { formatCredits } from '@/utils/formatCredits';
+
+// Extend GenerationResponse with chapters until OpenAPI types are regenerated
+interface ChapterDto {
+  title: string;
+  index: number;
+  startTimeMs: number;
+  endTimeMs: number;
+  startPosition: number;
+  endPosition: number;
+  estimatedWordCount: number;
+}
 
 export default function GenerationPage() {
   const params = useParams();
   const id = params?.id as string;
   const { data: generation, error, isLoading } = useGeneration(id);
   const submitFeedback = useSubmitFeedback();
+  const [currentTimeMs, setCurrentTimeMs] = useState(0);
+  const [seekTimeMs, setSeekTimeMs] = useState<number | null>(null);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const chapters: ChapterDto[] = (generation as any)?.chapters ?? [];
+
+  const handleTimeUpdate = useCallback((timeMs: number) => {
+    setCurrentTimeMs(timeMs);
+  }, []);
+
+  const handleChapterSeek = useCallback((startTimeMs: number) => {
+    setSeekTimeMs(startTimeMs);
+    setCurrentTimeMs(startTimeMs);
+  }, []);
 
   const handleFeedbackSubmit = (feedback: FeedbackData) => {
     const tagPrefix = feedback.tags.length > 0
@@ -102,7 +129,11 @@ export default function GenerationPage() {
           <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
             <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Audio Player</h2>
             {generation.audioUrl ? (
-              <AudioPlayer audioUrl={generation.audioUrl} />
+              <AudioPlayer
+                audioUrl={generation.audioUrl}
+                onTimeUpdate={handleTimeUpdate}
+                seekTimeMs={seekTimeMs}
+              />
             ) : (
               <div className="rounded-lg bg-gray-100 dark:bg-gray-800 p-8 text-center">
                 <p className="text-gray-500 dark:text-gray-400">
@@ -115,11 +146,23 @@ export default function GenerationPage() {
             )}
           </div>
 
-          {/* Chapters */}
-          <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
-            <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Chapters</h2>
-            <p className="text-gray-500 dark:text-gray-400">No chapters detected</p>
-          </div>
+          {/* Chapters - only shown when chapters exist */}
+          {chapters.length > 0 && (
+            <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
+              <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Chapters</h2>
+              <ChapterNavigation
+                chapters={chapters.map((ch): Chapter => ({
+                  title: ch.title,
+                  index: ch.index,
+                  startTimeMs: ch.startTimeMs,
+                  endTimeMs: ch.endTimeMs,
+                  estimatedWordCount: ch.estimatedWordCount,
+                }))}
+                currentTimeMs={currentTimeMs}
+                onSeek={handleChapterSeek}
+              />
+            </div>
+          )}
         </div>
 
         <div className="space-y-6">

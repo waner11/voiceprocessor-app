@@ -32,6 +32,16 @@ vi.mock('@/components/FeedbackForm/FeedbackForm', () => ({
   ),
 }));
 
+vi.mock('@/components/ChapterNavigation/ChapterNavigation', () => ({
+  ChapterNavigation: ({ chapters, onSeek }: { chapters: { title: string }[]; onSeek: (ms: number) => void }) => (
+    <div data-testid="chapter-navigation">
+      {chapters.map((ch: { title: string }, i: number) => (
+        <button key={i} onClick={() => onSeek(i * 60000)}>{ch.title}</button>
+      ))}
+    </div>
+  ),
+}));
+
 import { useGeneration } from '@/hooks/useGenerations';
 
 describe('Generation Detail Page', () => {
@@ -227,5 +237,69 @@ describe('Generation Detail Page', () => {
     render(<Page />);
 
     expect(screen.getByText('1,234,567')).toBeInTheDocument();
+  });
+
+  it('renders ChapterNavigation when generation has chapters', () => {
+    (useGeneration as ReturnType<typeof vi.fn>).mockReturnValue({
+      data: {
+        id: 'test-generation-id',
+        status: 'Completed',
+        provider: 'ElevenLabs',
+        characterCount: 100,
+        createdAt: '2026-01-29T00:00:00Z',
+        audioUrl: 'https://example.com/audio.mp3',
+        chapters: [
+          { title: 'Introduction', index: 0, startTimeMs: 0, endTimeMs: 60000, startPosition: 0, endPosition: 100, estimatedWordCount: 50 },
+          { title: 'Chapter 1', index: 1, startTimeMs: 60000, endTimeMs: 180000, startPosition: 100, endPosition: 300, estimatedWordCount: 100 },
+        ],
+      },
+      error: null,
+      isLoading: false,
+    });
+
+    render(<Page />);
+
+    expect(screen.getByTestId('chapter-navigation')).toBeInTheDocument();
+    expect(screen.getByText('Introduction')).toBeInTheDocument();
+    expect(screen.getByText('Chapter 1')).toBeInTheDocument();
+  });
+
+  it('does not render ChapterNavigation when generation has no chapters', () => {
+    (useGeneration as ReturnType<typeof vi.fn>).mockReturnValue({
+      data: {
+        id: 'test-generation-id',
+        status: 'Completed',
+        provider: 'ElevenLabs',
+        characterCount: 100,
+        createdAt: '2026-01-29T00:00:00Z',
+        audioUrl: 'https://example.com/audio.mp3',
+      },
+      error: null,
+      isLoading: false,
+    });
+
+    render(<Page />);
+
+    expect(screen.queryByTestId('chapter-navigation')).not.toBeInTheDocument();
+  });
+
+  it('does not render ChapterNavigation when chapters array is empty', () => {
+    (useGeneration as ReturnType<typeof vi.fn>).mockReturnValue({
+      data: {
+        id: 'test-generation-id',
+        status: 'Completed',
+        provider: 'ElevenLabs',
+        characterCount: 100,
+        createdAt: '2026-01-29T00:00:00Z',
+        audioUrl: 'https://example.com/audio.mp3',
+        chapters: [],
+      },
+      error: null,
+      isLoading: false,
+    });
+
+    render(<Page />);
+
+    expect(screen.queryByTestId('chapter-navigation')).not.toBeInTheDocument();
   });
 });

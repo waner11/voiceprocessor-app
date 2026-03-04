@@ -105,16 +105,18 @@ public class GenerationsController : ApiControllerBase
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20,
         [FromQuery] GenerationStatus? status = null,
+        [FromQuery] string? search = null,
+        [FromQuery] Provider? provider = null,
         CancellationToken cancellationToken = default)
     {
         var userId = _currentUser.UserId
             ?? throw new UnauthorizedAccessException("User not authenticated");
 
-        _logger.LogDebug("Getting generations for user {UserId}, page {Page}, pageSize {PageSize}, status {Status}",
-            userId, page, pageSize, status);
+        _logger.LogDebug("Getting generations for user {UserId}, page {Page}, pageSize {PageSize}, status {Status}, search {Search}, provider {Provider}",
+            userId, page, pageSize, status, search, provider);
 
         var response = await _generationManager.GetGenerationsAsync(
-            userId, page, pageSize, status, cancellationToken);
+            userId, page, pageSize, status, search, provider, cancellationToken);
 
         return Ok(response);
     }

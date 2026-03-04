@@ -63,3 +63,7 @@ skills/
 !.claude/skills/
 !.claude/agents/
 !.opencode/skills/
+
+# Credentials and sensitive files
+cookies.txt
+.opencode/opencode.db

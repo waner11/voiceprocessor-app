@@ -33,12 +33,20 @@ public class GenerationAccessor : IGenerationAccessor
         int page,
         int pageSize,
         GenerationStatus? status = null,
+        string? search = null,
+        Provider? provider = null,
         CancellationToken cancellationToken = default)
     {
         var query = _dbContext.Generations.Where(g => g.UserId == userId);
 
         if (status.HasValue)
             query = query.Where(g => g.Status == status.Value);
+
+        if (!string.IsNullOrWhiteSpace(search))
+            query = query.Where(g => EF.Functions.ILike(g.InputText.Substring(0, 200), $"%{search}%"));
+
+        if (provider.HasValue)
+            query = query.Where(g => g.SelectedProvider == provider.Value);
 
         var totalCount = await query.CountAsync(cancellationToken);
 

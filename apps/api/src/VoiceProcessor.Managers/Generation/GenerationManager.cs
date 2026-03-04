@@ -21,6 +21,8 @@ public class GenerationManager : IGenerationManager
     private readonly IChunkingEngine _chunkingEngine;
     private readonly IPricingEngine _pricingEngine;
     private readonly IRoutingEngine _routingEngine;
+    private readonly IChapterDetectionEngine _chapterDetectionEngine;
+    private readonly IChapterTimingEngine _chapterTimingEngine;
     private readonly IBackgroundJobClient _backgroundJobClient;
     private readonly ILogger<GenerationManager> _logger;
 
@@ -33,6 +35,8 @@ public class GenerationManager : IGenerationManager
         IChunkingEngine chunkingEngine,
         IPricingEngine pricingEngine,
         IRoutingEngine routingEngine,
+        IChapterDetectionEngine chapterDetectionEngine,
+        IChapterTimingEngine chapterTimingEngine,
         IBackgroundJobClient backgroundJobClient,
         ILogger<GenerationManager> logger)
     {
@@ -44,6 +48,8 @@ public class GenerationManager : IGenerationManager
         _chunkingEngine = chunkingEngine;
         _pricingEngine = pricingEngine;
         _routingEngine = routingEngine;
+        _chapterDetectionEngine = chapterDetectionEngine;
+        _chapterTimingEngine = chapterTimingEngine;
         _backgroundJobClient = backgroundJobClient;
         _logger = logger;
     }
@@ -214,8 +220,8 @@ public class GenerationManager : IGenerationManager
         Guid generationId,
         CancellationToken cancellationToken = default)
     {
-        var generation = await _generationAccessor.GetByIdAsync(generationId, cancellationToken);
-        return generation is null ? null : MapToResponse(generation);
+        var generation = await _generationAccessor.GetByIdWithChunksAsync(generationId, cancellationToken);
+        return generation is null ? null : MapToResponse(generation, includeChapters: true);
     }
 
     public async Task<PagedResponse<GenerationResponse>> GetGenerationsAsync(
@@ -223,14 +229,16 @@ public class GenerationManager : IGenerationManager
         int page = 1,
         int pageSize = 20,
         GenerationStatus? status = null,
+        string? search = null,
+        Provider? provider = null,
         CancellationToken cancellationToken = default)
     {
         var (items, totalCount) = await _generationAccessor.GetByUserPagedAsync(
-            userId, page, pageSize, status, cancellationToken);
+            userId, page, pageSize, status, search, provider, cancellationToken);
 
         return new PagedResponse<GenerationResponse>
         {
-            Items = items.Select(MapToResponse).ToList(),
+            Items = items.Select(g => MapToResponse(g)).ToList(),
             TotalCount = totalCount,
             Page = page,
             PageSize = pageSize
@@ -299,8 +307,12 @@ public class GenerationManager : IGenerationManager
         return true;
     }
 
-    private GenerationResponse MapToResponse(Domain.Entities.Generation generation)
+    private GenerationResponse MapToResponse(Domain.Entities.Generation generation, bool includeChapters = false)
     {
+        var chapters = includeChapters
+            ? BuildChapters(generation)
+            : new List<ChapterDto>();
+
         return new GenerationResponse
         {
             Id = generation.Id,
@@ -324,8 +336,15 @@ public class GenerationManager : IGenerationManager
             ErrorMessage = generation.ErrorMessage,
             CreatedAt = generation.CreatedAt,
             StartedAt = generation.StartedAt,
-            CompletedAt = generation.CompletedAt
+            CompletedAt = generation.CompletedAt,
+            Chapters = chapters
         };
+    }
+
+    private List<ChapterDto> BuildChapters(Domain.Entities.Generation generation)
+    {
+        var detectedChapters = _chapterDetectionEngine.DetectChapters(generation.InputText);
+        return _chapterTimingEngine.MapChaptersToTimestamps(detectedChapters, generation.Chunks);
     }
 
     private static int EstimateDuration(int characterCount, Provider provider)
