@@ -20,6 +20,12 @@ export function VoicePreviewPlayer({
 }: VoicePreviewPlayerProps) {
   const [state, setState] = useState<PlayerState>("idle");
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const handlersRef = useRef<{
+    playing: () => void;
+    pause: () => void;
+    ended: () => void;
+    error: () => void;
+  } | null>(null);
 
   const stop = useCallback(() => {
     if (audioRef.current) {
@@ -41,7 +47,7 @@ export function VoicePreviewPlayer({
         const audio = audioRef.current;
         audio.pause();
         // Remove all event listeners
-        const handlers = (audio as any).__voicePreviewHandlers;
+        const handlers = handlersRef.current;
         if (handlers) {
           audio.removeEventListener("playing", handlers.playing);
           audio.removeEventListener("pause", handlers.pause);
@@ -105,8 +111,8 @@ export function VoicePreviewPlayer({
     audio.addEventListener("ended", handleEnded);
     audio.addEventListener("error", handleError);
 
-    // Store handler references on the audio element for cleanup
-    (audio as any).__voicePreviewHandlers = {
+    // Store handler references in ref for cleanup
+    handlersRef.current = {
       playing: handlePlaying,
       pause: handlePause,
       ended: handleEnded,
