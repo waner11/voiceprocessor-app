@@ -8,23 +8,24 @@ using Moq;
 using VoiceProcessor.Accessors.Documents;
 using VoiceProcessor.Clients.Api.Controllers;
 using VoiceProcessor.Domain.DTOs.Responses;
+using VoiceProcessor.Managers.Contracts;
 
 namespace VoiceProcessor.Managers.Tests.Documents;
 
 public class DocumentsControllerTests
 {
-    private readonly Mock<IDocumentParserAccessor> _mockDocumentParser;
+    private readonly Mock<IDocumentManager> _mockDocumentManager;
     private readonly Mock<ILogger<DocumentsController>> _mockLogger;
 
     public DocumentsControllerTests()
     {
-        _mockDocumentParser = new Mock<IDocumentParserAccessor>();
+        _mockDocumentManager = new Mock<IDocumentManager>();
         _mockLogger = new Mock<ILogger<DocumentsController>>();
     }
 
     private DocumentsController CreateController()
     {
-        return new DocumentsController(_mockDocumentParser.Object, _mockLogger.Object);
+        return new DocumentsController(_mockDocumentManager.Object, _mockLogger.Object);
     }
 
     [Fact]
@@ -38,8 +39,8 @@ public class DocumentsControllerTests
             WordCount: 4,
             CharacterCount: 20);
 
-        _mockDocumentParser
-            .Setup(x => x.ExtractTextAsync(It.IsAny<Stream>(), "application/pdf", It.IsAny<string>()))
+        _mockDocumentManager
+            .Setup(x => x.ExtractTextAsync(It.IsAny<Stream>(), "application/pdf", It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(extractionResult);
 
         var fileContent = new byte[] { 0x25, 0x50, 0x44, 0x46 }; // %PDF magic bytes
@@ -77,11 +78,12 @@ public class DocumentsControllerTests
             WordCount: 4,
             CharacterCount: 21);
 
-        _mockDocumentParser
+        _mockDocumentManager
             .Setup(x => x.ExtractTextAsync(
                 It.IsAny<Stream>(),
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                It.IsAny<string>()))
+                It.IsAny<string>(),
+                It.IsAny<CancellationToken>()))
             .ReturnsAsync(extractionResult);
 
         var fileContent = new byte[] { 0x50, 0x4B, 0x03, 0x04 }; // ZIP/DOCX magic bytes
@@ -127,8 +129,8 @@ public class DocumentsControllerTests
         // Arrange
         var controller = CreateController();
 
-        _mockDocumentParser
-            .Setup(x => x.ExtractTextAsync(It.IsAny<Stream>(), "text/plain", It.IsAny<string>()))
+        _mockDocumentManager
+            .Setup(x => x.ExtractTextAsync(It.IsAny<Stream>(), "text/plain", It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(new NotSupportedException("No document parser is configured for mime type 'text/plain'"));
 
         var fileContent = new byte[] { 0x48, 0x65, 0x6C, 0x6C }; // "Hell"
@@ -157,8 +159,8 @@ public class DocumentsControllerTests
         // Arrange
         var controller = CreateController();
 
-        _mockDocumentParser
-            .Setup(x => x.ExtractTextAsync(It.IsAny<Stream>(), "application/pdf", It.IsAny<string>()))
+        _mockDocumentManager
+            .Setup(x => x.ExtractTextAsync(It.IsAny<Stream>(), "application/pdf", It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(new DocumentParsingException("File exceeds the 50MB limit.")
             {
                 StatusCode = System.Net.HttpStatusCode.RequestEntityTooLarge
@@ -208,4 +210,3 @@ public class DocumentsControllerTests
         result.Result.Should().BeOfType<BadRequestObjectResult>();
     }
 }
-

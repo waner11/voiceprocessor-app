@@ -2,19 +2,20 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VoiceProcessor.Accessors.Documents;
 using VoiceProcessor.Domain.DTOs.Responses;
+using VoiceProcessor.Managers.Contracts;
 
 namespace VoiceProcessor.Clients.Api.Controllers;
 
 public class DocumentsController : ApiControllerBase
 {
-    private readonly IDocumentParserAccessor _documentParser;
+    private readonly IDocumentManager _documentManager;
     private readonly ILogger<DocumentsController> _logger;
 
     public DocumentsController(
-        IDocumentParserAccessor documentParser,
+        IDocumentManager documentManager,
         ILogger<DocumentsController> logger)
     {
-        _documentParser = documentParser;
+        _documentManager = documentManager;
         _logger = logger;
     }
 
@@ -22,7 +23,7 @@ public class DocumentsController : ApiControllerBase
     /// Extract text from an uploaded document (PDF or DOCX).
     /// </summary>
     [HttpPost("extract")]
-    [AllowAnonymous]
+    [Authorize]
     [Consumes("multipart/form-data")]
     [ProducesResponseType(typeof(DocumentExtractionResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
@@ -48,10 +49,11 @@ public class DocumentsController : ApiControllerBase
         try
         {
             await using var stream = file.OpenReadStream();
-            var result = await _documentParser.ExtractTextAsync(
+            var result = await _documentManager.ExtractTextAsync(
                 stream,
                 file.ContentType,
-                file.FileName);
+                file.FileName,
+                cancellationToken);
 
             _logger.LogInformation(
                 "Document extraction succeeded for {FileName}: {WordCount} words, {CharCount} chars",
@@ -78,4 +80,3 @@ public class DocumentsController : ApiControllerBase
         }
     }
 }
-
