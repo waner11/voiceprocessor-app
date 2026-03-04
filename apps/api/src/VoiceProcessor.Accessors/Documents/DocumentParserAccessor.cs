@@ -3,8 +3,6 @@ namespace VoiceProcessor.Accessors.Documents;
 
 public class DocumentParserAccessor : IDocumentParserAccessor
 {
-
-
     private readonly IReadOnlyCollection<IDocumentFormatParser> _parsers;
 
     public DocumentParserAccessor(IEnumerable<IDocumentFormatParser> parsers)
@@ -14,8 +12,6 @@ public class DocumentParserAccessor : IDocumentParserAccessor
 
     public Task<DocumentExtractionResult> ExtractTextAsync(Stream fileStream, string mimeType, string fileName, CancellationToken cancellationToken = default)
     {
-
-
         var parser = _parsers.FirstOrDefault(p =>
             p.SupportedMimeTypes.Contains(mimeType, StringComparer.OrdinalIgnoreCase));
 
@@ -27,6 +23,4 @@ public class DocumentParserAccessor : IDocumentParserAccessor
 
         return parser.ExtractTextAsync(fileStream, mimeType, fileName, cancellationToken);
     }
-
-
 }
