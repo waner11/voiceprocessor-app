@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using VoiceProcessor.Accessors.Documents;
+using VoiceProcessor.Domain.Exceptions;
 using VoiceProcessor.Clients.Api.Controllers;
 using VoiceProcessor.Domain.DTOs.Responses;
 using VoiceProcessor.Managers.Contracts;

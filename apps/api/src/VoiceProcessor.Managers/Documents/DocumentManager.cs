@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using VoiceProcessor.Accessors.Documents;
+using VoiceProcessor.Domain.Exceptions;
 using VoiceProcessor.Domain.DTOs.Documents;
 using VoiceProcessor.Managers.Contracts;
 
@@ -36,6 +37,6 @@ public class DocumentManager : IDocumentManager
             fileName,
             mimeType);
 
-        return _documentParserAccessor.ExtractTextAsync(fileStream, mimeType, fileName);
+        return _documentParserAccessor.ExtractTextAsync(fileStream, mimeType, fileName, cancellationToken);
     }
 }

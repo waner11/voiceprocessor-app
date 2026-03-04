@@ -1,3 +1,4 @@
+using VoiceProcessor.Domain.Exceptions;
 using UglyToad.PdfPig;
 using VoiceProcessor.Domain.DTOs.Documents;
 using VoiceProcessor.Utilities.Text;
@@ -7,7 +8,7 @@ public class PdfDocumentParserAccessor : IDocumentFormatParser
 {
     public IReadOnlyCollection<string> SupportedMimeTypes { get; } = ["application/pdf"];
 
-    public Task<DocumentExtractionResult> ExtractTextAsync(Stream fileStream, string mimeType, string fileName)
+    public Task<DocumentExtractionResult> ExtractTextAsync(Stream fileStream, string mimeType, string fileName, CancellationToken cancellationToken = default)
     {
         if (!SupportedMimeTypes.Contains(mimeType, StringComparer.OrdinalIgnoreCase))
         {

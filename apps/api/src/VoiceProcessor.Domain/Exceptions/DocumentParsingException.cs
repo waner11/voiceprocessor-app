@@ -1,4 +1,5 @@
-namespace VoiceProcessor.Accessors.Documents;
+namespace VoiceProcessor.Domain.Exceptions;
+
 public class DocumentParsingException : InvalidOperationException
 {
     public DocumentParsingException(string message) : base(message)

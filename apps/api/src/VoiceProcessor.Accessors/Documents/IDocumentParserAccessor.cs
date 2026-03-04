@@ -4,5 +4,5 @@ namespace VoiceProcessor.Accessors.Documents;
 
 public interface IDocumentParserAccessor
 {
-    Task<DocumentExtractionResult> ExtractTextAsync(Stream fileStream, string mimeType, string fileName);
+    Task<DocumentExtractionResult> ExtractTextAsync(Stream fileStream, string mimeType, string fileName, CancellationToken cancellationToken = default);
 }

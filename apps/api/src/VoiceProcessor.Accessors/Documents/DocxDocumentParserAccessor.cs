@@ -9,7 +9,7 @@ public class DocxDocumentParserAccessor : IDocumentFormatParser
     public IReadOnlyCollection<string> SupportedMimeTypes { get; } =
         ["application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
 
-    public Task<DocumentExtractionResult> ExtractTextAsync(Stream fileStream, string mimeType, string fileName)
+    public Task<DocumentExtractionResult> ExtractTextAsync(Stream fileStream, string mimeType, string fileName, CancellationToken cancellationToken = default)
     {
         if (!SupportedMimeTypes.Contains(mimeType, StringComparer.OrdinalIgnoreCase))
         {

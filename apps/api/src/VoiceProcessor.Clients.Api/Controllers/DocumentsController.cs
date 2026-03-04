@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using VoiceProcessor.Accessors.Documents;
+using VoiceProcessor.Domain.Exceptions;
 using VoiceProcessor.Domain.DTOs.Responses;
 using VoiceProcessor.Managers.Contracts;
 

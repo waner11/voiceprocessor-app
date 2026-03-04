@@ -12,7 +12,7 @@ public class DocumentParserAccessor : IDocumentParserAccessor
         _parsers = parsers.ToList();
     }
 
-    public Task<DocumentExtractionResult> ExtractTextAsync(Stream fileStream, string mimeType, string fileName)
+    public Task<DocumentExtractionResult> ExtractTextAsync(Stream fileStream, string mimeType, string fileName, CancellationToken cancellationToken = default)
     {
 
 
@@ -25,7 +25,7 @@ public class DocumentParserAccessor : IDocumentParserAccessor
                 $"No document parser is configured for mime type '{mimeType}' ({fileName}).");
         }
 
-        return parser.ExtractTextAsync(fileStream, mimeType, fileName);
+        return parser.ExtractTextAsync(fileStream, mimeType, fileName, cancellationToken);
     }
 
 
