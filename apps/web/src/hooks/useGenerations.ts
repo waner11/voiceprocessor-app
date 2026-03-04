@@ -96,8 +96,13 @@ export function useCreateGeneration() {
 
   return useMutation({
     mutationFn: async (params: CreateGenerationParams) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const body: any = {
+      const body: components["schemas"]["CreateGenerationRequest"] & {
+        preset?: string;
+        speed?: number;
+        stability?: number;
+        similarityBoost?: number;
+        style?: number;
+      } = {
         text: params.text,
         voiceId: params.voiceId,
         routingPreference: params.routingPreference,
