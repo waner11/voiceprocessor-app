@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using VoiceProcessor.Accessors.Documents;
 using VoiceProcessor.Clients.Api.Controllers;
+using VoiceProcessor.Domain.DTOs.Responses;
 
 namespace VoiceProcessor.Managers.Tests.Documents;
 
