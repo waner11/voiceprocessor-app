@@ -161,10 +161,7 @@ public class DocumentsControllerTests
 
         _mockDocumentManager
             .Setup(x => x.ExtractTextAsync(It.IsAny<Stream>(), "application/pdf", It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ThrowsAsync(new DocumentParsingException("File exceeds the 50MB limit.")
-            {
-                StatusCode = System.Net.HttpStatusCode.RequestEntityTooLarge
-            });
+            .ThrowsAsync(new FileTooLargeException("File exceeds the 50MB limit."));
 
         var fileContent = new byte[] { 0x25, 0x50, 0x44, 0x46 };
         var formFile = new FormFile(

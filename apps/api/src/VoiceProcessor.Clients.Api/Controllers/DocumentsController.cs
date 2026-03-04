@@ -65,7 +65,7 @@ public class DocumentsController : ApiControllerBase
                 result.WordCount,
                 result.CharacterCount));
         }
-        catch (DocumentParsingException ex) when (ex.StatusCode == System.Net.HttpStatusCode.RequestEntityTooLarge)
+        catch (FileTooLargeException ex)
         {
             _logger.LogWarning("Document extraction rejected — file too large: {FileName}", file.FileName);
             return StatusCode(StatusCodes.Status413RequestEntityTooLarge,

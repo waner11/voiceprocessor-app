@@ -1,4 +1,3 @@
-using System.Net;
 using Microsoft.Extensions.Logging;
 using VoiceProcessor.Accessors.Documents;
 using VoiceProcessor.Domain.DTOs.Documents;
@@ -29,10 +28,7 @@ public class DocumentManager : IDocumentManager
     {
         if (fileStream.CanSeek && fileStream.Length > MaxFileSizeBytes)
         {
-            throw new DocumentParsingException("File exceeds the 50MB limit.")
-            {
-                StatusCode = HttpStatusCode.RequestEntityTooLarge
-            };
+            throw new FileTooLargeException("File exceeds the 50MB limit.");
         }
 
         _logger.LogInformation(
