@@ -38,7 +38,16 @@ export function VoicePreviewPlayer({
   useEffect(() => {
     return () => {
       if (audioRef.current) {
-        audioRef.current.pause();
+        const audio = audioRef.current;
+        audio.pause();
+        // Remove all event listeners
+        const handlers = (audio as any).__voicePreviewHandlers;
+        if (handlers) {
+          audio.removeEventListener("playing", handlers.playing);
+          audio.removeEventListener("pause", handlers.pause);
+          audio.removeEventListener("ended", handlers.ended);
+          audio.removeEventListener("error", handlers.error);
+        }
         audioRef.current = null;
       }
     };
@@ -72,22 +81,37 @@ export function VoicePreviewPlayer({
 
     setState("loading");
 
-    audio.addEventListener("playing", () => {
+    // Create named handler functions so they can be removed later
+    const handlePlaying = () => {
       setState("playing");
-    });
+    };
 
-    audio.addEventListener("pause", () => {
+    const handlePause = () => {
       // Only set paused if we're not already in idle/error state
       setState((prev) => (prev === "playing" ? "paused" : prev));
-    });
+    };
 
-    audio.addEventListener("ended", () => {
+    const handleEnded = () => {
       setState("idle");
-    });
+    };
 
-    audio.addEventListener("error", () => {
+    const handleError = () => {
       setState("error");
-    });
+    };
+
+    // Add event listeners with named handlers
+    audio.addEventListener("playing", handlePlaying);
+    audio.addEventListener("pause", handlePause);
+    audio.addEventListener("ended", handleEnded);
+    audio.addEventListener("error", handleError);
+
+    // Store handler references on the audio element for cleanup
+    (audio as any).__voicePreviewHandlers = {
+      playing: handlePlaying,
+      pause: handlePause,
+      ended: handleEnded,
+      error: handleError,
+    };
 
     try {
       await audio.play();

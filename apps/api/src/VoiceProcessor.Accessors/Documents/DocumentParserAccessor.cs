@@ -1,3 +1,5 @@
+using VoiceProcessor.Domain.DTOs.Documents;
+
 using System.Net;
 
 namespace VoiceProcessor.Accessors.Documents;

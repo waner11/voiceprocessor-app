@@ -1,5 +1,6 @@
 using UglyToad.PdfPig;
-
+using VoiceProcessor.Domain.DTOs.Documents;
+using VoiceProcessor.Utilities.Text;
 namespace VoiceProcessor.Accessors.Documents;
 
 public class PdfDocumentParserAccessor : IDocumentFormatParser

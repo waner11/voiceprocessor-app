@@ -1,8 +1,9 @@
 using System.Text.RegularExpressions;
+using VoiceProcessor.Domain.DTOs.Documents;
 
-namespace VoiceProcessor.Accessors.Documents;
+namespace VoiceProcessor.Utilities.Text;
 
-internal static partial class DocumentTextMetrics
+public static partial class DocumentTextMetrics
 {
     [GeneratedRegex(@"\s+")]
     private static partial Regex WhitespaceRegex();

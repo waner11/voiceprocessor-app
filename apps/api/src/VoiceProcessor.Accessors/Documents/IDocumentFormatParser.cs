@@ -1,3 +1,5 @@
+using VoiceProcessor.Domain.DTOs.Documents;
+
 namespace VoiceProcessor.Accessors.Documents;
 
 public interface IDocumentFormatParser

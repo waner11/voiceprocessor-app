@@ -1,6 +1,7 @@
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
-
+using VoiceProcessor.Domain.DTOs.Documents;
+using VoiceProcessor.Utilities.Text;
 namespace VoiceProcessor.Accessors.Documents;
 
 public class DocxDocumentParserAccessor : IDocumentFormatParser

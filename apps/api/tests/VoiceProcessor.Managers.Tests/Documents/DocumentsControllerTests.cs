@@ -1,3 +1,5 @@
+using VoiceProcessor.Domain.DTOs.Documents;
+
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
