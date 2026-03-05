@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useForgotPassword } from "@/hooks";
+import { useForgotPassword, type ApiError } from "@/hooks";
 
 const forgotPasswordSchema = z.object({
   email: z.string().email("Please enter a valid email"),
@@ -33,8 +33,8 @@ export default function ForgotPasswordPage() {
         setIsSubmitted(true);
       },
       onError: (err: Error) => {
-        const errorMessage = (err as unknown as Record<string, unknown>)?.message || "Something went wrong. Please try again.";
-        setError(String(errorMessage));
+        const apiErr = err as unknown as ApiError;
+        setError(apiErr?.message || "Something went wrong. Please try again.");
       },
     });
   };

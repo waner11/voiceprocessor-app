@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useResetPassword } from "@/hooks";
+import { useResetPassword, type ApiError } from "@/hooks";
 
 const resetPasswordSchema = z
   .object({
@@ -40,10 +40,8 @@ function ResetPasswordContent() {
       { token: token!, newPassword: data.newPassword },
       {
         onError: (err: Error) => {
-          const errorMessage =
-            (err as unknown as Record<string, unknown>)?.message ||
-            "Something went wrong. Please try again.";
-          setError(String(errorMessage));
+          const apiErr = err as unknown as ApiError;
+          setError(apiErr?.message || "Something went wrong. Please try again.");
         },
       }
     );
