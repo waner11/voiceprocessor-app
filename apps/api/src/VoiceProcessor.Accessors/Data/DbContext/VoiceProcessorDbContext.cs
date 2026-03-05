@@ -20,6 +20,7 @@ public class VoiceProcessorDbContext : Microsoft.EntityFrameworkCore.DbContext
     public DbSet<ExternalLogin> ExternalLogins => Set<ExternalLogin>();
     public DbSet<PaymentHistory> PaymentHistories => Set<PaymentHistory>();
     public DbSet<CreditDeduction> CreditDeductions => Set<CreditDeduction>();
+    public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -35,6 +36,7 @@ public class VoiceProcessorDbContext : Microsoft.EntityFrameworkCore.DbContext
         ConfigureExternalLogin(modelBuilder);
         ConfigurePaymentHistory(modelBuilder);
         ConfigureCreditDeduction(modelBuilder);
+        ConfigurePasswordResetToken(modelBuilder);
     }
 
     private static void ConfigureUser(ModelBuilder modelBuilder)
@@ -346,6 +348,30 @@ public class VoiceProcessorDbContext : Microsoft.EntityFrameworkCore.DbContext
             // writes to this table via TryDeductCreditsAsync).
             entity.HasIndex(e => e.IdempotencyKey).IsUnique();
             entity.HasIndex(e => new { e.UserId, e.CreatedAt });
+        });
+    }
+
+    private static void ConfigurePasswordResetToken(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<PasswordResetToken>(entity =>
+        {
+            entity.ToTable("password_reset_tokens");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.TokenHash)
+                .IsRequired()
+                .HasMaxLength(256);
+
+            entity.Ignore(e => e.IsUsed);
+            entity.Ignore(e => e.IsExpired);
+
+            entity.HasOne<User>()
+                .WithMany()
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => e.TokenHash).IsUnique();
+            entity.HasIndex(e => e.UserId);
         });
     }
 }

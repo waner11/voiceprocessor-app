@@ -28,7 +28,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IApiKeyAccessor, ApiKeyAccessor>();
         services.AddScoped<IExternalLoginAccessor, ExternalLoginAccessor>();
         services.AddScoped<IPaymentHistoryAccessor, PaymentHistoryAccessor>();
-
+        services.AddScoped<IPaymentHistoryAccessor, PaymentHistoryAccessor>();
+        services.AddScoped<IPasswordResetTokenAccessor, PasswordResetTokenAccessor>();
         // Stripe accessor
         services.Configure<StripeOptions>(
             configuration.GetSection(StripeOptions.SectionName));
