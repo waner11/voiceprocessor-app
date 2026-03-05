@@ -17,6 +17,15 @@ interface RegisterRequest {
   name: string;
 }
 
+interface ForgotPasswordRequest {
+  email: string;
+}
+
+interface ResetPasswordRequest {
+  token: string;
+  newPassword: string;
+}
+
 interface AuthResponse {
   user: {
     id: string;
@@ -168,6 +177,36 @@ export function useCurrentUser() {
     },
     onSuccess: (user) => {
       login(user, user.creditsRemaining);
+    },
+  });
+}
+
+export function useForgotPassword() {
+  return useMutation({
+    mutationFn: async (data: ForgotPasswordRequest) => {
+      const response = await apiRequest<{ message: string }>(
+        "/api/v1/auth/forgot-password",
+        {
+          method: "POST",
+          body: JSON.stringify(data),
+        }
+      );
+      return response;
+    },
+  });
+}
+
+export function useResetPassword() {
+  return useMutation({
+    mutationFn: async (data: ResetPasswordRequest) => {
+      const response = await apiRequest<{ message: string }>(
+        "/api/v1/auth/reset-password",
+        {
+          method: "POST",
+          body: JSON.stringify(data),
+        }
+      );
+      return response;
     },
   });
 }
