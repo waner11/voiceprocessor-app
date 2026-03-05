@@ -6,6 +6,7 @@ using VoiceProcessor.Clients.Api.Extensions;
 using VoiceProcessor.Clients.Api.Services;
 using VoiceProcessor.Domain.DTOs.Requests.Auth;
 using VoiceProcessor.Domain.DTOs.Responses.Auth;
+using VoiceProcessor.Domain.DTOs.Responses;
 using VoiceProcessor.Engines.Security;
 using VoiceProcessor.Managers.Contracts;
 
@@ -102,9 +103,13 @@ public class AuthController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Request a password reset link
-    /// </summary>
+/// <summary>
+/// Request a password reset link
+/// </summary>
+/// <remarks>
+/// Generic Exception is intentionally caught to prevent email enumeration.
+/// Any failure (invalid email, email send failure, etc.) silently returns 200.
+/// </remarks>
     [HttpPost("forgot-password")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -142,7 +147,7 @@ public class AuthController : ControllerBase
         }
         catch (InvalidOperationException ex)
         {
-            return BadRequest(new { error = ex.Message });
+            return BadRequest(new ErrorResponse { Code = "INVALID_RESET_TOKEN", Message = ex.Message });
         }
     }
 
