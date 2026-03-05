@@ -169,6 +169,8 @@ public class PasswordResetTokenAccessorIntegrationTests : IAsyncLifetime
         await _accessor.MarkAsUsedAsync(token.Id);
 
         // Assert
+        // Detach to avoid cached entity from change tracker (ExecuteUpdateAsync bypasses tracker)
+        _dbContext.Entry(token).State = Microsoft.EntityFrameworkCore.EntityState.Detached;
         var dbToken = await _dbContext.PasswordResetTokens.FindAsync(token.Id);
         dbToken.Should().NotBeNull();
         dbToken!.UsedAt.Should().NotBeNull();
