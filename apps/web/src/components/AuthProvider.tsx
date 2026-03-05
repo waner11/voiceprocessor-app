@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/stores";
 
 // Public routes that don't require authentication
-const publicRoutes = ["/", "/login", "/signup", "/register", "/forgot-password"];
+const publicRoutes = ["/", "/login", "/signup", "/register", "/forgot-password", "/reset-password"];
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 

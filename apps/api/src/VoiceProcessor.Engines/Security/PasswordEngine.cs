@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using System.Text;
 using VoiceProcessor.Engines.Contracts;
 
 namespace VoiceProcessor.Engines.Security;
@@ -38,5 +39,19 @@ public class PasswordEngine : IPasswordEngine
             HashSize);
 
         return CryptographicOperations.FixedTimeEquals(hash, computedHash);
+    }
+
+    public string GenerateResetToken()
+    {
+        var bytes = RandomNumberGenerator.GetBytes(32);
+        var base64 = Convert.ToBase64String(bytes);
+        // Convert to URL-safe Base64: replace + with -, / with _, remove =
+        return base64.Replace("+", "-").Replace("/", "_").TrimEnd('=');
+    }
+
+    public string HashToken(string rawToken)
+    {
+        var hash = SHA256.HashData(Encoding.UTF8.GetBytes(rawToken));
+        return Convert.ToHexString(hash).ToLowerInvariant();
     }
 }

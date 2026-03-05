@@ -6,6 +6,7 @@ using VoiceProcessor.Clients.Api.Extensions;
 using VoiceProcessor.Clients.Api.Services;
 using VoiceProcessor.Domain.DTOs.Requests.Auth;
 using VoiceProcessor.Domain.DTOs.Responses.Auth;
+using VoiceProcessor.Domain.DTOs.Responses;
 using VoiceProcessor.Engines.Security;
 using VoiceProcessor.Managers.Contracts;
 
@@ -99,6 +100,54 @@ public class AuthController : ControllerBase
         catch (InvalidOperationException ex)
         {
             return Unauthorized(new { error = ex.Message });
+        }
+    }
+
+/// <summary>
+/// Request a password reset link
+/// </summary>
+/// <remarks>
+/// Generic Exception is intentionally caught to prevent email enumeration.
+/// Any failure (invalid email, email send failure, etc.) silently returns 200.
+/// </remarks>
+    [HttpPost("forgot-password")]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> ForgotPasswordAsync(
+        [FromBody] ForgotPasswordRequest request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _authManager.ForgotPasswordAsync(request, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error processing forgot-password request");
+            // Still return 200 for anti-enumeration
+        }
+        return Ok(new { message = "If an account exists, a reset link has been sent" });
+    }
+
+    /// <summary>
+    /// Reset password using a valid reset token
+    /// </summary>
+    [HttpPost("reset-password")]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ResetPasswordAsync(
+        [FromBody] ResetPasswordRequest request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await _authManager.ResetPasswordAsync(request, cancellationToken);
+            return Ok(new { message = "Password has been reset successfully" });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new ErrorResponse { Code = "INVALID_RESET_TOKEN", Message = ex.Message });
         }
     }
 

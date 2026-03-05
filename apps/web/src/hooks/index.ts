@@ -20,6 +20,8 @@ export {
    useLogout,
    useRefreshToken,
    useCurrentUser,
+   useForgotPassword,
+   useResetPassword,
    type ApiError,
  } from "./useAuth";
 export { usePayment } from "./usePayment";

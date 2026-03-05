@@ -4,4 +4,6 @@ public interface IPasswordEngine
 {
     string HashPassword(string password);
     bool VerifyPassword(string password, string hash);
+    string GenerateResetToken();
+    string HashToken(string rawToken);
 }

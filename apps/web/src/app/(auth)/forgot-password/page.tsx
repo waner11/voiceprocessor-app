@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useForgotPassword, type ApiError } from "@/hooks";
 
 const forgotPasswordSchema = z.object({
   email: z.string().email("Please enter a valid email"),
@@ -13,7 +14,7 @@ const forgotPasswordSchema = z.object({
 type ForgotPasswordForm = z.infer<typeof forgotPasswordSchema>;
 
 export default function ForgotPasswordPage() {
-  const [isLoading, setIsLoading] = useState(false);
+  const { mutate: forgotPassword, isPending } = useForgotPassword();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,23 +26,18 @@ export default function ForgotPasswordPage() {
     resolver: zodResolver(forgotPasswordSchema),
   });
 
-   const onSubmit = async () => {
-     setIsLoading(true);
-     setError(null);
-
-     try {
-       // TODO: Replace with actual API call
-       // await api.POST("/api/v1/auth/forgot-password", { body: data });
-
-       // Mock for now
-       await new Promise((resolve) => setTimeout(resolve, 1000));
-       setIsSubmitted(true);
-     } catch {
-       setError("Something went wrong. Please try again.");
-     } finally {
-       setIsLoading(false);
-     }
-   };
+  const onSubmit = async (data: ForgotPasswordForm) => {
+    setError(null);
+    forgotPassword(data, {
+      onSuccess: () => {
+        setIsSubmitted(true);
+      },
+      onError: (err: Error) => {
+        const apiErr = err as unknown as ApiError;
+        setError(apiErr?.message || "Something went wrong. Please try again.");
+      },
+    });
+  };
 
   if (isSubmitted) {
     return (
@@ -110,10 +106,10 @@ export default function ForgotPasswordPage() {
 
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={isPending}
           className="w-full rounded-lg bg-blue-600 py-2.5 text-white hover:bg-blue-700 disabled:opacity-50"
         >
-          {isLoading ? "Sending..." : "Send reset link"}
+          {isPending ? "Sending..." : "Send reset link"}
         </button>
       </form>
 

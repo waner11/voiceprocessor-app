@@ -8,6 +8,7 @@ using VoiceProcessor.Domain.Enums;
 using VoiceProcessor.Engines.Contracts;
 using VoiceProcessor.Engines.Security;
 using VoiceProcessor.Managers.Contracts;
+using VoiceProcessor.Managers.Options;
 
 namespace VoiceProcessor.Managers.Auth;
 
@@ -17,11 +18,14 @@ public class AuthManager : IAuthManager
     private readonly IRefreshTokenAccessor _refreshTokenAccessor;
     private readonly IApiKeyAccessor _apiKeyAccessor;
     private readonly IExternalLoginAccessor _externalLoginAccessor;
+    private readonly IPasswordResetTokenAccessor _passwordResetTokenAccessor;
+    private readonly IEmailAccessor _emailAccessor;
     private readonly IJwtEngine _jwtEngine;
     private readonly IPasswordEngine _passwordEngine;
     private readonly IApiKeyEngine _apiKeyEngine;
     private readonly IEnumerable<IOAuthEngine> _oauthEngines;
     private readonly JwtOptions _jwtOptions;
+    private readonly AppOptions _appOptions;
     private readonly ILogger<AuthManager> _logger;
 
     public AuthManager(
@@ -29,22 +33,28 @@ public class AuthManager : IAuthManager
         IRefreshTokenAccessor refreshTokenAccessor,
         IApiKeyAccessor apiKeyAccessor,
         IExternalLoginAccessor externalLoginAccessor,
+        IPasswordResetTokenAccessor passwordResetTokenAccessor,
+        IEmailAccessor emailAccessor,
         IJwtEngine jwtEngine,
         IPasswordEngine passwordEngine,
         IApiKeyEngine apiKeyEngine,
         IEnumerable<IOAuthEngine> oauthEngines,
         IOptions<JwtOptions> jwtOptions,
+        IOptions<AppOptions> appOptions,
         ILogger<AuthManager> logger)
     {
         _userAccessor = userAccessor;
         _refreshTokenAccessor = refreshTokenAccessor;
         _apiKeyAccessor = apiKeyAccessor;
         _externalLoginAccessor = externalLoginAccessor;
+        _passwordResetTokenAccessor = passwordResetTokenAccessor;
+        _emailAccessor = emailAccessor;
         _jwtEngine = jwtEngine;
         _passwordEngine = passwordEngine;
         _apiKeyEngine = apiKeyEngine;
         _oauthEngines = oauthEngines;
         _jwtOptions = jwtOptions.Value;
+        _appOptions = appOptions.Value;
         _logger = logger;
     }
 
@@ -193,6 +203,67 @@ public class AuthManager : IAuthManager
         }
 
         _logger.LogInformation("User logged out: {UserId}", userId);
+    }
+
+    public async Task ForgotPasswordAsync(ForgotPasswordRequest request, CancellationToken cancellationToken = default)
+    {
+        var user = await _userAccessor.GetByEmailAsync(request.Email.ToLowerInvariant(), cancellationToken);
+
+        // Anti-enumeration: silently return if user not found or OAuth-only
+        if (user is null || user.PasswordHash is null)
+        {
+            return;
+        }
+
+        await _passwordResetTokenAccessor.InvalidateAllForUserAsync(user.Id, cancellationToken);
+
+        var rawToken = _passwordEngine.GenerateResetToken();
+        var hash = _passwordEngine.HashToken(rawToken);
+
+        var token = new Domain.Entities.PasswordResetToken
+        {
+            Id = Guid.NewGuid(),
+            UserId = user.Id,
+            TokenHash = hash,
+            ExpiresAt = DateTime.UtcNow.AddHours(1),
+            CreatedAt = DateTime.UtcNow
+        };
+
+        await _passwordResetTokenAccessor.CreateAsync(token, cancellationToken);
+
+        var resetUrl = $"{_appOptions.FrontendBaseUrl}/reset-password?token={rawToken}";
+        var htmlBody = $"<p>Click <a href='{resetUrl}'>here</a> to reset your password. Link expires in 1 hour.</p>";
+
+        await _emailAccessor.SendEmailAsync(user.Email, "Reset your VoiceProcessor password", htmlBody, cancellationToken);
+        _logger.LogInformation("Password reset email sent for user {UserId}", user.Id);
+    }
+
+    public async Task ResetPasswordAsync(ResetPasswordRequest request, CancellationToken cancellationToken = default)
+    {
+        var hash = _passwordEngine.HashToken(request.Token);
+        var token = await _passwordResetTokenAccessor.GetByTokenHashAsync(hash, cancellationToken);
+
+        if (token is null)
+        {
+            throw new InvalidOperationException("Invalid or expired reset token");
+        }
+
+        var user = await _userAccessor.GetByIdAsync(token.UserId, cancellationToken);
+        if (user is null)
+        {
+            throw new InvalidOperationException("Invalid or expired reset token");
+        }
+
+        user.PasswordHash = _passwordEngine.HashPassword(request.NewPassword);
+        user.PasswordChangedAt = DateTime.UtcNow;
+        user.FailedLoginAttempts = 0;
+        user.LockoutEndsAt = null;
+
+        await _userAccessor.UpdateAsync(user, cancellationToken);
+        await _passwordResetTokenAccessor.MarkAsUsedAsync(token.Id, cancellationToken);
+        await _refreshTokenAccessor.RevokeAllUserTokensAsync(user.Id, cancellationToken);
+
+        _logger.LogInformation("Password reset completed for user {UserId}", user.Id);
     }
 
     public async Task<ApiKeyCreatedResponse> CreateApiKeyAsync(Guid userId, CreateApiKeyRequest request, CancellationToken cancellationToken = default)
