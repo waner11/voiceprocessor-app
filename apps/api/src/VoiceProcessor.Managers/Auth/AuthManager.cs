@@ -18,13 +18,13 @@ public class AuthManager : IAuthManager
     private readonly IRefreshTokenAccessor _refreshTokenAccessor;
     private readonly IApiKeyAccessor _apiKeyAccessor;
     private readonly IExternalLoginAccessor _externalLoginAccessor;
+    private readonly IPasswordResetTokenAccessor _passwordResetTokenAccessor;
+    private readonly IEmailAccessor _emailAccessor;
     private readonly IJwtEngine _jwtEngine;
     private readonly IPasswordEngine _passwordEngine;
     private readonly IApiKeyEngine _apiKeyEngine;
     private readonly IEnumerable<IOAuthEngine> _oauthEngines;
     private readonly JwtOptions _jwtOptions;
-    private readonly IPasswordResetTokenAccessor _passwordResetTokenAccessor;
-    private readonly IEmailAccessor _emailAccessor;
     private readonly AppOptions _appOptions;
     private readonly ILogger<AuthManager> _logger;
 
@@ -33,13 +33,13 @@ public class AuthManager : IAuthManager
         IRefreshTokenAccessor refreshTokenAccessor,
         IApiKeyAccessor apiKeyAccessor,
         IExternalLoginAccessor externalLoginAccessor,
+        IPasswordResetTokenAccessor passwordResetTokenAccessor,
+        IEmailAccessor emailAccessor,
         IJwtEngine jwtEngine,
         IPasswordEngine passwordEngine,
         IApiKeyEngine apiKeyEngine,
         IEnumerable<IOAuthEngine> oauthEngines,
         IOptions<JwtOptions> jwtOptions,
-        IPasswordResetTokenAccessor passwordResetTokenAccessor,
-        IEmailAccessor emailAccessor,
         IOptions<AppOptions> appOptions,
         ILogger<AuthManager> logger)
     {
@@ -47,13 +47,13 @@ public class AuthManager : IAuthManager
         _refreshTokenAccessor = refreshTokenAccessor;
         _apiKeyAccessor = apiKeyAccessor;
         _externalLoginAccessor = externalLoginAccessor;
+        _passwordResetTokenAccessor = passwordResetTokenAccessor;
+        _emailAccessor = emailAccessor;
         _jwtEngine = jwtEngine;
         _passwordEngine = passwordEngine;
         _apiKeyEngine = apiKeyEngine;
         _oauthEngines = oauthEngines;
         _jwtOptions = jwtOptions.Value;
-        _passwordResetTokenAccessor = passwordResetTokenAccessor;
-        _emailAccessor = emailAccessor;
         _appOptions = appOptions.Value;
         _logger = logger;
     }

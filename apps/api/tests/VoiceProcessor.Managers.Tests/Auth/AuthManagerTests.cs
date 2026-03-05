@@ -71,13 +71,13 @@ public class AuthManagerTests
             _mockRefreshTokenAccessor.Object,
             _mockApiKeyAccessor.Object,
             _mockExternalLoginAccessor.Object,
+            _mockPasswordResetTokenAccessor.Object,
+            _mockEmailAccessor.Object,
             _mockJwtEngine.Object,
             _mockPasswordEngine.Object,
             _mockApiKeyEngine.Object,
             oauthEngines,
             Microsoft.Extensions.Options.Options.Create(_jwtOptions),
-            _mockPasswordResetTokenAccessor.Object,
-            _mockEmailAccessor.Object,
             Microsoft.Extensions.Options.Options.Create(_appOptions),
             _mockLogger.Object
         );
