@@ -11,7 +11,4 @@ public class PasswordResetToken
 
     public bool IsUsed => UsedAt.HasValue;
     public bool IsExpired => DateTime.UtcNow >= ExpiresAt;
-
-    // Navigation
-    public User User { get; set; } = null!;
 }
