@@ -9,6 +9,8 @@ using VoiceProcessor.Accessors.Documents;
 using VoiceProcessor.Accessors.Payments;
 using VoiceProcessor.Accessors.Providers;
 using VoiceProcessor.Accessors.Storage;
+using Resend;
+using VoiceProcessor.Accessors.Notifications;
 
 namespace VoiceProcessor.Accessors.DependencyInjection;
 
@@ -51,6 +53,8 @@ public static class ServiceCollectionExtensions
         // TTS Provider factory for runtime resolution
         services.AddScoped<ITtsProviderFactory, TtsProviderFactory>();
 
+        // Email accessor (Resend)
+        AddResendEmailAccessor(services, configuration);
         return services;
     }
 
@@ -107,6 +111,24 @@ public static class ServiceCollectionExtensions
         // Register as ITtsProviderAccessor for collection injection
         services.AddScoped<ITtsProviderAccessor, OpenAiTtsAccessor>(sp =>
             sp.GetRequiredService<OpenAiTtsAccessor>());
+    }
+
+    private static void AddResendEmailAccessor(
+        IServiceCollection services,
+        IConfiguration configuration)
+    {
+        services.Configure<ResendOptions>(
+            configuration.GetSection(ResendOptions.SectionName));
+
+        services.AddOptions();
+        services.AddHttpClient<ResendClient>();
+        services.Configure<ResendClientOptions>(o =>
+        {
+            o.ApiToken = configuration[$"{ResendOptions.SectionName}:ApiKey"] ?? string.Empty;
+        });
+        services.AddTransient<IResend, ResendClient>();
+
+        services.AddScoped<IEmailAccessor, ResendEmailAccessor>();
     }
 
     private static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()

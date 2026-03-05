@@ -50,7 +50,7 @@ public class ResendEmailAccessorTests
             Times.Once);
 
         capturedMessage.Should().NotBeNull();
-        capturedMessage!.From.Should().Be("Test App <noreply@test.com>");
+        capturedMessage!.From.ToString().Should().Be("Test App <noreply@test.com>");
         capturedMessage.To.Should().Contain("user@example.com");
         capturedMessage.Subject.Should().Be("Reset your password");
         capturedMessage.HtmlBody.Should().Contain("Click");
