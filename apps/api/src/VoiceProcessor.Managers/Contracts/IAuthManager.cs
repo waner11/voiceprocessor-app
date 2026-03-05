@@ -10,6 +10,8 @@ public interface IAuthManager
     Task<AuthResponse> LoginAsync(LoginRequest request, string? ipAddress = null, CancellationToken cancellationToken = default);
     Task<AuthResponse> RefreshTokenAsync(string refreshToken, string? ipAddress = null, CancellationToken cancellationToken = default);
     Task LogoutAsync(Guid userId, string? refreshToken = null, CancellationToken cancellationToken = default);
+    Task ForgotPasswordAsync(ForgotPasswordRequest request, CancellationToken cancellationToken = default);
+    Task ResetPasswordAsync(ResetPasswordRequest request, CancellationToken cancellationToken = default);
 
     // API Key management
     Task<ApiKeyCreatedResponse> CreateApiKeyAsync(Guid userId, CreateApiKeyRequest request, CancellationToken cancellationToken = default);

@@ -9,6 +9,7 @@ using VoiceProcessor.Domain.Enums;
 using VoiceProcessor.Engines.Contracts;
 using VoiceProcessor.Engines.Security;
 using VoiceProcessor.Managers.Auth;
+using AppOptions = VoiceProcessor.Managers.Options.AppOptions;
 
 namespace VoiceProcessor.Managers.Tests.Auth;
 
@@ -23,6 +24,9 @@ public class AuthManagerTests
     private readonly Mock<IApiKeyEngine> _mockApiKeyEngine;
     private readonly Mock<IOAuthEngine> _mockGoogleOAuthEngine;
     private readonly Mock<IOAuthEngine> _mockGitHubOAuthEngine;
+    private readonly Mock<IPasswordResetTokenAccessor> _mockPasswordResetTokenAccessor;
+    private readonly Mock<IEmailAccessor> _mockEmailAccessor;
+    private readonly AppOptions _appOptions;
     private readonly JwtOptions _jwtOptions;
     private readonly Mock<ILogger<AuthManager>> _mockLogger;
 
@@ -38,6 +42,13 @@ public class AuthManagerTests
         _mockGoogleOAuthEngine = new Mock<IOAuthEngine>();
         _mockGitHubOAuthEngine = new Mock<IOAuthEngine>();
         _mockLogger = new Mock<ILogger<AuthManager>>();
+        _mockPasswordResetTokenAccessor = new Mock<IPasswordResetTokenAccessor>();
+        _mockEmailAccessor = new Mock<IEmailAccessor>();
+
+        _appOptions = new AppOptions
+        {
+            FrontendBaseUrl = "http://localhost:3000"
+        };
 
         _jwtOptions = new JwtOptions
         {
@@ -64,7 +75,10 @@ public class AuthManagerTests
             _mockPasswordEngine.Object,
             _mockApiKeyEngine.Object,
             oauthEngines,
-            Options.Create(_jwtOptions),
+            Microsoft.Extensions.Options.Options.Create(_jwtOptions),
+            _mockPasswordResetTokenAccessor.Object,
+            _mockEmailAccessor.Object,
+            Microsoft.Extensions.Options.Options.Create(_appOptions),
             _mockLogger.Object
         );
     }
@@ -610,5 +624,205 @@ public class AuthManagerTests
             .WithMessage("Cannot unlink the only login method. Set a password first.");
 
         _mockExternalLoginAccessor.Verify(x => x.DeleteAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    // ─── ForgotPassword Tests ───────────────────────────────────────────────────
+
+    [Fact]
+    public async Task ForgotPassword_NonExistentEmail_NoException()
+    {
+        // Arrange
+        var manager = CreateManager();
+        var request = new ForgotPasswordRequest { Email = "nonexistent@example.com" };
+
+        _mockUserAccessor.Setup(x => x.GetByEmailAsync("nonexistent@example.com", It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Domain.Entities.User?)null);
+
+        // Act
+        var act = async () => await manager.ForgotPasswordAsync(request);
+
+        // Assert — no exception, silent return
+        await act.Should().NotThrowAsync();
+        _mockEmailAccessor.Verify(x => x.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+        _mockPasswordResetTokenAccessor.Verify(x => x.CreateAsync(It.IsAny<PasswordResetToken>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task ForgotPassword_OAuthOnlyUser_NoException()
+    {
+        // Arrange
+        var manager = CreateManager();
+        var request = new ForgotPasswordRequest { Email = "oauth@example.com" };
+
+        var oauthUser = new Domain.Entities.User
+        {
+            Id = Guid.NewGuid(),
+            Email = "oauth@example.com",
+            PasswordHash = null,  // OAuth-only user
+            IsActive = true
+        };
+
+        _mockUserAccessor.Setup(x => x.GetByEmailAsync("oauth@example.com", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(oauthUser);
+
+        // Act
+        var act = async () => await manager.ForgotPasswordAsync(request);
+
+        // Assert — no exception, no email sent (anti-enumeration)
+        await act.Should().NotThrowAsync();
+        _mockEmailAccessor.Verify(x => x.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+        _mockPasswordResetTokenAccessor.Verify(x => x.CreateAsync(It.IsAny<PasswordResetToken>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task ForgotPassword_ValidEmail_CreatesTokenAndSendsEmail()
+    {
+        // Arrange
+        var manager = CreateManager();
+        var request = new ForgotPasswordRequest { Email = "User@Example.COM" };
+
+        var user = new Domain.Entities.User
+        {
+            Id = Guid.NewGuid(),
+            Email = "user@example.com",
+            PasswordHash = "hashed_password",
+            IsActive = true
+        };
+
+        _mockUserAccessor.Setup(x => x.GetByEmailAsync("user@example.com", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+
+        _mockPasswordEngine.Setup(x => x.GenerateResetToken())
+            .Returns("raw_reset_token");
+
+        _mockPasswordEngine.Setup(x => x.HashToken("raw_reset_token"))
+            .Returns("hashed_reset_token");
+
+        _mockPasswordResetTokenAccessor.Setup(x => x.InvalidateAllForUserAsync(user.Id, It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        PasswordResetToken? capturedToken = null;
+        _mockPasswordResetTokenAccessor.Setup(x => x.CreateAsync(It.IsAny<PasswordResetToken>(), It.IsAny<CancellationToken>()))
+            .Callback<PasswordResetToken, CancellationToken>((t, ct) => capturedToken = t)
+            .ReturnsAsync((PasswordResetToken t, CancellationToken ct) => t);
+
+        string? capturedTo = null;
+        string? capturedSubject = null;
+        string? capturedBody = null;
+        _mockEmailAccessor.Setup(x => x.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Callback<string, string, string, CancellationToken>((to, subject, body, ct) =>
+            {
+                capturedTo = to;
+                capturedSubject = subject;
+                capturedBody = body;
+            })
+            .Returns(Task.CompletedTask);
+
+        // Act
+        await manager.ForgotPasswordAsync(request);
+
+        // Assert
+        _mockPasswordResetTokenAccessor.Verify(x => x.InvalidateAllForUserAsync(user.Id, It.IsAny<CancellationToken>()), Times.Once);
+        _mockPasswordResetTokenAccessor.Verify(x => x.CreateAsync(It.IsAny<PasswordResetToken>(), It.IsAny<CancellationToken>()), Times.Once);
+        _mockEmailAccessor.Verify(x => x.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
+
+        capturedToken.Should().NotBeNull();
+        capturedToken!.UserId.Should().Be(user.Id);
+        capturedToken.TokenHash.Should().Be("hashed_reset_token");
+        capturedToken.ExpiresAt.Should().BeCloseTo(DateTime.UtcNow.AddHours(1), TimeSpan.FromSeconds(5));
+
+        capturedTo.Should().Be("user@example.com");
+        capturedSubject.Should().Contain("password");
+        capturedBody.Should().Contain("raw_reset_token");
+        capturedBody.Should().Contain("http://localhost:3000");
+    }
+
+    // ─── ResetPassword Tests ─────────────────────────────────────────────────────
+
+    [Fact]
+    public async Task ResetPassword_InvalidToken_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var manager = CreateManager();
+        var request = new ResetPasswordRequest { Token = "invalid_token", NewPassword = "NewPassword123!" };
+
+        _mockPasswordEngine.Setup(x => x.HashToken("invalid_token"))
+            .Returns("hashed_invalid_token");
+
+        _mockPasswordResetTokenAccessor.Setup(x => x.GetByTokenHashAsync("hashed_invalid_token", It.IsAny<CancellationToken>()))
+            .ReturnsAsync((PasswordResetToken?)null);
+
+        // Act
+        var act = async () => await manager.ResetPasswordAsync(request);
+
+        // Assert
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("Invalid or expired reset token");
+    }
+
+    [Fact]
+    public async Task ResetPassword_ValidToken_UpdatesPasswordAndRevokesTokens()
+    {
+        // Arrange
+        var manager = CreateManager();
+        var userId = Guid.NewGuid();
+        var tokenId = Guid.NewGuid();
+        var request = new ResetPasswordRequest { Token = "valid_raw_token", NewPassword = "NewPassword123!" };
+
+        var resetToken = new PasswordResetToken
+        {
+            Id = tokenId,
+            UserId = userId,
+            TokenHash = "hashed_valid_token",
+            ExpiresAt = DateTime.UtcNow.AddHours(1),
+            CreatedAt = DateTime.UtcNow
+        };
+
+        var user = new Domain.Entities.User
+        {
+            Id = userId,
+            Email = "user@example.com",
+            PasswordHash = "old_hash",
+            FailedLoginAttempts = 3,
+            LockoutEndsAt = DateTime.UtcNow.AddMinutes(10),
+            IsActive = true
+        };
+
+        _mockPasswordEngine.Setup(x => x.HashToken("valid_raw_token"))
+            .Returns("hashed_valid_token");
+
+        _mockPasswordResetTokenAccessor.Setup(x => x.GetByTokenHashAsync("hashed_valid_token", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(resetToken);
+
+        _mockUserAccessor.Setup(x => x.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+
+        _mockPasswordEngine.Setup(x => x.HashPassword("NewPassword123!"))
+            .Returns("new_hashed_password");
+
+        Domain.Entities.User? updatedUser = null;
+        _mockUserAccessor.Setup(x => x.UpdateAsync(It.IsAny<Domain.Entities.User>(), It.IsAny<CancellationToken>()))
+            .Callback<Domain.Entities.User, CancellationToken>((u, ct) => updatedUser = u)
+            .Returns(Task.CompletedTask);
+
+        _mockPasswordResetTokenAccessor.Setup(x => x.MarkAsUsedAsync(tokenId, It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        _mockRefreshTokenAccessor.Setup(x => x.RevokeAllUserTokensAsync(userId, It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        // Act
+        await manager.ResetPasswordAsync(request);
+
+        // Assert
+        updatedUser.Should().NotBeNull();
+        updatedUser!.PasswordHash.Should().Be("new_hashed_password");
+        updatedUser.PasswordChangedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+        updatedUser.FailedLoginAttempts.Should().Be(0);
+        updatedUser.LockoutEndsAt.Should().BeNull();
+
+        _mockUserAccessor.Verify(x => x.UpdateAsync(It.IsAny<Domain.Entities.User>(), It.IsAny<CancellationToken>()), Times.Once);
+        _mockPasswordResetTokenAccessor.Verify(x => x.MarkAsUsedAsync(tokenId, It.IsAny<CancellationToken>()), Times.Once);
+        _mockRefreshTokenAccessor.Verify(x => x.RevokeAllUserTokensAsync(userId, It.IsAny<CancellationToken>()), Times.Once);
     }
 }

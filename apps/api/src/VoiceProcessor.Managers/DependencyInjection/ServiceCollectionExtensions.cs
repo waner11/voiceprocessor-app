@@ -7,6 +7,7 @@ using VoiceProcessor.Managers.Generation;
 using VoiceProcessor.Managers.Payment;
 using VoiceProcessor.Managers.Voice;
 using VoiceProcessor.Utilities.Timing;
+using VoiceProcessor.Managers.Options;
 
 namespace VoiceProcessor.Managers.DependencyInjection;
 
@@ -16,6 +17,10 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        // App Options
+        services.Configure<AppOptions>(
+            configuration.GetSection(AppOptions.SectionName));
+
         // Auth Manager
         services.AddScoped<IAuthManager, AuthManager>();
 
