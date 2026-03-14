@@ -454,6 +454,112 @@ public class AuthController : ControllerBase
 
     #endregion
 
+    #region Profile Management
+
+    [HttpPut("profile")]
+    [Authorize]
+    [ProducesResponseType(typeof(UserInfoResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> UpdateProfile(
+        [FromBody] UpdateProfileRequest request,
+        CancellationToken cancellationToken)
+    {
+        if (!_currentUser.IsAuthenticated || _currentUser.UserId is null)
+        {
+            return Unauthorized();
+        }
+
+        try
+        {
+            var response = await _authManager.UpdateProfileAsync(_currentUser.UserId.Value, request, cancellationToken);
+            return Ok(response);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    [HttpPost("change-password")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> ChangePassword(
+        [FromBody] ChangePasswordRequest request,
+        CancellationToken cancellationToken)
+    {
+        if (!_currentUser.IsAuthenticated || _currentUser.UserId is null)
+        {
+            return Unauthorized();
+        }
+
+        try
+        {
+            await _authManager.ChangePasswordAsync(_currentUser.UserId.Value, request, cancellationToken);
+            return NoContent();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    [HttpPost("set-password")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> SetPassword(
+        [FromBody] SetPasswordRequest request,
+        CancellationToken cancellationToken)
+    {
+        if (!_currentUser.IsAuthenticated || _currentUser.UserId is null)
+        {
+            return Unauthorized();
+        }
+
+        try
+        {
+            await _authManager.SetPasswordAsync(_currentUser.UserId.Value, request, cancellationToken);
+            return NoContent();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    [HttpDelete("account")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> DeleteAccount(
+        [FromBody] DeleteAccountRequest request,
+        CancellationToken cancellationToken)
+    {
+        if (!_currentUser.IsAuthenticated || _currentUser.UserId is null)
+        {
+            return Unauthorized();
+        }
+
+        try
+        {
+            await _authManager.DeleteAccountAsync(_currentUser.UserId.Value, request, cancellationToken);
+            Response.Cookies.Delete("accessToken");
+            Response.Cookies.Delete("refreshToken");
+            return NoContent();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    #endregion
+
     private string? GetClientIpAddress()
     {
         // Check for forwarded header first (behind proxy/load balancer)
