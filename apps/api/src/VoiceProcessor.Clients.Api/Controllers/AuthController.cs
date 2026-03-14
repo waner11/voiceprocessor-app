@@ -229,12 +229,10 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetCurrentUser(CancellationToken cancellationToken)
     {
-        if (!_currentUser.IsAuthenticated || _currentUser.UserId is null)
-        {
-            return Unauthorized();
-        }
+        var userId = _currentUser.UserId
+            ?? throw new UnauthorizedAccessException("User not authenticated");
 
-        var response = await _authManager.GetCurrentUserAsync(_currentUser.UserId.Value, cancellationToken);
+        var response = await _authManager.GetCurrentUserAsync(userId, cancellationToken);
         return Ok(response);
     }
 
@@ -465,14 +463,12 @@ public class AuthController : ControllerBase
         [FromBody] UpdateProfileRequest request,
         CancellationToken cancellationToken)
     {
-        if (!_currentUser.IsAuthenticated || _currentUser.UserId is null)
-        {
-            return Unauthorized();
-        }
+        var userId = _currentUser.UserId
+            ?? throw new UnauthorizedAccessException("User not authenticated");
 
         try
         {
-            var response = await _authManager.UpdateProfileAsync(_currentUser.UserId.Value, request, cancellationToken);
+            var response = await _authManager.UpdateProfileAsync(userId, request, cancellationToken);
             return Ok(response);
         }
         catch (InvalidOperationException ex)
@@ -490,14 +486,12 @@ public class AuthController : ControllerBase
         [FromBody] ChangePasswordRequest request,
         CancellationToken cancellationToken)
     {
-        if (!_currentUser.IsAuthenticated || _currentUser.UserId is null)
-        {
-            return Unauthorized();
-        }
+        var userId = _currentUser.UserId
+            ?? throw new UnauthorizedAccessException("User not authenticated");
 
         try
         {
-            await _authManager.ChangePasswordAsync(_currentUser.UserId.Value, request, cancellationToken);
+            await _authManager.ChangePasswordAsync(userId, request, cancellationToken);
             return NoContent();
         }
         catch (InvalidOperationException ex)
@@ -515,14 +509,12 @@ public class AuthController : ControllerBase
         [FromBody] SetPasswordRequest request,
         CancellationToken cancellationToken)
     {
-        if (!_currentUser.IsAuthenticated || _currentUser.UserId is null)
-        {
-            return Unauthorized();
-        }
+        var userId = _currentUser.UserId
+            ?? throw new UnauthorizedAccessException("User not authenticated");
 
         try
         {
-            await _authManager.SetPasswordAsync(_currentUser.UserId.Value, request, cancellationToken);
+            await _authManager.SetPasswordAsync(userId, request, cancellationToken);
             return NoContent();
         }
         catch (InvalidOperationException ex)
@@ -540,16 +532,13 @@ public class AuthController : ControllerBase
         [FromBody] DeleteAccountRequest request,
         CancellationToken cancellationToken)
     {
-        if (!_currentUser.IsAuthenticated || _currentUser.UserId is null)
-        {
-            return Unauthorized();
-        }
+        var userId = _currentUser.UserId
+            ?? throw new UnauthorizedAccessException("User not authenticated");
 
         try
         {
-            await _authManager.DeleteAccountAsync(_currentUser.UserId.Value, request, cancellationToken);
-            Response.Cookies.Delete("accessToken");
-            Response.Cookies.Delete("refreshToken");
+            await _authManager.DeleteAccountAsync(userId, request, cancellationToken);
+            Response.ClearAuthCookies(_environment.IsDevelopment());
             return NoContent();
         }
         catch (InvalidOperationException ex)
