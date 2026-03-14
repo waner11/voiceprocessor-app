@@ -9,4 +9,5 @@ public record UserInfoResponse
     public string? Name { get; init; }
     public required SubscriptionTier Tier { get; init; }
     public required int CreditsRemaining { get; init; }
+    public required bool HasPassword { get; init; }
 }
