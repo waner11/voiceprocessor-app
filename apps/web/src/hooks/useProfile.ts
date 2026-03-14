@@ -19,7 +19,11 @@ interface SetPasswordRequest {
 }
 
 interface UpdateProfileResponse {
-  name: string;
+  id: string;
+  email: string;
+  name?: string;
+  hasPassword: boolean;
+  creditsRemaining: number;
 }
 
 export type { ApiError };
@@ -41,7 +45,7 @@ export function useUpdateProfile() {
     },
     onSuccess: (data) => {
       if (user) {
-        setUser({ ...user, name: data.name });
+        setUser({ ...user, name: data.name, hasPassword: data.hasPassword });
       }
     },
   });
