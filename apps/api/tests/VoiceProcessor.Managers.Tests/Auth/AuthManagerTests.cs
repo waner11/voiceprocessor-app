@@ -1158,6 +1158,125 @@ public class AuthManagerTests
     }
 
     [Fact]
+    public async Task DeleteAccountAsync_LocalUser_WithCorrectPassword_ShouldSucceed()
+    {
+        var manager = CreateManager();
+        var userId = Guid.NewGuid();
+        var user = new Domain.Entities.User
+        {
+            Id = userId,
+            Email = "test@example.com",
+            IsActive = true,
+            PasswordHash = "hashedpw",
+            Tier = SubscriptionTier.Free,
+            CreditsRemaining = 500
+        };
+
+        _mockUserAccessor.Setup(x => x.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+        _mockPasswordEngine.Setup(x => x.VerifyPassword("currentpw", "hashedpw"))
+            .Returns(true);
+        _mockUserAccessor.Setup(x => x.UpdateAsync(It.IsAny<Domain.Entities.User>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+        _mockRefreshTokenAccessor.Setup(x => x.RevokeAllUserTokensAsync(userId, It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        await manager.DeleteAccountAsync(userId, new DeleteAccountRequest { Password = "currentpw" });
+
+        user.IsActive.Should().BeFalse();
+        user.LastActiveAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+        _mockPasswordEngine.Verify(x => x.VerifyPassword("currentpw", "hashedpw"), Times.Once);
+        _mockUserAccessor.Verify(x => x.UpdateAsync(It.IsAny<Domain.Entities.User>(), It.IsAny<CancellationToken>()), Times.Once);
+        _mockRefreshTokenAccessor.Verify(x => x.RevokeAllUserTokensAsync(userId, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task DeleteAccountAsync_LocalUser_WithoutPassword_ShouldThrow()
+    {
+        var manager = CreateManager();
+        var userId = Guid.NewGuid();
+        var user = new Domain.Entities.User
+        {
+            Id = userId,
+            Email = "test@example.com",
+            IsActive = true,
+            PasswordHash = "hashedpw",
+            Tier = SubscriptionTier.Free,
+            CreditsRemaining = 500
+        };
+
+        _mockUserAccessor.Setup(x => x.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+
+        var act = async () => await manager.DeleteAccountAsync(userId, new DeleteAccountRequest());
+
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("Password is required to delete your account");
+        _mockPasswordEngine.Verify(x => x.VerifyPassword(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+        _mockUserAccessor.Verify(x => x.UpdateAsync(It.IsAny<Domain.Entities.User>(), It.IsAny<CancellationToken>()), Times.Never);
+        _mockRefreshTokenAccessor.Verify(x => x.RevokeAllUserTokensAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task DeleteAccountAsync_LocalUser_WithWrongPassword_ShouldThrow()
+    {
+        var manager = CreateManager();
+        var userId = Guid.NewGuid();
+        var user = new Domain.Entities.User
+        {
+            Id = userId,
+            Email = "test@example.com",
+            IsActive = true,
+            PasswordHash = "hashedpw",
+            Tier = SubscriptionTier.Free,
+            CreditsRemaining = 500
+        };
+
+        _mockUserAccessor.Setup(x => x.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+        _mockPasswordEngine.Setup(x => x.VerifyPassword("wrongpw", "hashedpw"))
+            .Returns(false);
+
+        var act = async () => await manager.DeleteAccountAsync(userId, new DeleteAccountRequest { Password = "wrongpw" });
+
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("Incorrect password");
+        _mockPasswordEngine.Verify(x => x.VerifyPassword("wrongpw", "hashedpw"), Times.Once);
+        _mockUserAccessor.Verify(x => x.UpdateAsync(It.IsAny<Domain.Entities.User>(), It.IsAny<CancellationToken>()), Times.Never);
+        _mockRefreshTokenAccessor.Verify(x => x.RevokeAllUserTokensAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task DeleteAccountAsync_OAuthOnlyUser_WithoutPassword_ShouldSucceed()
+    {
+        var manager = CreateManager();
+        var userId = Guid.NewGuid();
+        var user = new Domain.Entities.User
+        {
+            Id = userId,
+            Email = "oauth@example.com",
+            IsActive = true,
+            PasswordHash = null,
+            Tier = SubscriptionTier.Free,
+            CreditsRemaining = 500
+        };
+
+        _mockUserAccessor.Setup(x => x.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(user);
+        _mockUserAccessor.Setup(x => x.UpdateAsync(It.IsAny<Domain.Entities.User>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+        _mockRefreshTokenAccessor.Setup(x => x.RevokeAllUserTokensAsync(userId, It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        await manager.DeleteAccountAsync(userId, new DeleteAccountRequest());
+
+        user.IsActive.Should().BeFalse();
+        _mockPasswordEngine.Verify(x => x.VerifyPassword(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+        _mockUserAccessor.Verify(x => x.UpdateAsync(It.IsAny<Domain.Entities.User>(), It.IsAny<CancellationToken>()), Times.Once);
+        _mockRefreshTokenAccessor.Verify(x => x.RevokeAllUserTokensAsync(userId, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
     public async Task DeleteAccountAsync_ShouldSetIsActiveFalse()
     {
         var manager = CreateManager();

@@ -119,7 +119,7 @@ public class AuthController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error processing forgot-password request");
+            _logger.LogError(ex, "Error processing forgot-password request. TraceId: {TraceId}", HttpContext.TraceIdentifier);
             // Still return 200 for anti-enumeration
         }
         return Ok(new { message = "If an account exists, a reset link has been sent" });
@@ -457,7 +457,7 @@ public class AuthController : ControllerBase
     [HttpPut("profile")]
     [Authorize]
     [ProducesResponseType(typeof(UserInfoResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> UpdateProfile(
         [FromBody] UpdateProfileRequest request,
@@ -473,14 +473,14 @@ public class AuthController : ControllerBase
         }
         catch (InvalidOperationException ex)
         {
-            return BadRequest(new { error = ex.Message });
+            return BadRequest(new ErrorResponse { Code = "PROFILE_UPDATE_FAILED", Message = ex.Message });
         }
     }
 
     [HttpPost("change-password")]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> ChangePassword(
         [FromBody] ChangePasswordRequest request,
@@ -496,14 +496,14 @@ public class AuthController : ControllerBase
         }
         catch (InvalidOperationException ex)
         {
-            return BadRequest(new { error = ex.Message });
+            return BadRequest(new ErrorResponse { Code = "CHANGE_PASSWORD_FAILED", Message = ex.Message });
         }
     }
 
     [HttpPost("set-password")]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> SetPassword(
         [FromBody] SetPasswordRequest request,
@@ -519,14 +519,14 @@ public class AuthController : ControllerBase
         }
         catch (InvalidOperationException ex)
         {
-            return BadRequest(new { error = ex.Message });
+            return BadRequest(new ErrorResponse { Code = "SET_PASSWORD_FAILED", Message = ex.Message });
         }
     }
 
     [HttpDelete("account")]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> DeleteAccount(
         [FromBody] DeleteAccountRequest request,
@@ -543,7 +543,7 @@ public class AuthController : ControllerBase
         }
         catch (InvalidOperationException ex)
         {
-            return BadRequest(new { error = ex.Message });
+            return BadRequest(new ErrorResponse { Code = "DELETE_ACCOUNT_FAILED", Message = ex.Message });
         }
     }
 

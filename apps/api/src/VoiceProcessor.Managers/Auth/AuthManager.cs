@@ -704,6 +704,19 @@ public class AuthManager : IAuthManager
             throw new InvalidOperationException("Account is already deactivated");
         }
 
+        if (user.PasswordHash is not null)
+        {
+            if (string.IsNullOrEmpty(request.Password))
+            {
+                throw new InvalidOperationException("Password is required to delete your account");
+            }
+
+            if (!_passwordEngine.VerifyPassword(request.Password, user.PasswordHash))
+            {
+                throw new InvalidOperationException("Incorrect password");
+            }
+        }
+
         user.IsActive = false;
         user.LastActiveAt = DateTime.UtcNow;
         await _userAccessor.UpdateAsync(user, cancellationToken);
