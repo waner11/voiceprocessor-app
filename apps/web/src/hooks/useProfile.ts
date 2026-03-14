@@ -69,14 +69,19 @@ export function useSetPassword() {
   });
 }
 
+interface DeleteAccountRequest {
+  password?: string;
+}
+
 export function useDeleteAccount() {
   const logout = useAuthStore((state) => state.logout);
   const router = useRouter();
 
   return useMutation({
-    mutationFn: async () => {
+    mutationFn: async (data?: DeleteAccountRequest) => {
       await apiRequest<void>("/api/v1/auth/account", {
         method: "DELETE",
+        body: JSON.stringify(data ?? {}),
       });
     },
     onSuccess: () => {
