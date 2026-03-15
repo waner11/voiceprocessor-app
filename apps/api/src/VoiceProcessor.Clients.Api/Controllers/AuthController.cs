@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using VoiceProcessor.Accessors.Contracts;
 using VoiceProcessor.Clients.Api.Extensions;
 using VoiceProcessor.Clients.Api.Services;
 using VoiceProcessor.Domain.DTOs.Requests.Auth;
@@ -21,22 +20,19 @@ public class AuthController : ControllerBase
     private readonly ILogger<AuthController> _logger;
     private readonly IWebHostEnvironment _environment;
     private readonly JwtOptions _jwtOptions;
-    private readonly IUserAccessor _userAccessor;
 
     public AuthController(
         IAuthManager authManager,
         ICurrentUserService currentUser,
         ILogger<AuthController> logger,
         IWebHostEnvironment environment,
-        IOptions<JwtOptions> jwtOptions,
-        IUserAccessor userAccessor)
+        IOptions<JwtOptions> jwtOptions)
     {
         _authManager = authManager;
         _currentUser = currentUser;
         _logger = logger;
         _environment = environment;
         _jwtOptions = jwtOptions.Value;
-        _userAccessor = userAccessor;
     }
 
     /// <summary>
@@ -103,13 +99,13 @@ public class AuthController : ControllerBase
         }
     }
 
-/// <summary>
-/// Request a password reset link
-/// </summary>
-/// <remarks>
-/// Generic Exception is intentionally caught to prevent email enumeration.
-/// Any failure (invalid email, email send failure, etc.) silently returns 200.
-/// </remarks>
+    /// <summary>
+    /// Request a password reset link
+    /// </summary>
+    /// <remarks>
+    /// Generic Exception is intentionally caught to prevent email enumeration.
+    /// Any failure (invalid email, email send failure, etc.) silently returns 200.
+    /// </remarks>
     [HttpPost("forgot-password")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -123,7 +119,7 @@ public class AuthController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error processing forgot-password request");
+            _logger.LogError(ex, "Error processing forgot-password request. TraceId: {TraceId}", HttpContext.TraceIdentifier);
             // Still return 200 for anti-enumeration
         }
         return Ok(new { message = "If an account exists, a reset link has been sent" });
@@ -233,27 +229,10 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetCurrentUser(CancellationToken cancellationToken)
     {
-        if (!_currentUser.IsAuthenticated || _currentUser.UserId is null)
-        {
-            return Unauthorized();
-        }
+        var userId = _currentUser.UserId
+            ?? throw new UnauthorizedAccessException("User not authenticated");
 
-        var user = await _userAccessor.GetByIdAsync(_currentUser.UserId.Value, cancellationToken);
-        if (user is null)
-        {
-            return NotFound();
-        }
-
-        var response = new UserInfoResponse
-        {
-            Id = _currentUser.UserId.Value,
-            Email = _currentUser.Email ?? string.Empty,
-            Name = _currentUser.Name,
-            Tier = Enum.TryParse<VoiceProcessor.Domain.Enums.SubscriptionTier>(
-                _currentUser.Tier, out var tier) ? tier : Domain.Enums.SubscriptionTier.Free,
-            CreditsRemaining = user.CreditsRemaining
-        };
-
+        var response = await _authManager.GetCurrentUserAsync(userId, cancellationToken);
         return Ok(response);
     }
 
@@ -468,6 +447,103 @@ public class AuthController : ControllerBase
         catch (InvalidOperationException ex)
         {
             return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    #endregion
+
+    #region Profile Management
+
+    [HttpPut("profile")]
+    [Authorize]
+    [ProducesResponseType(typeof(UserInfoResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> UpdateProfile(
+        [FromBody] UpdateProfileRequest request,
+        CancellationToken cancellationToken)
+    {
+        var userId = _currentUser.UserId
+            ?? throw new UnauthorizedAccessException("User not authenticated");
+
+        try
+        {
+            var response = await _authManager.UpdateProfileAsync(userId, request, cancellationToken);
+            return Ok(response);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new ErrorResponse { Code = "PROFILE_UPDATE_FAILED", Message = ex.Message });
+        }
+    }
+
+    [HttpPost("change-password")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> ChangePassword(
+        [FromBody] ChangePasswordRequest request,
+        CancellationToken cancellationToken)
+    {
+        var userId = _currentUser.UserId
+            ?? throw new UnauthorizedAccessException("User not authenticated");
+
+        try
+        {
+            await _authManager.ChangePasswordAsync(userId, request, cancellationToken);
+            return NoContent();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new ErrorResponse { Code = "CHANGE_PASSWORD_FAILED", Message = ex.Message });
+        }
+    }
+
+    [HttpPost("set-password")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> SetPassword(
+        [FromBody] SetPasswordRequest request,
+        CancellationToken cancellationToken)
+    {
+        var userId = _currentUser.UserId
+            ?? throw new UnauthorizedAccessException("User not authenticated");
+
+        try
+        {
+            await _authManager.SetPasswordAsync(userId, request, cancellationToken);
+            return NoContent();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new ErrorResponse { Code = "SET_PASSWORD_FAILED", Message = ex.Message });
+        }
+    }
+
+    [HttpDelete("account")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> DeleteAccount(
+        [FromBody] DeleteAccountRequest request,
+        CancellationToken cancellationToken)
+    {
+        var userId = _currentUser.UserId
+            ?? throw new UnauthorizedAccessException("User not authenticated");
+
+        try
+        {
+            await _authManager.DeleteAccountAsync(userId, request, cancellationToken);
+            Response.ClearAuthCookies(_environment.IsDevelopment());
+            return NoContent();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new ErrorResponse { Code = "DELETE_ACCOUNT_FAILED", Message = ex.Message });
         }
     }
 

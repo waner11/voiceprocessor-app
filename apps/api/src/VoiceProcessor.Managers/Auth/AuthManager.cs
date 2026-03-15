@@ -408,7 +408,8 @@ public class AuthManager : IAuthManager
         Email = user.Email,
         Name = user.Name,
         Tier = user.Tier,
-        CreditsRemaining = user.CreditsRemaining
+        CreditsRemaining = user.CreditsRemaining,
+        HasPassword = !string.IsNullOrEmpty(user.PasswordHash)
     };
 
     private static ApiKeyResponse MapToApiKeyResponse(ApiKey key) => new()
@@ -598,6 +599,130 @@ public class AuthManager : IAuthManager
 
         await _externalLoginAccessor.DeleteAsync(login.Id, cancellationToken);
         _logger.LogInformation("OAuth {Provider} unlinked from user {UserId}", provider, userId);
+    }
+
+    // Profile management
+
+    public async Task<UserInfoResponse> GetCurrentUserAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        var user = await _userAccessor.GetByIdAsync(userId, cancellationToken);
+        if (user is null)
+        {
+            throw new InvalidOperationException("User not found");
+        }
+
+        return MapToUserInfo(user);
+    }
+
+    public async Task<UserInfoResponse> UpdateProfileAsync(Guid userId, UpdateProfileRequest request, CancellationToken cancellationToken = default)
+    {
+        var user = await _userAccessor.GetByIdAsync(userId, cancellationToken);
+        if (user is null)
+        {
+            throw new InvalidOperationException("User not found");
+        }
+
+        if (!user.IsActive)
+        {
+            throw new InvalidOperationException("Account is deactivated");
+        }
+
+        user.Name = request.Name;
+        await _userAccessor.UpdateAsync(user, cancellationToken);
+
+        _logger.LogInformation("User profile updated: {UserId}", userId);
+        return MapToUserInfo(user);
+    }
+
+    public async Task ChangePasswordAsync(Guid userId, ChangePasswordRequest request, CancellationToken cancellationToken = default)
+    {
+        var user = await _userAccessor.GetByIdAsync(userId, cancellationToken);
+        if (user is null)
+        {
+            throw new InvalidOperationException("User not found");
+        }
+
+        if (!user.IsActive)
+        {
+            throw new InvalidOperationException("Account is deactivated");
+        }
+
+        if (user.PasswordHash is null)
+        {
+            throw new InvalidOperationException("No password set. Use set-password instead.");
+        }
+
+        if (!_passwordEngine.VerifyPassword(request.CurrentPassword, user.PasswordHash))
+        {
+            throw new InvalidOperationException("Current password is incorrect");
+        }
+
+        user.PasswordHash = _passwordEngine.HashPassword(request.NewPassword);
+        user.PasswordChangedAt = DateTime.UtcNow;
+        await _userAccessor.UpdateAsync(user, cancellationToken);
+        await _refreshTokenAccessor.RevokeAllUserTokensAsync(userId, cancellationToken);
+
+        _logger.LogInformation("Password changed for user {UserId}", userId);
+    }
+
+    public async Task SetPasswordAsync(Guid userId, SetPasswordRequest request, CancellationToken cancellationToken = default)
+    {
+        var user = await _userAccessor.GetByIdAsync(userId, cancellationToken);
+        if (user is null)
+        {
+            throw new InvalidOperationException("User not found");
+        }
+
+        if (!user.IsActive)
+        {
+            throw new InvalidOperationException("Account is deactivated");
+        }
+
+        if (user.PasswordHash is not null)
+        {
+            throw new InvalidOperationException("Password already set. Use change-password instead.");
+        }
+
+        user.PasswordHash = _passwordEngine.HashPassword(request.NewPassword);
+        user.PasswordChangedAt = DateTime.UtcNow;
+        await _userAccessor.UpdateAsync(user, cancellationToken);
+        await _refreshTokenAccessor.RevokeAllUserTokensAsync(userId, cancellationToken);
+
+        _logger.LogInformation("Password set for user {UserId}", userId);
+    }
+
+    public async Task DeleteAccountAsync(Guid userId, DeleteAccountRequest request, CancellationToken cancellationToken = default)
+    {
+        var user = await _userAccessor.GetByIdAsync(userId, cancellationToken);
+        if (user is null)
+        {
+            throw new InvalidOperationException("User not found");
+        }
+
+        if (!user.IsActive)
+        {
+            throw new InvalidOperationException("Account is already deactivated");
+        }
+
+        if (user.PasswordHash is not null)
+        {
+            if (string.IsNullOrEmpty(request.Password))
+            {
+                throw new InvalidOperationException("Password is required to delete your account");
+            }
+
+            if (!_passwordEngine.VerifyPassword(request.Password, user.PasswordHash))
+            {
+                throw new InvalidOperationException("Incorrect password");
+            }
+        }
+
+        user.IsActive = false;
+        user.LastActiveAt = DateTime.UtcNow;
+        await _userAccessor.UpdateAsync(user, cancellationToken);
+        await _refreshTokenAccessor.RevokeAllUserTokensAsync(userId, cancellationToken);
+
+        _logger.LogWarning("User account deleted: {UserId}", userId);
     }
 
     private IOAuthEngine GetOAuthEngine(string provider)

@@ -25,6 +25,13 @@ public interface IAuthManager
     Task<LinkedProvidersResponse> GetLinkedProvidersAsync(Guid userId, CancellationToken cancellationToken = default);
     Task LinkOAuthAsync(Guid userId, string provider, string code, string redirectUri, CancellationToken cancellationToken = default);
     Task UnlinkOAuthAsync(Guid userId, string provider, CancellationToken cancellationToken = default);
+
+    // Profile management
+    Task<UserInfoResponse> GetCurrentUserAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<UserInfoResponse> UpdateProfileAsync(Guid userId, UpdateProfileRequest request, CancellationToken cancellationToken = default);
+    Task ChangePasswordAsync(Guid userId, ChangePasswordRequest request, CancellationToken cancellationToken = default);
+    Task SetPasswordAsync(Guid userId, SetPasswordRequest request, CancellationToken cancellationToken = default);
+    Task DeleteAccountAsync(Guid userId, DeleteAccountRequest request, CancellationToken cancellationToken = default);
 }
 
 public record AuthValidationResult
