@@ -9,7 +9,7 @@ const mockLogin = vi.fn();
 const mockLogout = vi.fn();
 
 vi.mock('@/stores', () => ({
-  useAuthStore: (selector: (state: any) => any) => {
+  useAuthStore: (selector: (state: Record<string, unknown>) => unknown) => {
     const state = {
       login: mockLogin,
       logout: mockLogout,
@@ -34,8 +34,10 @@ const createWrapper = () => {
     },
   });
 
-  return ({ children }: { children: React.ReactNode }) =>
+  const Wrapper = ({ children }: { children: React.ReactNode }) =>
     React.createElement(QueryClientProvider, { client: queryClient }, children);
+  Wrapper.displayName = 'TestQueryWrapper';
+  return Wrapper;
 };
 
 describe('useForgotPassword', () => {
