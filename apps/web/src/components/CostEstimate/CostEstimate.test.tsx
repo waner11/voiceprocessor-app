@@ -54,3 +54,129 @@ describe("CostEstimate", () => {
     expect(screen.getByText("Compare all providers")).toBeInTheDocument();
   });
 });
+
+describe("Provider Badges", () => {
+  const twoProviders = [
+    { provider: "OpenAI" as const, cost: 0.05, creditsRequired: 50, estimatedDurationMs: 3000, qualityTier: null, isAvailable: true },
+    { provider: "ElevenLabs" as const, cost: 0.10, creditsRequired: 100, estimatedDurationMs: 2000, qualityTier: "High", isAvailable: true },
+  ];
+
+  const threeProviders = [
+    { provider: "OpenAI" as const, cost: 0.05, creditsRequired: 50, estimatedDurationMs: 3000, qualityTier: null, isAvailable: true },
+    { provider: "ElevenLabs" as const, cost: 0.10, creditsRequired: 100, estimatedDurationMs: 2000, qualityTier: "High", isAvailable: true },
+    { provider: "GoogleCloud" as const, cost: 0.08, creditsRequired: 80, estimatedDurationMs: 2500, qualityTier: null, isAvailable: true },
+  ];
+
+  const mockEstimateWithProviders = (providerEstimates: typeof twoProviders) => ({
+    characterCount: 500,
+    estimatedChunks: 2,
+    estimatedCost: 0.05,
+    creditsRequired: 50,
+    currency: "USD",
+    recommendedProvider: "OpenAI" as const,
+    providerEstimates,
+  });
+
+  it("shows Premium Quality badge for provider with qualityTier containing 'High'", () => {
+    render(
+      <CostEstimate
+        costEstimate={mockEstimateWithProviders(twoProviders)}
+        isEstimating={false}
+        characterCount={500}
+        wordCount={100}
+      />
+    );
+    expect(screen.getByText("Premium Quality (2x Credits)")).toBeInTheDocument();
+  });
+
+  it("shows Best Value badge for cheapest available provider when 2+ providers", () => {
+    render(
+      <CostEstimate
+        costEstimate={mockEstimateWithProviders(twoProviders)}
+        isEstimating={false}
+        characterCount={500}
+        wordCount={100}
+      />
+    );
+    expect(screen.getByText("Best Value")).toBeInTheDocument();
+  });
+
+  it("does NOT show Best Value badge when only 1 provider", () => {
+    const singleProvider = [
+      { provider: "OpenAI" as const, cost: 0.05, creditsRequired: 50, estimatedDurationMs: 3000, qualityTier: null, isAvailable: true },
+    ];
+    render(
+      <CostEstimate
+        costEstimate={mockEstimateWithProviders(singleProvider)}
+        isEstimating={false}
+        characterCount={500}
+        wordCount={100}
+      />
+    );
+    expect(screen.queryByText("Best Value")).not.toBeInTheDocument();
+  });
+
+  it("shows Best Value on ALL tied providers when costs are equal", () => {
+    const tiedProviders = [
+      { provider: "OpenAI" as const, cost: 0.05, creditsRequired: 100, estimatedDurationMs: 3000, qualityTier: null, isAvailable: true },
+      { provider: "GoogleCloud" as const, cost: 0.05, creditsRequired: 100, estimatedDurationMs: 2500, qualityTier: null, isAvailable: true },
+      { provider: "ElevenLabs" as const, cost: 0.10, creditsRequired: 200, estimatedDurationMs: 2000, qualityTier: "High", isAvailable: true },
+    ];
+    render(
+      <CostEstimate
+        costEstimate={mockEstimateWithProviders(tiedProviders)}
+        isEstimating={false}
+        characterCount={500}
+        wordCount={100}
+      />
+    );
+    const bestValueBadges = screen.getAllByText("Best Value");
+    expect(bestValueBadges).toHaveLength(2);
+  });
+
+  it("excludes unavailable providers from Best Value calculation", () => {
+    const withUnavailable = [
+      { provider: "OpenAI" as const, cost: 0.01, creditsRequired: 10, estimatedDurationMs: 3000, qualityTier: null, isAvailable: false },
+      { provider: "GoogleCloud" as const, cost: 0.05, creditsRequired: 50, estimatedDurationMs: 2500, qualityTier: null, isAvailable: true },
+    ];
+    render(
+      <CostEstimate
+        costEstimate={mockEstimateWithProviders(withUnavailable)}
+        isEstimating={false}
+        characterCount={500}
+        wordCount={100}
+      />
+    );
+    // Only 1 available provider, so no Best Value badge
+    expect(screen.queryByText("Best Value")).not.toBeInTheDocument();
+  });
+
+  it("does NOT show Premium badge when qualityTier is null", () => {
+    const noQualityTier = [
+      { provider: "OpenAI" as const, cost: 0.05, creditsRequired: 50, estimatedDurationMs: 3000, qualityTier: null, isAvailable: true },
+      { provider: "GoogleCloud" as const, cost: 0.08, creditsRequired: 80, estimatedDurationMs: 2500, qualityTier: null, isAvailable: true },
+    ];
+    render(
+      <CostEstimate
+        costEstimate={mockEstimateWithProviders(noQualityTier)}
+        isEstimating={false}
+        characterCount={500}
+        wordCount={100}
+      />
+    );
+    expect(screen.queryByText("Premium Quality (2x Credits)")).not.toBeInTheDocument();
+  });
+
+  it("Premium badge has amber CSS classes", () => {
+    render(
+      <CostEstimate
+        costEstimate={mockEstimateWithProviders(twoProviders)}
+        isEstimating={false}
+        characterCount={500}
+        wordCount={100}
+      />
+    );
+    const premiumBadge = screen.getByText("Premium Quality (2x Credits)");
+    expect(premiumBadge.className).toMatch(/amber/);
+  });
+});
