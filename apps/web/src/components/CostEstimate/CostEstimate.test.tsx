@@ -61,12 +61,6 @@ describe("Provider Badges", () => {
     { provider: "ElevenLabs" as const, cost: 0.10, creditsRequired: 100, estimatedDurationMs: 2000, qualityTier: "High", isAvailable: true },
   ];
 
-  const threeProviders = [
-    { provider: "OpenAI" as const, cost: 0.05, creditsRequired: 50, estimatedDurationMs: 3000, qualityTier: null, isAvailable: true },
-    { provider: "ElevenLabs" as const, cost: 0.10, creditsRequired: 100, estimatedDurationMs: 2000, qualityTier: "High", isAvailable: true },
-    { provider: "GoogleCloud" as const, cost: 0.08, creditsRequired: 80, estimatedDurationMs: 2500, qualityTier: null, isAvailable: true },
-  ];
-
   const mockEstimateWithProviders = (providerEstimates: typeof twoProviders) => ({
     characterCount: 500,
     estimatedChunks: 2,
