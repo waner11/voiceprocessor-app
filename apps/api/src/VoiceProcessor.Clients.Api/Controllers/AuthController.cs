@@ -147,6 +147,7 @@ public class AuthController : ControllerBase
         }
     }
 
+    /// <summary>
     /// Refresh access token using a refresh token
     /// </summary>
     [HttpPost("refresh")]
