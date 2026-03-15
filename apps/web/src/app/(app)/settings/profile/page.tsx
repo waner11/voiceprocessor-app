@@ -47,6 +47,10 @@ type ChangePasswordForm = z.infer<typeof changePasswordSchema>;
 type SetPasswordForm = z.infer<typeof setPasswordSchema>;
 type DeleteAccountForm = z.infer<typeof deleteAccountSchema>;
 
+function getErrorMessage(err: unknown, fallback: string): string {
+  return ((err as Record<string, unknown>)?.message as string) || fallback;
+}
+
 export default function ProfileSettingsPage() {
   const user = useAuthStore((state) => state.user);
   const [isEditing, setIsEditing] = useState(false);
@@ -83,7 +87,7 @@ export default function ProfileSettingsPage() {
           setIsEditing(false);
         },
         onError: (err) => {
-          const msg = (err as unknown as Record<string, unknown>)?.message || "Failed to update profile";
+          const msg = getErrorMessage(err, "Failed to update profile");
           toast.error(String(msg));
         },
       }
@@ -99,7 +103,7 @@ export default function ProfileSettingsPage() {
           changePasswordForm.reset();
         },
         onError: (err) => {
-          const msg = (err as unknown as Record<string, unknown>)?.message || "Failed to change password";
+          const msg = getErrorMessage(err, "Failed to change password");
           toast.error(String(msg));
         },
       }
@@ -115,7 +119,7 @@ export default function ProfileSettingsPage() {
           setPasswordForm.reset();
         },
         onError: (err) => {
-          const msg = (err as unknown as Record<string, unknown>)?.message || "Failed to set password";
+          const msg = getErrorMessage(err, "Failed to set password");
           toast.error(String(msg));
         },
       }
@@ -127,7 +131,7 @@ export default function ProfileSettingsPage() {
       { password: data.password },
       {
         onError: (err) => {
-          const msg = (err as unknown as Record<string, unknown>)?.message || "Failed to delete account";
+          const msg = getErrorMessage(err, "Failed to delete account");
           toast.error(String(msg));
         },
       }
@@ -223,6 +227,7 @@ export default function ProfileSettingsPage() {
               <input
                 {...changePasswordForm.register("currentPassword")}
                 type="password"
+                autoComplete="current-password"
                 placeholder="••••••••"
                 className="w-full max-w-md rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
@@ -238,6 +243,7 @@ export default function ProfileSettingsPage() {
               <input
                 {...changePasswordForm.register("newPassword")}
                 type="password"
+                autoComplete="new-password"
                 placeholder="••••••••"
                 className="w-full max-w-md rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
@@ -253,6 +259,7 @@ export default function ProfileSettingsPage() {
               <input
                 {...changePasswordForm.register("confirmPassword")}
                 type="password"
+                autoComplete="new-password"
                 placeholder="••••••••"
                 className="w-full max-w-md rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
@@ -282,6 +289,7 @@ export default function ProfileSettingsPage() {
               <input
                 {...setPasswordForm.register("newPassword")}
                 type="password"
+                autoComplete="new-password"
                 placeholder="••••••••"
                 className="w-full max-w-md rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
@@ -297,6 +305,7 @@ export default function ProfileSettingsPage() {
               <input
                 {...setPasswordForm.register("confirmPassword")}
                 type="password"
+                autoComplete="new-password"
                 placeholder="••••••••"
                 className="w-full max-w-md rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
@@ -330,9 +339,18 @@ export default function ProfileSettingsPage() {
       </section>
 
       {showDeleteDialog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="w-full max-w-md rounded-lg bg-white dark:bg-gray-900 p-6 shadow-xl">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Delete Account</h3>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+          tabIndex={-1}
+          onKeyDown={(e) => { if (e.key === 'Escape') setShowDeleteDialog(false); }}
+        >
+          <div
+            className="w-full max-w-md rounded-lg bg-white dark:bg-gray-900 p-6 shadow-xl"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-dialog-title"
+          >
+            <h3 id="delete-dialog-title" className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Delete Account</h3>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               Your account will be deactivated. This action cannot be undone.
             </p>
@@ -346,6 +364,8 @@ export default function ProfileSettingsPage() {
                   <input
                     {...deleteAccountForm.register("password")}
                     type="password"
+                    autoComplete="current-password"
+                    autoFocus
                     placeholder="••••••••"
                     className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
                   />
@@ -356,6 +376,7 @@ export default function ProfileSettingsPage() {
                 <button
                   type="submit"
                   disabled={isDeletingAccount}
+                  autoFocus={!user?.hasPassword}
                   className="rounded-lg bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700 disabled:opacity-50"
                 >
                   {isDeletingAccount ? "Deleting..." : "Confirm Delete"}
