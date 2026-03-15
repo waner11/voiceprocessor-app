@@ -99,13 +99,13 @@ public class AuthController : ControllerBase
         }
     }
 
-/// <summary>
-/// Request a password reset link
-/// </summary>
-/// <remarks>
-/// Generic Exception is intentionally caught to prevent email enumeration.
-/// Any failure (invalid email, email send failure, etc.) silently returns 200.
-/// </remarks>
+    /// <summary>
+    /// Request a password reset link
+    /// </summary>
+    /// <remarks>
+    /// Generic Exception is intentionally caught to prevent email enumeration.
+    /// Any failure (invalid email, email send failure, etc.) silently returns 200.
+    /// </remarks>
     [HttpPost("forgot-password")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
