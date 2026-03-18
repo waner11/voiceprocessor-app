@@ -18,6 +18,54 @@ function getLowestCost(estimates: Array<{ creditsRequired: number; isAvailable?:
   return Math.min(...available.map((e) => e.creditsRequired));
 }
 
+interface ProviderListProps {
+  estimates: Array<{
+    provider: string;
+    creditsRequired: number;
+    qualityTier?: string | null;
+    isAvailable?: boolean;
+  }>;
+}
+
+function ProviderList({ estimates }: ProviderListProps) {
+  const lowestCost = getLowestCost(estimates);
+  const availableCount = estimates.filter((e) => e.isAvailable !== false).length;
+
+  return (
+    <>
+      {estimates.map((estimate) => {
+        const isPremium = isPremiumProvider(estimate.qualityTier);
+        const isBestValue = availableCount > 1 && estimate.isAvailable !== false && estimate.creditsRequired === lowestCost;
+        return (
+          <div
+            key={estimate.provider}
+            className="flex items-center justify-between rounded p-2 bg-gray-700/50"
+          >
+            <div className="flex flex-col gap-1">
+              <span>{estimate.provider}</span>
+              <div className="flex gap-1">
+                {isPremium && (
+                  <span className="rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200 px-2 py-0.5 text-xs font-medium">
+                    Premium Quality (2x Credits)
+                  </span>
+                )}
+                {isBestValue && (
+                  <span className="rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 px-2 py-0.5 text-xs font-medium">
+                    Best Value
+                  </span>
+                )}
+              </div>
+            </div>
+            <span>
+              {formatCredits(estimate.creditsRequired)}
+            </span>
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
 interface CostEstimateProps {
   costEstimate: CostEstimateResponse | null | undefined;
   isEstimating: boolean;
@@ -67,47 +115,15 @@ export function CostEstimate({
             </div>
           </div>
            {costEstimate?.providerEstimates && costEstimate.providerEstimates.length > 1 && (
-             <details className="mt-4 text-sm">
-               <summary className="cursor-pointer text-blue-400 hover:underline">
-                 Compare all providers
-               </summary>
-               <div className="mt-2 space-y-2">
-                 {(() => {
-                   const lowestCost = getLowestCost(costEstimate.providerEstimates);
-                   const availableCount = costEstimate.providerEstimates.filter((e) => e.isAvailable !== false).length;
-                   return costEstimate.providerEstimates.map((estimate) => {
-                     const isPremium = isPremiumProvider(estimate.qualityTier);
-                     const isBestValue = availableCount > 1 && estimate.isAvailable !== false && estimate.creditsRequired === lowestCost;
-                     return (
-                       <div
-                         key={estimate.provider}
-                         className="flex items-center justify-between rounded p-2 bg-gray-700/50"
-                       >
-                         <div className="flex flex-col gap-1">
-                           <span>{estimate.provider}</span>
-                           <div className="flex gap-1">
-                             {isPremium && (
-                               <span className="rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200 px-2 py-0.5 text-xs font-medium">
-                                 Premium Quality (2x Credits)
-                               </span>
-                             )}
-                             {isBestValue && (
-                               <span className="rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 px-2 py-0.5 text-xs font-medium">
-                                 Best Value
-                               </span>
-                             )}
-                           </div>
-                         </div>
-                         <span>
-                           {formatCredits(estimate.creditsRequired)}
-                         </span>
-                       </div>
-                     );
-                   });
-                 })()}
-               </div>
-             </details>
-           )}
+              <details className="mt-4 text-sm">
+                <summary className="cursor-pointer text-blue-400 hover:underline">
+                  Compare all providers
+                </summary>
+                <div className="mt-2 space-y-2">
+                  <ProviderList estimates={costEstimate.providerEstimates} />
+                </div>
+              </details>
+            )}
         </div>
       ) : (
         <div className="py-4 text-center text-gray-400">

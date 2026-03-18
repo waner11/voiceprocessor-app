@@ -6,7 +6,7 @@ export interface User {
   email: string;
   name?: string;
   avatarUrl?: string;
-  hasPassword?: boolean;
+  hasPassword: boolean;
 }
 
 interface AuthState {
@@ -57,22 +57,27 @@ export const useAuthStore = create<AuthState>()(
         creditsRemaining: state.creditsRemaining,
         isAuthenticated: state.isAuthenticated,
       }),
-       onRehydrateStorage: () => (state) => {
-         // Clean up legacy token if it exists
-         const stored = localStorage.getItem('voiceprocessor-auth');
-         if (stored) {
-           try {
-             const parsed = JSON.parse(stored);
-             if (parsed.state?.token) {
-               delete parsed.state.token;
-               localStorage.setItem('voiceprocessor-auth', JSON.stringify(parsed));
-             }
-           } catch {
-             // Ignore parse errors
-           }
-         }
-         state?.setLoading(false);
-       },
+        onRehydrateStorage: () => (state) => {
+          // Clean up legacy token if it exists
+          const stored = localStorage.getItem('voiceprocessor-auth');
+          if (stored) {
+            try {
+              const parsed = JSON.parse(stored);
+              if (parsed.state?.token) {
+                delete parsed.state.token;
+                localStorage.setItem('voiceprocessor-auth', JSON.stringify(parsed));
+              }
+              // Migrate: default hasPassword for pre-profile-management persisted data
+              if (parsed.state?.user && parsed.state.user.hasPassword === undefined) {
+                parsed.state.user.hasPassword = false;
+                localStorage.setItem('voiceprocessor-auth', JSON.stringify(parsed));
+              }
+            } catch {
+              // Ignore parse errors
+            }
+          }
+          state?.setLoading(false);
+        },
     }
   )
 );

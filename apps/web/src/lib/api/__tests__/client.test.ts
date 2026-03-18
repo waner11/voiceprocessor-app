@@ -53,7 +53,7 @@ describe('401 Refresh Interceptor', () => {
     expect(call1).toBeInstanceOf(Request);
     expect(call1.url).toContain('/api/v1/some-endpoint');
     
-    expect(call2).toContain('/api/v1/Auth/refresh');
+    expect(call2).toContain('/api/v1/auth/refresh');
     expect(mockFetch.mock.calls[1][1]).toMatchObject({ method: 'POST' });
     
     expect(call3).toContain('/api/v1/some-endpoint');
@@ -83,7 +83,7 @@ describe('401 Refresh Interceptor', () => {
     expect(call1).toBeInstanceOf(Request);
     expect(call1.url).toContain('/api/v1/some-endpoint');
     
-    expect(call2).toContain('/api/v1/Auth/refresh');
+    expect(call2).toContain('/api/v1/auth/refresh');
     expect(mockFetch.mock.calls[1][1]).toMatchObject({ method: 'POST' });
     
     expect(mockLogout).toHaveBeenCalledTimes(1);
@@ -115,7 +115,7 @@ describe('401 Refresh Interceptor', () => {
     expect(mockFetch).toHaveBeenCalledTimes(7);
     
     const refreshCalls = mockFetch.mock.calls.filter(call => 
-      typeof call[0] === 'string' && call[0].includes('/api/v1/Auth/refresh')
+      typeof call[0] === 'string' && call[0].includes('/api/v1/auth/refresh')
     );
     expect(refreshCalls).toHaveLength(1);
     
@@ -148,7 +148,7 @@ describe('401 Refresh Interceptor', () => {
     expect(call1).toBeInstanceOf(Request);
     expect(call1.url).toContain('/api/v1/some-endpoint');
     
-    expect(call2).toContain('/api/v1/Auth/refresh');
+    expect(call2).toContain('/api/v1/auth/refresh');
     
     expect(call3).toContain('/api/v1/some-endpoint');
     
@@ -180,7 +180,7 @@ describe('401 Refresh Interceptor', () => {
     expect(mockLogout).not.toHaveBeenCalled();
 
     const refreshCalls = mockFetch.mock.calls.filter(call => 
-      typeof call[0] === 'string' && call[0].includes('/api/v1/Auth/refresh')
+      typeof call[0] === 'string' && call[0].includes('/api/v1/auth/refresh')
     );
     expect(refreshCalls).toHaveLength(0);
   });
@@ -210,7 +210,7 @@ describe('401 Refresh Interceptor', () => {
     expect(call1.url).toContain('/api/v1/auth/login');
     
     const call2 = mockFetch.mock.calls[1][0];
-    expect(call2).toContain('/api/v1/Auth/refresh');
+    expect(call2).toContain('/api/v1/auth/refresh');
     
     const retryCall = mockFetch.mock.calls[2];
     const retryInit = retryCall[1] as RequestInit;

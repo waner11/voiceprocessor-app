@@ -39,7 +39,7 @@ export default function ApiKeysSettingsPage() {
      
      const fetchKeys = async () => {
        try {
-         const response = await fetch(`${API_URL}/api/v1/Auth/api-keys`, {
+         const response = await fetch(`${API_URL}/api/v1/auth/api-keys`, {
            credentials: "include",
          });
 
@@ -74,7 +74,7 @@ export default function ApiKeysSettingsPage() {
 
     setError(null);
     try {
-      const response = await fetch(`${API_URL}/api/v1/Auth/api-keys`, {
+      const response = await fetch(`${API_URL}/api/v1/auth/api-keys`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -110,7 +110,7 @@ export default function ApiKeysSettingsPage() {
     }
 
     try {
-      const response = await fetch(`${API_URL}/api/v1/Auth/api-keys/${id}`, {
+      const response = await fetch(`${API_URL}/api/v1/auth/api-keys/${id}`, {
         method: "DELETE",
         credentials: "include",
       });
