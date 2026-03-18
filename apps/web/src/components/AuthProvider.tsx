@@ -26,11 +26,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     const validateSession = async () => {
       // If we think we're authenticated (from persisted state), verify with server
-      if (isAuthenticated) {
-        try {
-          const response = await fetch(`${API_URL}/api/v1/Auth/me`, {
-            credentials: 'include',
-          });
+       if (isAuthenticated) {
+         try {
+           const response = await fetch(`${API_URL}/api/v1/auth/me`, {
+             credentials: 'include',
+           });
           
            if (response.ok) {
              const user = await response.json();

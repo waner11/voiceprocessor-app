@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import toast from "react-hot-toast";
+import FocusTrap from "focus-trap-react";
 import { useAuthStore } from "@/stores";
 import {
   useUpdateProfile,
@@ -48,7 +49,10 @@ type SetPasswordForm = z.infer<typeof setPasswordSchema>;
 type DeleteAccountForm = z.infer<typeof deleteAccountSchema>;
 
 function getErrorMessage(err: unknown, fallback: string): string {
-  return ((err as Record<string, unknown>)?.message as string) || fallback;
+  if (err && typeof err === "object" && "message" in err) {
+    return String((err as { message: unknown }).message);
+  }
+  return fallback;
 }
 
 export default function ProfileSettingsPage() {
@@ -339,17 +343,18 @@ export default function ProfileSettingsPage() {
       </section>
 
       {showDeleteDialog && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-          tabIndex={-1}
-          onKeyDown={(e) => { if (e.key === 'Escape') setShowDeleteDialog(false); }}
-        >
+        <FocusTrap focusTrapOptions={{ initialFocus: false }}>
           <div
-            className="w-full max-w-md rounded-lg bg-white dark:bg-gray-900 p-6 shadow-xl"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="delete-dialog-title"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+            tabIndex={-1}
+            onKeyDown={(e) => { if (e.key === 'Escape') setShowDeleteDialog(false); }}
           >
+            <div
+              className="w-full max-w-md rounded-lg bg-white dark:bg-gray-900 p-6 shadow-xl"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="delete-dialog-title"
+            >
             <h3 id="delete-dialog-title" className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Delete Account</h3>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               Your account will be deactivated. This action cannot be undone.
@@ -393,8 +398,9 @@ export default function ProfileSettingsPage() {
                 </button>
               </div>
             </form>
+            </div>
           </div>
-        </div>
+        </FocusTrap>
       )}
     </div>
   );

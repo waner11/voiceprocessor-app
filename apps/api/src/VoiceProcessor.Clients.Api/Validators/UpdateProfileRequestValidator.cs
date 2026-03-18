@@ -10,8 +10,6 @@ public class UpdateProfileRequestValidator : AbstractValidator<UpdateProfileRequ
         RuleFor(x => x.Name)
             .NotEmpty()
             .WithMessage("Name is required")
-            .MinimumLength(1)
-            .WithMessage("Name must be at least 1 character long")
             .MaximumLength(100)
             .WithMessage("Name must not exceed 100 characters");
     }

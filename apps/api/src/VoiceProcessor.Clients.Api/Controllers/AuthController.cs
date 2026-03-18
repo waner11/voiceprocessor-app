@@ -232,8 +232,15 @@ public class AuthController : ControllerBase
         var userId = _currentUser.UserId
             ?? throw new UnauthorizedAccessException("User not authenticated");
 
-        var response = await _authManager.GetCurrentUserAsync(userId, cancellationToken);
-        return Ok(response);
+        try
+        {
+            var response = await _authManager.GetCurrentUserAsync(userId, cancellationToken);
+            return Ok(response);
+        }
+        catch (InvalidOperationException ex) when (ex.Message.Contains("not found"))
+        {
+            return NotFound(new ErrorResponse { Code = "USER_NOT_FOUND", Message = ex.Message });
+        }
     }
 
     /// <summary>
@@ -454,6 +461,9 @@ public class AuthController : ControllerBase
 
     #region Profile Management
 
+    /// <summary>
+    /// Update current user's profile information
+    /// </summary>
     [HttpPut("profile")]
     [Authorize]
     [ProducesResponseType(typeof(UserInfoResponse), StatusCodes.Status200OK)]
@@ -477,6 +487,9 @@ public class AuthController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Change the current user's password
+    /// </summary>
     [HttpPost("change-password")]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -500,6 +513,9 @@ public class AuthController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Set a password for the current user (for OAuth-only accounts)
+    /// </summary>
     [HttpPost("set-password")]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -523,6 +539,9 @@ public class AuthController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Delete the current user's account permanently
+    /// </summary>
     [HttpDelete("account")]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

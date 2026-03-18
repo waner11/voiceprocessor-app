@@ -19,14 +19,14 @@ async function attemptRefresh(): Promise<boolean> {
     return refreshPromise;
   }
 
-  refreshPromise = (async () => {
-    try {
-      const response = await fetch(`${API_URL}/api/v1/Auth/refresh`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({}),
-      });
+   refreshPromise = (async () => {
+     try {
+       const response = await fetch(`${API_URL}/api/v1/auth/refresh`, {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         credentials: 'include',
+         body: JSON.stringify({}),
+       });
 
       if (response.ok) {
         return true;
