@@ -66,6 +66,7 @@ export default function GeneratePage() {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadWarning, setUploadWarning] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const pasteNotificationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { data: voicesData, isLoading: voicesLoading } = useVoices({ pageSize: 20 });
   const { mutate: estimateCost, data: costEstimate, isPending: isEstimating } = useEstimateCost();
@@ -87,6 +88,14 @@ export default function GeneratePage() {
     return () => clearTimeout(timer);
   }, [text]);
 
+  useEffect(() => {
+    return () => {
+      if (pasteNotificationTimerRef.current) {
+        clearTimeout(pasteNotificationTimerRef.current);
+      }
+    };
+  }, []);
+
   const handleTextChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value);
   }, []);
@@ -106,7 +115,13 @@ export default function GeneratePage() {
       const truncatedPaste = pastedText.slice(0, Math.max(0, availableSpace));
       setText(beforeSelection + truncatedPaste + afterSelection);
       setPasteNotification(`Text was truncated to fit the ${formatNumber(MAX_CHAR_LENGTH)} character limit.`);
-      setTimeout(() => setPasteNotification(null), 5000);
+      if (pasteNotificationTimerRef.current) {
+        clearTimeout(pasteNotificationTimerRef.current);
+      }
+      pasteNotificationTimerRef.current = setTimeout(() => {
+        setPasteNotification(null);
+        pasteNotificationTimerRef.current = null;
+      }, 5000);
     }
   }, [text]);
 
