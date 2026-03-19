@@ -501,7 +501,7 @@ public class GenerationAccessorIntegrationTests : IAsyncLifetime
         var user = new User
         {
             Id = userId,
-            Email = "test@example.com",
+            Email = $"gen-test-{userId}@example.com",
             Name = "Test User",
             Tier = SubscriptionTier.Free,
             CreditsRemaining = 1000,
@@ -515,7 +515,7 @@ public class GenerationAccessorIntegrationTests : IAsyncLifetime
             Id = _voiceId,
             Name = "Test Voice",
             Provider = Provider.ElevenLabs,
-            ProviderVoiceId = "voice_123",
+            ProviderVoiceId = _voiceId.ToString(),
             CostPerThousandChars = 0.30m,
             IsActive = true,
             CreatedAt = DateTime.UtcNow
