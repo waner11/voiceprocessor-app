@@ -1,6 +1,5 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using Testcontainers.PostgreSql;
 using VoiceProcessor.Accessors.Data;
 using VoiceProcessor.Accessors.Data.DbContext;
 using VoiceProcessor.Domain.Entities;
@@ -8,26 +7,26 @@ using VoiceProcessor.Domain.Enums;
 
 namespace VoiceProcessor.Accessors.Tests.Data;
 
+[Collection("PostgreSQL")]
 public class PasswordResetTokenAccessorIntegrationTests : IAsyncLifetime
 {
-    private PostgreSqlContainer _container = null!;
+    private readonly PostgresFixture _fixture;
     private VoiceProcessorDbContext _dbContext = null!;
     private PasswordResetTokenAccessor _accessor = null!;
     private Guid _userId = Guid.Empty;
 
+    public PasswordResetTokenAccessorIntegrationTests(PostgresFixture fixture)
+    {
+        _fixture = fixture;
+    }
+
     public async Task InitializeAsync()
     {
-        _container = new PostgreSqlBuilder("postgres:16-alpine").Build();
-        await _container.StartAsync();
-
-        var options = new DbContextOptionsBuilder<VoiceProcessorDbContext>()
-            .UseNpgsql(_container.GetConnectionString())
-            .Options;
-
-        _dbContext = new VoiceProcessorDbContext(options);
-        await _dbContext.Database.MigrateAsync();
-
+        _dbContext = _fixture.CreateDbContext();
         _accessor = new PasswordResetTokenAccessor(_dbContext);
+
+        await _dbContext.PasswordResetTokens.ExecuteDeleteAsync();
+        await _dbContext.Users.ExecuteDeleteAsync();
 
         _userId = await SeedUser();
     }
@@ -35,7 +34,6 @@ public class PasswordResetTokenAccessorIntegrationTests : IAsyncLifetime
     public async Task DisposeAsync()
     {
         await _dbContext.DisposeAsync();
-        await _container.DisposeAsync();
     }
 
     [Fact]
@@ -259,13 +257,13 @@ public class PasswordResetTokenAccessorIntegrationTests : IAsyncLifetime
         remaining[0].Id.Should().Be(activeToken.Id);
     }
 
-    private async Task<Guid> SeedUser(string email = "test@example.com")
+    private async Task<Guid> SeedUser(string? email = null)
     {
         var userId = Guid.NewGuid();
         var user = new User
         {
             Id = userId,
-            Email = email,
+            Email = email ?? $"prt-test-{userId}@example.com",
             Name = "Test User",
             Tier = SubscriptionTier.Free,
             CreditsRemaining = 1000,

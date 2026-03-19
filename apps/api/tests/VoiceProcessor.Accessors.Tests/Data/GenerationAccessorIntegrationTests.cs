@@ -1,6 +1,5 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using Testcontainers.PostgreSql;
 using VoiceProcessor.Accessors.Data;
 using VoiceProcessor.Accessors.Data.DbContext;
 using VoiceProcessor.Domain.Entities;
@@ -8,32 +7,34 @@ using VoiceProcessor.Domain.Enums;
 
 namespace VoiceProcessor.Accessors.Tests.Data;
 
+[Collection("PostgreSQL")]
 public class GenerationAccessorIntegrationTests : IAsyncLifetime
 {
-    private PostgreSqlContainer _container = null!;
+    private readonly PostgresFixture _fixture;
     private VoiceProcessorDbContext _dbContext = null!;
     private GenerationAccessor _accessor = null!;
     private Guid _voiceId = Guid.Empty;
 
+    public GenerationAccessorIntegrationTests(PostgresFixture fixture)
+    {
+        _fixture = fixture;
+    }
+
     public async Task InitializeAsync()
     {
-        _container = new PostgreSqlBuilder("postgres:16-alpine").Build();
-        await _container.StartAsync();
-
-        var options = new DbContextOptionsBuilder<VoiceProcessorDbContext>()
-            .UseNpgsql(_container.GetConnectionString())
-            .Options;
-
-        _dbContext = new VoiceProcessorDbContext(options);
-        await _dbContext.Database.MigrateAsync();
-
+        _dbContext = _fixture.CreateDbContext();
         _accessor = new GenerationAccessor(_dbContext);
+
+        await _dbContext.Feedbacks.ExecuteDeleteAsync();
+        await _dbContext.GenerationChunks.ExecuteDeleteAsync();
+        await _dbContext.Generations.ExecuteDeleteAsync();
+        await _dbContext.Voices.ExecuteDeleteAsync();
+        await _dbContext.Users.ExecuteDeleteAsync();
     }
 
     public async Task DisposeAsync()
     {
         await _dbContext.DisposeAsync();
-        await _container.DisposeAsync();
     }
 
     [Fact]
@@ -362,12 +363,151 @@ public class GenerationAccessorIntegrationTests : IAsyncLifetime
         totalCount.Should().Be(2);
     }
 
+    [Fact]
+    public async Task GetByUserPagedAsync_WithSearchFilter_EscapesPercentWildcard()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        await SeedUserAndVoice(userId);
+
+        var gen1 = new Generation
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            VoiceId = _voiceId,
+            InputText = "50% off",
+            CharacterCount = 7,
+            Status = GenerationStatus.Completed,
+            RoutingPreference = RoutingPreference.Balanced,
+            SelectedProvider = Provider.ElevenLabs,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        var gen2 = new Generation
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            VoiceId = _voiceId,
+            InputText = "50 off",
+            CharacterCount = 6,
+            Status = GenerationStatus.Completed,
+            RoutingPreference = RoutingPreference.Balanced,
+            SelectedProvider = Provider.ElevenLabs,
+            CreatedAt = DateTime.UtcNow.AddHours(-1)
+        };
+
+        _dbContext.Generations.AddRange(gen1, gen2);
+        await _dbContext.SaveChangesAsync();
+
+        // Act - Search for literal "50%"
+        var (items, totalCount) = await _accessor.GetByUserPagedAsync(
+            userId, 1, 20, null, "50%", null, CancellationToken.None);
+
+        // Assert - Should match ONLY gen1 (literal %), not gen2 (which has "50 " but not "50%")
+        items.Should().HaveCount(1);
+        totalCount.Should().Be(1);
+        items[0].Id.Should().Be(gen1.Id);
+        items[0].InputText.Should().Contain("50%");
+    }
+
+    [Fact]
+    public async Task GetByUserPagedAsync_WithSearchFilter_EscapesUnderscoreWildcard()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        await SeedUserAndVoice(userId);
+
+        var gen1 = new Generation
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            VoiceId = _voiceId,
+            InputText = "under_score test",
+            CharacterCount = 16,
+            Status = GenerationStatus.Completed,
+            RoutingPreference = RoutingPreference.Balanced,
+            SelectedProvider = Provider.ElevenLabs,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        var gen2 = new Generation
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            VoiceId = _voiceId,
+            InputText = "underscore test",
+            CharacterCount = 15,
+            Status = GenerationStatus.Completed,
+            RoutingPreference = RoutingPreference.Balanced,
+            SelectedProvider = Provider.ElevenLabs,
+            CreatedAt = DateTime.UtcNow.AddHours(-1)
+        };
+
+        _dbContext.Generations.AddRange(gen1, gen2);
+        await _dbContext.SaveChangesAsync();
+
+        // Act - Search for literal "under_score"
+        var (items, totalCount) = await _accessor.GetByUserPagedAsync(
+            userId, 1, 20, null, "under_score", null, CancellationToken.None);
+
+        // Assert - Should match ONLY gen1 (literal _), not underscore as wildcard
+        items.Should().HaveCount(1);
+        totalCount.Should().Be(1);
+        items[0].Id.Should().Be(gen1.Id);
+    }
+
+    [Fact]
+    public async Task GetByUserPagedAsync_WithSearchFilter_EscapesBackslashWildcard()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        await SeedUserAndVoice(userId);
+
+        var gen1 = new Generation
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            VoiceId = _voiceId,
+            InputText = "back\\slash test",
+            CharacterCount = 15,
+            Status = GenerationStatus.Completed,
+            RoutingPreference = RoutingPreference.Balanced,
+            SelectedProvider = Provider.ElevenLabs,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        var gen2 = new Generation
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            VoiceId = _voiceId,
+            InputText = "backslash test",
+            CharacterCount = 14,
+            Status = GenerationStatus.Completed,
+            RoutingPreference = RoutingPreference.Balanced,
+            SelectedProvider = Provider.ElevenLabs,
+            CreatedAt = DateTime.UtcNow.AddHours(-1)
+        };
+
+        _dbContext.Generations.AddRange(gen1, gen2);
+        await _dbContext.SaveChangesAsync();
+
+        // Act - Search for literal "back\slash"
+        var (items, totalCount) = await _accessor.GetByUserPagedAsync(
+            userId, 1, 20, null, "back\\slash", null, CancellationToken.None);
+
+        // Assert - Should match ONLY gen1 (literal \)
+        items.Should().HaveCount(1);
+        totalCount.Should().Be(1);
+        items[0].Id.Should().Be(gen1.Id);
+    }
+
     private async Task SeedUserAndVoice(Guid userId)
     {
         var user = new User
         {
             Id = userId,
-            Email = "test@example.com",
+            Email = $"gen-test-{userId}@example.com",
             Name = "Test User",
             Tier = SubscriptionTier.Free,
             CreditsRemaining = 1000,
@@ -381,7 +521,7 @@ public class GenerationAccessorIntegrationTests : IAsyncLifetime
             Id = _voiceId,
             Name = "Test Voice",
             Provider = Provider.ElevenLabs,
-            ProviderVoiceId = "voice_123",
+            ProviderVoiceId = _voiceId.ToString(),
             CostPerThousandChars = 0.30m,
             IsActive = true,
             CreatedAt = DateTime.UtcNow

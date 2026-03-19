@@ -1,6 +1,5 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using Testcontainers.PostgreSql;
 using VoiceProcessor.Accessors.Data;
 using VoiceProcessor.Accessors.Data.DbContext;
 using VoiceProcessor.Domain.Entities;
@@ -8,31 +7,33 @@ using VoiceProcessor.Domain.Enums;
 
 namespace VoiceProcessor.Accessors.Tests.Data;
 
+[Collection("PostgreSQL")]
 public class FeedbackAccessorTests : IAsyncLifetime
 {
-    private PostgreSqlContainer _container = null!;
+    private readonly PostgresFixture _fixture;
     private VoiceProcessorDbContext _dbContext = null!;
     private FeedbackAccessor _accessor = null!;
 
+    public FeedbackAccessorTests(PostgresFixture fixture)
+    {
+        _fixture = fixture;
+    }
+
     public async Task InitializeAsync()
     {
-        _container = new PostgreSqlBuilder("postgres:16-alpine").Build();
-        await _container.StartAsync();
-
-        var options = new DbContextOptionsBuilder<VoiceProcessorDbContext>()
-            .UseNpgsql(_container.GetConnectionString())
-            .Options;
-
-        _dbContext = new VoiceProcessorDbContext(options);
-        await _dbContext.Database.MigrateAsync();
-
+        _dbContext = _fixture.CreateDbContext();
         _accessor = new FeedbackAccessor(_dbContext);
+
+        await _dbContext.Feedbacks.ExecuteDeleteAsync();
+        await _dbContext.GenerationChunks.ExecuteDeleteAsync();
+        await _dbContext.Generations.ExecuteDeleteAsync();
+        await _dbContext.Voices.ExecuteDeleteAsync();
+        await _dbContext.Users.ExecuteDeleteAsync();
     }
 
     public async Task DisposeAsync()
     {
         await _dbContext.DisposeAsync();
-        await _container.DisposeAsync();
     }
 
     [Fact]
@@ -179,7 +180,7 @@ public class FeedbackAccessorTests : IAsyncLifetime
         var user = new User
         {
             Id = userId,
-            Email = "test@example.com",
+            Email = $"fb-test-{userId}@example.com",
             Name = "Test User",
             Tier = SubscriptionTier.Free,
             CreditsRemaining = 1000,
@@ -187,12 +188,13 @@ public class FeedbackAccessorTests : IAsyncLifetime
             CreatedAt = DateTime.UtcNow
         };
 
+        var voiceId = Guid.NewGuid();
         var voice = new Voice
         {
-            Id = Guid.NewGuid(),
+            Id = voiceId,
             Name = "Test Voice",
             Provider = Provider.ElevenLabs,
-            ProviderVoiceId = "voice_123",
+            ProviderVoiceId = voiceId.ToString(),
             CostPerThousandChars = 0.30m,
             IsActive = true,
             CreatedAt = DateTime.UtcNow

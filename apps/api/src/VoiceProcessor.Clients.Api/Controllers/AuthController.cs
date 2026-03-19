@@ -63,7 +63,7 @@ public class AuthController : ControllerBase
         }
         catch (InvalidOperationException ex) when (ex.Message.Contains("already registered"))
         {
-            return Conflict(new { error = ex.Message });
+            return Conflict(new ErrorResponse { Code = "EMAIL_ALREADY_REGISTERED", Message = ex.Message });
         }
     }
 
@@ -95,7 +95,7 @@ public class AuthController : ControllerBase
         }
         catch (InvalidOperationException ex)
         {
-            return Unauthorized(new { error = ex.Message });
+            return Unauthorized(new ErrorResponse { Code = "INVALID_CREDENTIALS", Message = ex.Message });
         }
     }
 
@@ -175,7 +175,7 @@ public class AuthController : ControllerBase
             // If still empty, return 400 Bad Request
             if (string.IsNullOrWhiteSpace(refreshToken))
             {
-                return BadRequest(new { error = "Refresh token is required" });
+                return BadRequest(new ErrorResponse { Code = "REFRESH_TOKEN_REQUIRED", Message = "Refresh token is required" });
             }
             
             var ipAddress = GetClientIpAddress();
@@ -194,7 +194,7 @@ public class AuthController : ControllerBase
         }
         catch (InvalidOperationException ex)
         {
-            return Unauthorized(new { error = ex.Message });
+            return Unauthorized(new ErrorResponse { Code = "INVALID_REFRESH_TOKEN", Message = ex.Message });
         }
     }
 
@@ -299,7 +299,7 @@ public class AuthController : ControllerBase
         }
         catch (InvalidOperationException)
         {
-            return NotFound(new { error = "API key not found" });
+            return NotFound(new ErrorResponse { Code = "API_KEY_NOT_FOUND", Message = "API key not found" });
         }
     }
 
@@ -318,7 +318,7 @@ public class AuthController : ControllerBase
     {
         if (string.IsNullOrWhiteSpace(redirectUri))
         {
-            return BadRequest(new { error = "redirectUri is required" });
+            return BadRequest(new ErrorResponse { Code = "REDIRECT_URI_REQUIRED", Message = "redirectUri is required" });
         }
 
         try
@@ -328,7 +328,7 @@ public class AuthController : ControllerBase
         }
         catch (InvalidOperationException ex)
         {
-            return BadRequest(new { error = ex.Message });
+            return BadRequest(new ErrorResponse { Code = "INVALID_OAUTH_PROVIDER", Message = ex.Message });
         }
     }
 
@@ -363,12 +363,12 @@ public class AuthController : ControllerBase
         }
         catch (InvalidOperationException ex)
         {
-            return BadRequest(new { error = ex.Message });
+            return BadRequest(new ErrorResponse { Code = "OAUTH_AUTHENTICATION_FAILED", Message = ex.Message });
         }
         catch (HttpRequestException ex)
         {
             _logger.LogError(ex, "OAuth provider error for {Provider}", provider);
-            return Unauthorized(new { error = "Failed to authenticate with provider" });
+            return Unauthorized(new ErrorResponse { Code = "OAUTH_PROVIDER_UNREACHABLE", Message = "Failed to authenticate with provider" });
         }
     }
 
@@ -413,16 +413,16 @@ public class AuthController : ControllerBase
         }
         catch (InvalidOperationException ex) when (ex.Message.Contains("already linked"))
         {
-            return Conflict(new { error = ex.Message });
+            return Conflict(new ErrorResponse { Code = "OAUTH_PROVIDER_ALREADY_LINKED", Message = ex.Message });
         }
         catch (InvalidOperationException ex)
         {
-            return BadRequest(new { error = ex.Message });
+            return BadRequest(new ErrorResponse { Code = "OAUTH_LINK_FAILED", Message = ex.Message });
         }
         catch (HttpRequestException ex)
         {
             _logger.LogError(ex, "OAuth provider error while linking {Provider}", provider);
-            return BadRequest(new { error = "Failed to authenticate with provider" });
+            return BadRequest(new ErrorResponse { Code = "OAUTH_PROVIDER_UNREACHABLE", Message = "Failed to authenticate with provider" });
         }
     }
 
@@ -449,11 +449,11 @@ public class AuthController : ControllerBase
         }
         catch (InvalidOperationException ex) when (ex.Message.Contains("not linked"))
         {
-            return NotFound(new { error = ex.Message });
+            return NotFound(new ErrorResponse { Code = "OAUTH_PROVIDER_NOT_LINKED", Message = ex.Message });
         }
         catch (InvalidOperationException ex)
         {
-            return BadRequest(new { error = ex.Message });
+            return BadRequest(new ErrorResponse { Code = "OAUTH_UNLINK_FAILED", Message = ex.Message });
         }
     }
 
