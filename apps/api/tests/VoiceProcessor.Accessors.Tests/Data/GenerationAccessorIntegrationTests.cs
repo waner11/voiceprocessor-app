@@ -374,8 +374,8 @@ public class GenerationAccessorIntegrationTests : IAsyncLifetime
             Id = Guid.NewGuid(),
             UserId = userId,
             VoiceId = _voiceId,
-            InputText = "50% off sale",
-            CharacterCount = 12,
+            InputText = "50% off",
+            CharacterCount = 7,
             Status = GenerationStatus.Completed,
             RoutingPreference = RoutingPreference.Balanced,
             SelectedProvider = Provider.ElevenLabs,
@@ -387,8 +387,8 @@ public class GenerationAccessorIntegrationTests : IAsyncLifetime
             Id = Guid.NewGuid(),
             UserId = userId,
             VoiceId = _voiceId,
-            InputText = "50 percent discount",
-            CharacterCount = 19,
+            InputText = "50 off",
+            CharacterCount = 6,
             Status = GenerationStatus.Completed,
             RoutingPreference = RoutingPreference.Balanced,
             SelectedProvider = Provider.ElevenLabs,
@@ -406,6 +406,7 @@ public class GenerationAccessorIntegrationTests : IAsyncLifetime
         items.Should().HaveCount(1);
         totalCount.Should().Be(1);
         items[0].Id.Should().Be(gen1.Id);
+        items[0].InputText.Should().Contain("50%");
     }
 
     [Fact]

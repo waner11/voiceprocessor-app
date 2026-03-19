@@ -1,8 +1,7 @@
-import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import GeneratePage from "../page";
 
-// Mock the hooks
 vi.mock("@/hooks", () => ({
   useVoices: vi.fn(() => ({
     data: {
@@ -47,33 +46,30 @@ describe("Paste Notification Timer Cleanup", () => {
     vi.useRealTimers();
   });
 
-  it("clears timer when component unmounts (no orphaned timers)", async () => {
+  it("clears timer when component unmounts (no orphaned timers)", () => {
     const { unmount } = render(<GeneratePage />);
     const textarea = screen.getByPlaceholderText(/paste your text/i) as HTMLTextAreaElement;
 
-    // Set initial text to allow paste
-    fireEvent.change(textarea, { target: { value: "a".repeat(499_990) } });
+    act(() => {
+      fireEvent.change(textarea, { target: { value: "a".repeat(499_990) } });
+    });
 
-    // Simulate paste that triggers truncation and timer
-    const pasteData = "b".repeat(20);
-    const clipboardData = {
-      getData: () => pasteData,
-    };
-    fireEvent.paste(textarea, { clipboardData });
+    act(() => {
+      fireEvent.paste(textarea, {
+        clipboardData: { getData: () => "b".repeat(20) },
+      });
+    });
 
-    // Notification should appear
     expect(screen.getByText(/text was truncated/i)).toBeInTheDocument();
 
-    // Unmount component
     unmount();
 
-    // Advance timers - should not throw or cause warnings
     expect(() => {
       vi.advanceTimersByTime(5000);
     }).not.toThrow();
   });
 
-  it("clears previous timer before setting new one on rapid consecutive pastes", async () => {
+  it("only one timer is active at a time (previous timer cleared on new paste)", () => {
     render(<GeneratePage />);
     const textarea = screen.getByPlaceholderText(/paste your text/i) as HTMLTextAreaElement;
 
@@ -82,9 +78,8 @@ describe("Paste Notification Timer Cleanup", () => {
     });
 
     act(() => {
-      const pasteData1 = "b".repeat(5);
       fireEvent.paste(textarea, {
-        clipboardData: { getData: () => pasteData1 },
+        clipboardData: { getData: () => "b".repeat(20) },
       });
     });
 
@@ -96,11 +91,9 @@ describe("Paste Notification Timer Cleanup", () => {
 
     act(() => {
       fireEvent.paste(textarea, {
-        clipboardData: { getData: () => "c".repeat(5) },
+        clipboardData: { getData: () => "c".repeat(20) },
       });
     });
-
-    expect(screen.getByText(/text was truncated/i)).toBeInTheDocument();
 
     act(() => {
       vi.advanceTimersByTime(3000);
@@ -109,13 +102,13 @@ describe("Paste Notification Timer Cleanup", () => {
     expect(screen.getByText(/text was truncated/i)).toBeInTheDocument();
 
     act(() => {
-      vi.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(2000);
     });
 
     expect(screen.queryByText(/text was truncated/i)).not.toBeInTheDocument();
   });
 
-  it("notification disappears after 5 seconds", async () => {
+  it("notification disappears after 5 seconds", () => {
     render(<GeneratePage />);
     const textarea = screen.getByPlaceholderText(/paste your text/i) as HTMLTextAreaElement;
 
@@ -124,11 +117,9 @@ describe("Paste Notification Timer Cleanup", () => {
     });
 
     act(() => {
-      const pasteData = "b".repeat(20);
-      const clipboardData = {
-        getData: () => pasteData,
-      };
-      fireEvent.paste(textarea, { clipboardData });
+      fireEvent.paste(textarea, {
+        clipboardData: { getData: () => "b".repeat(20) },
+      });
     });
 
     expect(screen.getByText(/text was truncated/i)).toBeInTheDocument();

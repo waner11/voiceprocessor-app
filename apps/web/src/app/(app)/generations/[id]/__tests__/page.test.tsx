@@ -26,28 +26,16 @@ vi.mock('@/components/GenerationStatus/GenerationStatus', () => ({
   ),
 }));
 
-vi.mock('@/components/FeedbackForm/FeedbackForm', () => {
-  const mockOnSubmit = vi.fn();
-  return {
-    FeedbackForm: ({ generationId, onSubmit }: { generationId: string; onSubmit?: (data: FeedbackData) => void }) => {
-      if (onSubmit) {
-        mockOnSubmit.mockImplementation(onSubmit);
-      }
-      return (
-        <div data-testid="feedback-form">
-          FeedbackForm: {generationId}
-          <button 
-            data-testid="feedback-submit-trigger"
-            onClick={() => mockOnSubmit({ generationId, rating: 5, tags: [], comment: 'test' })}
-          >
-            Submit
-          </button>
-        </div>
-      );
-    },
-    __mockOnSubmit: mockOnSubmit,
-  };
-});
+let capturedOnSubmit: ((data: FeedbackData) => void) | undefined;
+
+vi.mock('@/components/FeedbackForm/FeedbackForm', () => ({
+  FeedbackForm: ({ generationId, onSubmit }: { generationId: string; onSubmit?: (data: FeedbackData) => void }) => {
+    capturedOnSubmit = onSubmit;
+    return (
+      <div data-testid="feedback-form">FeedbackForm: {generationId}</div>
+    );
+  },
+}));
 
 vi.mock('@/components/ChapterNavigation/ChapterNavigation', () => ({
   ChapterNavigation: ({ chapters, onSeek }: { chapters: { title: string }[]; onSeek: (ms: number) => void }) => (
@@ -342,9 +330,21 @@ describe('Generation Detail Page', () => {
 
       render(<Page />);
 
-      const feedbackForm = screen.getByTestId('feedback-form');
-      expect(feedbackForm).toBeInTheDocument();
-      expect(mockMutate).not.toHaveBeenCalled();
+      expect(screen.getByTestId('feedback-form')).toBeInTheDocument();
+      expect(capturedOnSubmit).toBeDefined();
+
+      capturedOnSubmit?.({
+        generationId: 'test-generation-id',
+        rating: 5,
+        tags: ['audio-quality', 'pronunciation'],
+        comment: 'Great work',
+      });
+
+      expect(mockMutate).toHaveBeenCalledWith({
+        id: 'test-generation-id',
+        rating: 5,
+        comment: '[Tags: audio-quality, pronunciation] Great work',
+      });
     });
 
     it('calls submitFeedback.mutate without tag prefix when tags array is empty', () => {
@@ -367,9 +367,21 @@ describe('Generation Detail Page', () => {
 
       render(<Page />);
 
-      const feedbackForm = screen.getByTestId('feedback-form');
-      expect(feedbackForm).toBeInTheDocument();
-      expect(mockMutate).not.toHaveBeenCalled();
+      expect(screen.getByTestId('feedback-form')).toBeInTheDocument();
+      expect(capturedOnSubmit).toBeDefined();
+
+      capturedOnSubmit?.({
+        generationId: 'test-generation-id',
+        rating: 4,
+        tags: [],
+        comment: 'Good voice',
+      });
+
+      expect(mockMutate).toHaveBeenCalledWith({
+        id: 'test-generation-id',
+        rating: 4,
+        comment: 'Good voice',
+      });
     });
 
     it('calls submitFeedback.mutate with single tag prefix', () => {
@@ -392,9 +404,21 @@ describe('Generation Detail Page', () => {
 
       render(<Page />);
 
-      const feedbackForm = screen.getByTestId('feedback-form');
-      expect(feedbackForm).toBeInTheDocument();
-      expect(mockMutate).not.toHaveBeenCalled();
+      expect(screen.getByTestId('feedback-form')).toBeInTheDocument();
+      expect(capturedOnSubmit).toBeDefined();
+
+      capturedOnSubmit?.({
+        generationId: 'test-generation-id',
+        rating: 3,
+        tags: ['speed'],
+        comment: 'Too fast',
+      });
+
+      expect(mockMutate).toHaveBeenCalledWith({
+        id: 'test-generation-id',
+        rating: 3,
+        comment: '[Tags: speed] Too fast',
+      });
     });
   });
 });
