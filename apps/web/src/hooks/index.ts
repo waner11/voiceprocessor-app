@@ -12,7 +12,7 @@ export {
   useVoicesByProvider,
   useRefreshVoices,
 } from "./useVoices";
-export { useUsage } from "./useUsage";
+export { useUsage, type UsageData } from "./useUsage";
 export { useGenerationHub, useSignalRStatus } from "./useGenerationHub";
 export {
    useLogin,

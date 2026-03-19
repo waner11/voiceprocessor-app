@@ -1,23 +1,27 @@
 "use client";
 
-import { useAuthStore } from "@/stores";
+import { useQuery } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/api/apiRequest";
 
-/**
- * Hook to get user's credit/usage information from the auth store.
- * Credits are populated from the login/register response.
- */
+export interface UsageData {
+  creditsUsedThisMonth: number;
+  creditsRemaining: number;
+  generationsCount: number;
+  totalAudioMinutes: number;
+}
+
 export function useUsage() {
-  const creditsRemaining = useAuthStore((state) => state.creditsRemaining);
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const { data, isLoading, error, refetch } = useQuery<UsageData>({
+    queryKey: ["usage"],
+    queryFn: async () => {
+      return apiRequest<UsageData>("/api/v1/usage");
+    },
+  });
 
   return {
-    data: isAuthenticated
-      ? {
-          charactersUsed: 0, // Would need a separate API call to get actual usage
-          charactersLimit: creditsRemaining,
-          charactersRemaining: creditsRemaining,
-        }
-      : null,
-    isLoading: false,
+    data,
+    isLoading,
+    error,
+    refetch,
   };
 }
