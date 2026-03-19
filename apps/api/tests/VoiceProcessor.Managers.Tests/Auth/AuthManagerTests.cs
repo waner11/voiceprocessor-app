@@ -16,6 +16,7 @@ namespace VoiceProcessor.Managers.Tests.Auth;
 public class AuthManagerTests
 {
     private readonly Mock<IUserAccessor> _mockUserAccessor;
+    private readonly Mock<IGenerationAccessor> _mockGenerationAccessor;
     private readonly Mock<IRefreshTokenAccessor> _mockRefreshTokenAccessor;
     private readonly Mock<IApiKeyAccessor> _mockApiKeyAccessor;
     private readonly Mock<IExternalLoginAccessor> _mockExternalLoginAccessor;
@@ -33,6 +34,7 @@ public class AuthManagerTests
     public AuthManagerTests()
     {
         _mockUserAccessor = new Mock<IUserAccessor>();
+        _mockGenerationAccessor = new Mock<IGenerationAccessor>();
         _mockRefreshTokenAccessor = new Mock<IRefreshTokenAccessor>();
         _mockApiKeyAccessor = new Mock<IApiKeyAccessor>();
         _mockExternalLoginAccessor = new Mock<IExternalLoginAccessor>();
@@ -68,6 +70,7 @@ public class AuthManagerTests
         var oauthEngines = new List<IOAuthEngine> { _mockGoogleOAuthEngine.Object, _mockGitHubOAuthEngine.Object };
         return new AuthManager(
             _mockUserAccessor.Object,
+            _mockGenerationAccessor.Object,
             _mockRefreshTokenAccessor.Object,
             _mockApiKeyAccessor.Object,
             _mockExternalLoginAccessor.Object,

@@ -1,4 +1,5 @@
 using VoiceProcessor.Domain.DTOs.Requests.Auth;
+using VoiceProcessor.Domain.DTOs.Responses;
 using VoiceProcessor.Domain.DTOs.Responses.Auth;
 
 namespace VoiceProcessor.Managers.Contracts;
@@ -27,6 +28,7 @@ public interface IAuthManager
     Task UnlinkOAuthAsync(Guid userId, string provider, CancellationToken cancellationToken = default);
 
     // Profile management
+    Task<UsageResponse> GetUsageAsync(Guid userId, CancellationToken ct);
     Task<UserInfoResponse> GetCurrentUserAsync(Guid userId, CancellationToken cancellationToken = default);
     Task<UserInfoResponse> UpdateProfileAsync(Guid userId, UpdateProfileRequest request, CancellationToken cancellationToken = default);
     Task ChangePasswordAsync(Guid userId, ChangePasswordRequest request, CancellationToken cancellationToken = default);

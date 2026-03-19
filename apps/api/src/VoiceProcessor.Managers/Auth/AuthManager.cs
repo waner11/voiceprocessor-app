@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using VoiceProcessor.Accessors.Contracts;
 using VoiceProcessor.Domain.DTOs.Requests.Auth;
+using VoiceProcessor.Domain.DTOs.Responses;
 using VoiceProcessor.Domain.DTOs.Responses.Auth;
 using VoiceProcessor.Domain.Entities;
 using VoiceProcessor.Domain.Enums;
@@ -15,6 +16,7 @@ namespace VoiceProcessor.Managers.Auth;
 public class AuthManager : IAuthManager
 {
     private readonly IUserAccessor _userAccessor;
+    private readonly IGenerationAccessor _generationAccessor;
     private readonly IRefreshTokenAccessor _refreshTokenAccessor;
     private readonly IApiKeyAccessor _apiKeyAccessor;
     private readonly IExternalLoginAccessor _externalLoginAccessor;
@@ -30,6 +32,7 @@ public class AuthManager : IAuthManager
 
     public AuthManager(
         IUserAccessor userAccessor,
+        IGenerationAccessor generationAccessor,
         IRefreshTokenAccessor refreshTokenAccessor,
         IApiKeyAccessor apiKeyAccessor,
         IExternalLoginAccessor externalLoginAccessor,
@@ -44,6 +47,7 @@ public class AuthManager : IAuthManager
         ILogger<AuthManager> logger)
     {
         _userAccessor = userAccessor;
+        _generationAccessor = generationAccessor;
         _refreshTokenAccessor = refreshTokenAccessor;
         _apiKeyAccessor = apiKeyAccessor;
         _externalLoginAccessor = externalLoginAccessor;
@@ -602,6 +606,27 @@ public class AuthManager : IAuthManager
     }
 
     // Profile management
+
+    public async Task<UsageResponse> GetUsageAsync(Guid userId, CancellationToken ct)
+    {
+        var user = await _userAccessor.GetByIdAsync(userId, ct);
+        if (user is null)
+        {
+            throw new InvalidOperationException("User not found");
+        }
+
+        var monthStart = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+        var (generationCount, totalAudioDurationMs) = await _generationAccessor.GetMonthlyStatsAsync(userId, monthStart, ct);
+        var totalAudioMinutes = (int)(totalAudioDurationMs / 60_000);
+
+        return new UsageResponse
+        {
+            CreditsUsedThisMonth = user.CreditsUsedThisMonth,
+            CreditsRemaining = user.CreditsRemaining,
+            GenerationsCount = generationCount,
+            TotalAudioMinutes = totalAudioMinutes
+        };
+    }
 
     public async Task<UserInfoResponse> GetCurrentUserAsync(Guid userId, CancellationToken cancellationToken = default)
     {
