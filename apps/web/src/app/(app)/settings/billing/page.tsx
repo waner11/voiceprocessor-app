@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { CreditPackCard } from "@/components/CreditPackCard";
 import { paymentService } from "@/lib/api/payment/service";
 import { usePayment } from "@/hooks/usePayment";
+import { useUsage } from "@/hooks/useUsage";
 import { useAuthStore } from "@/stores/authStore";
 import { CreditPack, Payment } from "@/lib/api/payment/types";
 import { formatNumber } from "@/utils/formatNumber";
@@ -20,15 +21,7 @@ export default function BillingSettingsPage() {
   
   const creditsRemaining = useAuthStore((state) => state.creditsRemaining);
   const { startCheckout, isProcessing, error } = usePayment();
-
-  const usage = {
-    charactersUsed: 45000,
-    charactersLimit: 100000,
-    generationsCount: 23,
-    totalAudioMinutes: 156,
-  };
-
-  const usagePercentage = (usage.charactersUsed / usage.charactersLimit) * 100;
+  const { data: usage, isLoading: isLoadingUsage, error: usageError, refetch: refetchUsage } = useUsage();
 
   useEffect(() => {
     async function fetchPacks() {
@@ -178,42 +171,41 @@ export default function BillingSettingsPage() {
       <section className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Usage This Month</h2>
 
-        <div className="space-y-6">
-          <div>
-             <div className="flex items-center justify-between mb-2">
-               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Characters</span>
-               <span className="text-sm text-gray-500 dark:text-gray-400">
-                 {formatNumber(usage.charactersUsed)} / {formatNumber(usage.charactersLimit)}
-               </span>
-             </div>
-            <div className="h-3 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+        {isLoadingUsage ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[1, 2, 3].map((i) => (
               <div
-                className={`h-full rounded-full transition-all ${
-                  usagePercentage > 90
-                    ? "bg-red-500"
-                    : usagePercentage > 75
-                    ? "bg-yellow-500"
-                    : "bg-blue-500"
-                }`}
-                style={{ width: `${Math.min(usagePercentage, 100)}%` }}
+                key={i}
+                className="rounded-lg bg-gray-50 dark:bg-gray-800 p-4 h-20 animate-pulse"
               />
-            </div>
-             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-               {formatNumber(usage.charactersLimit - usage.charactersUsed)} characters remaining
-             </p>
+            ))}
           </div>
-
-          <div className="grid grid-cols-2 gap-4">
+        ) : usageError ? (
+          <div className="text-center py-8">
+            <p className="text-red-600 dark:text-red-400 mb-4">Failed to load usage data</p>
+            <button
+              onClick={() => refetchUsage()}
+              className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="rounded-lg bg-gray-50 dark:bg-gray-800 p-4">
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{usage.generationsCount}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatNumber(usage?.creditsUsedThisMonth ?? 0)}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Credits Used This Month</p>
+            </div>
+            <div className="rounded-lg bg-gray-50 dark:bg-gray-800 p-4">
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatNumber(usage?.generationsCount ?? 0)}</p>
               <p className="text-sm text-gray-500 dark:text-gray-400">Generations</p>
             </div>
             <div className="rounded-lg bg-gray-50 dark:bg-gray-800 p-4">
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{usage.totalAudioMinutes}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatNumber(usage?.totalAudioMinutes ?? 0)}</p>
               <p className="text-sm text-gray-500 dark:text-gray-400">Audio Minutes</p>
             </div>
           </div>
-        </div>
+        )}
       </section>
 
       <section className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
