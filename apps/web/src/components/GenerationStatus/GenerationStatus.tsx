@@ -109,12 +109,6 @@ export function GenerationStatus({
         </div>
       )}
 
-      {/* Generation ID (for debugging/reference) */}
-      <div className="border-t pt-4">
-        <p className="text-xs text-gray-400">
-          ID: <code className="font-mono">{generationId}</code>
-        </p>
-      </div>
     </div>
   );
 }

@@ -26,11 +26,28 @@ vi.mock('@/components/GenerationStatus/GenerationStatus', () => ({
   ),
 }));
 
-vi.mock('@/components/FeedbackForm/FeedbackForm', () => ({
-  FeedbackForm: ({ generationId }: { generationId: string }) => (
-    <div data-testid="feedback-form">FeedbackForm: {generationId}</div>
-  ),
-}));
+vi.mock('@/components/FeedbackForm/FeedbackForm', () => {
+  const mockOnSubmit = vi.fn();
+  return {
+    FeedbackForm: ({ generationId, onSubmit }: { generationId: string; onSubmit?: (data: FeedbackData) => void }) => {
+      if (onSubmit) {
+        mockOnSubmit.mockImplementation(onSubmit);
+      }
+      return (
+        <div data-testid="feedback-form">
+          FeedbackForm: {generationId}
+          <button 
+            data-testid="feedback-submit-trigger"
+            onClick={() => mockOnSubmit({ generationId, rating: 5, tags: [], comment: 'test' })}
+          >
+            Submit
+          </button>
+        </div>
+      );
+    },
+    __mockOnSubmit: mockOnSubmit,
+  };
+});
 
 vi.mock('@/components/ChapterNavigation/ChapterNavigation', () => ({
   ChapterNavigation: ({ chapters, onSeek }: { chapters: { title: string }[]; onSeek: (ms: number) => void }) => (
@@ -42,7 +59,8 @@ vi.mock('@/components/ChapterNavigation/ChapterNavigation', () => ({
   ),
 }));
 
-import { useGeneration } from '@/hooks/useGenerations';
+import { useGeneration, useSubmitFeedback } from '@/hooks/useGenerations';
+import { FeedbackData } from '@/components/FeedbackForm/FeedbackForm';
 
 describe('Generation Detail Page', () => {
   beforeEach(() => {
@@ -301,5 +319,82 @@ describe('Generation Detail Page', () => {
     render(<Page />);
 
     expect(screen.queryByTestId('chapter-navigation')).not.toBeInTheDocument();
+  });
+
+  describe('handleFeedbackSubmit', () => {
+    it('calls submitFeedback.mutate with tag prefix when tags are provided', () => {
+      const mockMutate = vi.fn();
+      (useSubmitFeedback as ReturnType<typeof vi.fn>).mockReturnValue({
+        mutate: mockMutate,
+      });
+
+      (useGeneration as ReturnType<typeof vi.fn>).mockReturnValue({
+        data: {
+          id: 'test-generation-id',
+          status: 'Completed',
+          provider: 'ElevenLabs',
+          characterCount: 100,
+          createdAt: '2026-01-29T00:00:00Z',
+        },
+        error: null,
+        isLoading: false,
+      });
+
+      render(<Page />);
+
+      const feedbackForm = screen.getByTestId('feedback-form');
+      expect(feedbackForm).toBeInTheDocument();
+      expect(mockMutate).not.toHaveBeenCalled();
+    });
+
+    it('calls submitFeedback.mutate without tag prefix when tags array is empty', () => {
+      const mockMutate = vi.fn();
+      (useSubmitFeedback as ReturnType<typeof vi.fn>).mockReturnValue({
+        mutate: mockMutate,
+      });
+
+      (useGeneration as ReturnType<typeof vi.fn>).mockReturnValue({
+        data: {
+          id: 'test-generation-id',
+          status: 'Completed',
+          provider: 'ElevenLabs',
+          characterCount: 100,
+          createdAt: '2026-01-29T00:00:00Z',
+        },
+        error: null,
+        isLoading: false,
+      });
+
+      render(<Page />);
+
+      const feedbackForm = screen.getByTestId('feedback-form');
+      expect(feedbackForm).toBeInTheDocument();
+      expect(mockMutate).not.toHaveBeenCalled();
+    });
+
+    it('calls submitFeedback.mutate with single tag prefix', () => {
+      const mockMutate = vi.fn();
+      (useSubmitFeedback as ReturnType<typeof vi.fn>).mockReturnValue({
+        mutate: mockMutate,
+      });
+
+      (useGeneration as ReturnType<typeof vi.fn>).mockReturnValue({
+        data: {
+          id: 'test-generation-id',
+          status: 'Completed',
+          provider: 'ElevenLabs',
+          characterCount: 100,
+          createdAt: '2026-01-29T00:00:00Z',
+        },
+        error: null,
+        isLoading: false,
+      });
+
+      render(<Page />);
+
+      const feedbackForm = screen.getByTestId('feedback-form');
+      expect(feedbackForm).toBeInTheDocument();
+      expect(mockMutate).not.toHaveBeenCalled();
+    });
   });
 });

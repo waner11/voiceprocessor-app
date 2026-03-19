@@ -43,7 +43,10 @@ public class GenerationAccessor : IGenerationAccessor
             query = query.Where(g => g.Status == status.Value);
 
         if (!string.IsNullOrWhiteSpace(search))
-            query = query.Where(g => EF.Functions.ILike(g.InputText.Substring(0, 200), $"%{search}%"));
+        {
+            var escapedSearch = EscapeILikePattern(search);
+            query = query.Where(g => EF.Functions.ILike(g.InputText.Substring(0, 200), $"%{escapedSearch}%"));
+        }
 
         if (provider.HasValue)
             query = query.Where(g => g.SelectedProvider == provider.Value);
@@ -123,4 +126,7 @@ public class GenerationAccessor : IGenerationAccessor
                 .SetProperty(g => g.CompletedAt, DateTime.UtcNow),
                 cancellationToken);
     }
+
+    private static string EscapeILikePattern(string input)
+        => input.Replace("\\", "\\\\").Replace("%", @"\%").Replace("_", @"\_");
 }
