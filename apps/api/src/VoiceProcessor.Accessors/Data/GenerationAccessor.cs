@@ -45,7 +45,7 @@ public class GenerationAccessor : IGenerationAccessor
         if (!string.IsNullOrWhiteSpace(search))
         {
             var escapedSearch = EscapeILikePattern(search);
-            query = query.Where(g => EF.Functions.ILike(g.InputText.Substring(0, 200), $"%{escapedSearch}%"));
+            query = query.Where(g => EF.Functions.ILike(g.InputText.Substring(0, 200), $"%{escapedSearch}%", "\\"));
         }
 
         if (provider.HasValue)
@@ -128,5 +128,10 @@ public class GenerationAccessor : IGenerationAccessor
     }
 
     private static string EscapeILikePattern(string input)
-        => input.Replace("\\", "\\\\").Replace("%", @"\%").Replace("_", @"\_");
+    {
+        var result = input.Replace("\\", "\\\\");
+        result = result.Replace("%", "\\%");
+        result = result.Replace("_", "\\_");
+        return result;
+    }
 }
