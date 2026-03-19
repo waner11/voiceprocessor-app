@@ -69,6 +69,27 @@ public class GenerationAccessor : IGenerationAccessor
         return generation;
     }
 
+    public async Task<(int GenerationCount, long TotalAudioDurationMs)> GetMonthlyStatsAsync(
+        Guid userId,
+        DateTime monthStart,
+        CancellationToken ct)
+    {
+        var stats = await _dbContext.Generations
+            .Where(g => g.UserId == userId && g.Status == GenerationStatus.Completed && g.CreatedAt >= monthStart)
+            .GroupBy(_ => 1)
+            .Select(g => new
+            {
+                GenerationCount = g.Count(),
+                TotalAudioDurationMs = g.Sum(x => (long)(x.AudioDurationMs ?? 0))
+            })
+            .FirstOrDefaultAsync(ct);
+
+        if (stats is null)
+            return (0, 0);
+
+        return (stats.GenerationCount, stats.TotalAudioDurationMs);
+    }
+
     public async Task UpdateAsync(Generation generation, CancellationToken cancellationToken = default)
     {
         _dbContext.Generations.Update(generation);
