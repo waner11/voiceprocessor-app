@@ -92,7 +92,7 @@ export function Header() {
              <div className="hidden sm:flex items-center gap-2 text-sm">
                <span className="text-gray-500 dark:text-gray-400">Credits:</span>
                <span className="font-semibold tabular-nums text-gray-900 dark:text-white">
-                 {formatNumber(usage.charactersRemaining || 0)}
+                 {formatNumber(usage.creditsRemaining || 0)}
                </span>
              </div>
            )}

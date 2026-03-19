@@ -65,14 +65,14 @@ export default function DashboardPage() {
               <div className="h-9 w-24 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
               <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded" />
             </div>
-          ) : (
-            <>
-               <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                 {formatNumber(usageData?.charactersRemaining || 0)}
-               </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">characters remaining</p>
-            </>
-          )}
+           ) : (
+             <>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                  {formatNumber(usageData?.creditsRemaining || 0)}
+                </p>
+               <p className="text-sm text-gray-500 dark:text-gray-400">credits remaining</p>
+             </>
+           )}
         </div>
 
         <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
