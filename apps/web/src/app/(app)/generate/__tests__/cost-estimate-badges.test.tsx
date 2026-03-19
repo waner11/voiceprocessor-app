@@ -179,6 +179,22 @@ describe("Cost Estimate Badges on Generate Page", () => {
       isPending: false,
     });
 
+    vi.mocked(useVoices).mockReturnValue({
+      data: {
+        items: [
+          {
+            id: "voice-1",
+            name: "Test Voice",
+            provider: "ElevenLabs",
+            language: "English",
+            gender: "Male",
+            previewUrl: null,
+          },
+        ],
+      },
+      isLoading: false,
+    });
+
     render(<GeneratePage />);
 
     // Type text > 10 chars
@@ -217,6 +233,22 @@ describe("Cost Estimate Badges on Generate Page", () => {
       isPending: false,
     });
 
+    vi.mocked(useVoices).mockReturnValue({
+      data: {
+        items: [
+          {
+            id: "voice-1",
+            name: "Test Voice",
+            provider: "ElevenLabs",
+            language: "English",
+            gender: "Male",
+            previewUrl: null,
+          },
+        ],
+      },
+      isLoading: false,
+    });
+
     render(<GeneratePage />);
 
     // Type text > 10 chars
@@ -237,6 +269,22 @@ describe("Cost Estimate Badges on Generate Page", () => {
 
   it("does NOT render any badges when cost estimate is null", () => {
     // Use default mock (useEstimateCost returns data: null)
+    vi.mocked(useVoices).mockReturnValue({
+      data: {
+        items: [
+          {
+            id: "voice-1",
+            name: "Test Voice",
+            provider: "ElevenLabs",
+            language: "English",
+            gender: "Male",
+            previewUrl: null,
+          },
+        ],
+      },
+      isLoading: false,
+    });
+
     render(<GeneratePage />);
 
     // Type text > 10 chars
