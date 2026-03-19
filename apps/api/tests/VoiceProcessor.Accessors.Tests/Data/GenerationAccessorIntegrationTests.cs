@@ -1,6 +1,4 @@
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
-using Testcontainers.PostgreSql;
 using VoiceProcessor.Accessors.Data;
 using VoiceProcessor.Accessors.Data.DbContext;
 using VoiceProcessor.Domain.Entities;
@@ -8,32 +6,29 @@ using VoiceProcessor.Domain.Enums;
 
 namespace VoiceProcessor.Accessors.Tests.Data;
 
+[Collection("PostgreSQL")]
 public class GenerationAccessorIntegrationTests : IAsyncLifetime
 {
-    private PostgreSqlContainer _container = null!;
+    private readonly PostgresFixture _fixture;
     private VoiceProcessorDbContext _dbContext = null!;
     private GenerationAccessor _accessor = null!;
     private Guid _voiceId = Guid.Empty;
 
-    public async Task InitializeAsync()
+    public GenerationAccessorIntegrationTests(PostgresFixture fixture)
     {
-        _container = new PostgreSqlBuilder("postgres:16-alpine").Build();
-        await _container.StartAsync();
+        _fixture = fixture;
+    }
 
-        var options = new DbContextOptionsBuilder<VoiceProcessorDbContext>()
-            .UseNpgsql(_container.GetConnectionString())
-            .Options;
-
-        _dbContext = new VoiceProcessorDbContext(options);
-        await _dbContext.Database.MigrateAsync();
-
+    public Task InitializeAsync()
+    {
+        _dbContext = _fixture.CreateDbContext();
         _accessor = new GenerationAccessor(_dbContext);
+        return Task.CompletedTask;
     }
 
     public async Task DisposeAsync()
     {
         await _dbContext.DisposeAsync();
-        await _container.DisposeAsync();
     }
 
     [Fact]
