@@ -19,8 +19,6 @@ public class PostgresFixture : IAsyncLifetime
     /// </summary>
     public string ConnectionString => _container.GetConnectionString();
 
-    // Each test class calls this in InitializeAsync to get its own isolated DbContext.
-    // Never share a DbContext instance across tests.
     public VoiceProcessorDbContext CreateDbContext()
     {
         var options = new DbContextOptionsBuilder<VoiceProcessorDbContext>()
@@ -52,7 +50,5 @@ public class PostgresFixture : IAsyncLifetime
     }
 }
 
-// Groups all DB integration tests under one shared container.
-// xUnit runs test classes in the same collection sequentially — no parallel DB conflicts.
 [CollectionDefinition("PostgreSQL")]
 public class PostgresCollection : ICollectionFixture<PostgresFixture> { }
