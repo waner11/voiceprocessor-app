@@ -607,16 +607,16 @@ public class AuthManager : IAuthManager
 
     // Profile management
 
-    public async Task<UsageResponse> GetUsageAsync(Guid userId, CancellationToken ct)
+    public async Task<UsageResponse> GetUsageAsync(Guid userId, CancellationToken cancellationToken)
     {
-        var user = await _userAccessor.GetByIdAsync(userId, ct);
+        var user = await _userAccessor.GetByIdAsync(userId, cancellationToken);
         if (user is null)
         {
             throw new InvalidOperationException("User not found");
         }
 
         var monthStart = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1, 0, 0, 0, DateTimeKind.Utc);
-        var (generationCount, totalAudioDurationMs) = await _generationAccessor.GetMonthlyStatsAsync(userId, monthStart, ct);
+        var (generationCount, totalAudioDurationMs) = await _generationAccessor.GetMonthlyStatsAsync(userId, monthStart, cancellationToken);
         var totalAudioMinutes = (int)(totalAudioDurationMs / 60_000);
 
         return new UsageResponse

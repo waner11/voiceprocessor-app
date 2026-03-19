@@ -23,7 +23,7 @@ public interface IGenerationAccessor
     Task<(int GenerationCount, long TotalAudioDurationMs)> GetMonthlyStatsAsync(
         Guid userId,
         DateTime monthStart,
-        CancellationToken ct);
+        CancellationToken cancellationToken);
 
     Task UpdateAsync(Generation generation, CancellationToken cancellationToken = default);
 

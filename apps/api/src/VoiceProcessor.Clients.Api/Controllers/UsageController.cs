@@ -13,16 +13,13 @@ public class UsageController : ControllerBase
 {
     private readonly IAuthManager _authManager;
     private readonly ICurrentUserService _currentUser;
-    private readonly ILogger<UsageController> _logger;
 
     public UsageController(
         IAuthManager authManager,
-        ICurrentUserService currentUser,
-        ILogger<UsageController> logger)
+        ICurrentUserService currentUser)
     {
         _authManager = authManager;
         _currentUser = currentUser;
-        _logger = logger;
     }
 
     /// <summary>

@@ -32,7 +32,6 @@ export default function BillingSettingsPage() {
         setPacksError(null);
       } catch (error) {
         setPacksError("Failed to load credit packs");
-        console.error("Error fetching packs:", error);
       } finally {
         setIsLoadingPacks(false);
       }
@@ -48,7 +47,6 @@ export default function BillingSettingsPage() {
       const history = await paymentService.fetchPaymentHistory();
       setPayments(history);
     } catch (err) {
-      console.error("Error fetching payment history:", err);
       setPaymentsError("Failed to load payment history");
     } finally {
       setIsLoadingPayments(false);
@@ -140,7 +138,6 @@ export default function BillingSettingsPage() {
                   })
                   .catch((error) => {
                     setPacksError("Failed to load credit packs");
-                    console.error("Error fetching packs:", error);
                   })
                   .finally(() => {
                     setIsLoadingPacks(false);
