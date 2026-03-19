@@ -499,11 +499,29 @@ export default function GeneratePage() {
                       <span className="text-gray-400">Est. Duration</span>
                       <span>~{Math.ceil(wordCount / 150)} min</span>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex justify-between items-center">
                       <span className="text-gray-400">Provider</span>
-                      <span>
-                        {selectedVoiceData?.provider || costEstimate?.recommendedProvider || "Auto-select"}
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span>
+                          {selectedVoiceData?.provider || costEstimate?.recommendedProvider || "Auto-select"}
+                        </span>
+                        {costEstimate && !isEstimating && (() => {
+                          const activeProvider = selectedVoiceData?.provider || costEstimate?.recommendedProvider;
+                          const providerEstimate = costEstimate?.providerEstimates?.find(
+                            (e) => e.provider === activeProvider
+                          );
+                          return providerEstimate?.qualityTier === "Premium" ? (
+                            <span className="rounded-full bg-amber-100 dark:bg-amber-900 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-300">
+                              Premium Quality
+                            </span>
+                          ) : null;
+                        })()}
+                        {costEstimate && !isEstimating && routing === "Balanced" && (
+                          <span className="rounded-full bg-green-100 dark:bg-green-900 px-2 py-0.5 text-xs font-medium text-green-700 dark:text-green-300">
+                            Best Value
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                   {costEstimate?.providerEstimates && costEstimate.providerEstimates.length > 1 && (

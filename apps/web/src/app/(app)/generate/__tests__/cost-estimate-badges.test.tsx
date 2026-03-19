@@ -40,6 +40,12 @@ vi.mock("next/navigation", () => ({
 describe("Cost Estimate Badges on Generate Page", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Reset useEstimateCost to default (data: null) to prevent mock leakage between tests
+    vi.mocked(useEstimateCost).mockReturnValue({
+      mutate: vi.fn(),
+      data: null,
+      isPending: false,
+    });
   });
 
   it("renders Premium badge for Premium quality tier", () => {
