@@ -19,11 +19,16 @@ public class FeedbackAccessorTests : IAsyncLifetime
         _fixture = fixture;
     }
 
-    public Task InitializeAsync()
+    public async Task InitializeAsync()
     {
         _dbContext = _fixture.CreateDbContext();
         _accessor = new FeedbackAccessor(_dbContext);
-        return Task.CompletedTask;
+
+        await _dbContext.Feedbacks.ExecuteDeleteAsync();
+        await _dbContext.GenerationChunks.ExecuteDeleteAsync();
+        await _dbContext.Generations.ExecuteDeleteAsync();
+        await _dbContext.Voices.ExecuteDeleteAsync();
+        await _dbContext.Users.ExecuteDeleteAsync();
     }
 
     public async Task DisposeAsync()
