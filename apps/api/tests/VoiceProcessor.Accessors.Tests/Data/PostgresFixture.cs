@@ -5,8 +5,9 @@ using VoiceProcessor.Accessors.Data.DbContext;
 namespace VoiceProcessor.Accessors.Tests.Data;
 
 /// <summary>
-/// PostgreSQL container fixture for integration tests.
+/// Shared PostgreSQL container fixture for integration tests.
 /// Implements IAsyncLifetime to manage container lifecycle with xUnit.
+/// Shared across all test classes in the "PostgreSQL" collection via ICollectionFixture.
 /// </summary>
 public class PostgresFixture : IAsyncLifetime
 {
@@ -18,21 +19,26 @@ public class PostgresFixture : IAsyncLifetime
     /// </summary>
     public string ConnectionString => _container.GetConnectionString();
 
+    // Each test class calls this in InitializeAsync to get its own isolated DbContext.
+    // Never share a DbContext instance across tests.
+    public VoiceProcessorDbContext CreateDbContext()
+    {
+        var options = new DbContextOptionsBuilder<VoiceProcessorDbContext>()
+            .UseNpgsql(ConnectionString)
+            .Options;
+
+        return new VoiceProcessorDbContext(options);
+    }
+
     /// <summary>
-    /// Initializes the fixture by starting the container and running migrations.
-    /// Called automatically by xUnit before test execution.
+    /// Starts the container and runs migrations once for the entire collection.
+    /// Called automatically by xUnit before any test in the collection executes.
     /// </summary>
     public async Task InitializeAsync()
     {
         await _container.StartAsync();
 
-        // Create DbContext with the container's connection string
-        var options = new DbContextOptionsBuilder<VoiceProcessorDbContext>()
-            .UseNpgsql(ConnectionString)
-            .Options;
-
-        // Run migrations to set up the database schema
-        await using var context = new VoiceProcessorDbContext(options);
+        await using var context = CreateDbContext();
         await context.Database.MigrateAsync();
     }
 
@@ -45,3 +51,8 @@ public class PostgresFixture : IAsyncLifetime
         await _container.DisposeAsync();
     }
 }
+
+// Groups all DB integration tests under one shared container.
+// xUnit runs test classes in the same collection sequentially — no parallel DB conflicts.
+[CollectionDefinition("PostgreSQL")]
+public class PostgresCollection : ICollectionFixture<PostgresFixture> { }
