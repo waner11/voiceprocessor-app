@@ -85,6 +85,6 @@ describe("SettingsLayout", () => {
     );
 
     const apiKeysLink = screen.getByText("API Keys").closest("a");
-    expect(apiKeysLink).toHaveClass("bg-blue-50");
+    expect(apiKeysLink).toHaveClass("bg-indigo-subtle");
   });
 });
