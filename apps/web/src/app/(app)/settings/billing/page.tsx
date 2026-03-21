@@ -98,20 +98,20 @@ export default function BillingSettingsPage() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+      <section className="rounded-lg border border-border-subtle bg-bg-elevated p-6">
+        <h2 className="text-xl font-semibold text-text-primary mb-4">
           Credit Balance
         </h2>
          <div className="flex items-baseline gap-2">
-           <span className="text-4xl font-bold text-gray-900 dark:text-white">
+           <span className="text-4xl font-bold text-text-primary">
              {formatNumber(creditsRemaining)}
            </span>
-           <span className="text-gray-500 dark:text-gray-400">credits</span>
+           <span className="text-text-muted">credits</span>
          </div>
       </section>
 
-      <section className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+      <section className="rounded-lg border border-border-subtle bg-bg-elevated p-6">
+        <h2 className="text-xl font-semibold text-text-primary mb-6">
           Buy Credits
         </h2>
 
@@ -120,13 +120,13 @@ export default function BillingSettingsPage() {
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-6 h-64 animate-pulse"
+                className="rounded-lg border border-border-subtle bg-bg-sunken p-6 h-64 animate-pulse"
               />
             ))}
           </div>
         ) : packsError ? (
           <div className="text-center py-8">
-            <p className="text-red-600 dark:text-red-400 mb-4">{packsError}</p>
+            <p className="text-state-error-text mb-4">{packsError}</p>
             <button
               onClick={() => {
                 setPacksError(null);
@@ -143,7 +143,7 @@ export default function BillingSettingsPage() {
                     setIsLoadingPacks(false);
                   });
               }}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition-colors"
+              className="rounded-lg bg-indigo px-4 py-2 text-white hover:bg-indigo-dark transition-colors"
             >
               Try Again
             </button>
@@ -165,88 +165,88 @@ export default function BillingSettingsPage() {
         )}
       </section>
 
-      <section className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Usage This Month</h2>
+      <section className="rounded-lg border border-border-subtle bg-bg-elevated p-6">
+        <h2 className="text-xl font-semibold text-text-primary mb-6">Usage This Month</h2>
 
         {isLoadingUsage ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="rounded-lg bg-gray-50 dark:bg-gray-800 p-4 h-20 animate-pulse"
+                className="rounded-lg bg-bg-sunken p-4 h-20 animate-pulse"
               />
             ))}
           </div>
         ) : usageError ? (
           <div className="text-center py-8">
-            <p className="text-red-600 dark:text-red-400 mb-4">Failed to load usage data</p>
+            <p className="text-state-error-text mb-4">Failed to load usage data</p>
             <button
               onClick={() => refetchUsage()}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition-colors"
+              className="rounded-lg bg-indigo px-4 py-2 text-white hover:bg-indigo-dark transition-colors"
             >
               Try Again
             </button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="rounded-lg bg-gray-50 dark:bg-gray-800 p-4">
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatNumber(usage?.creditsUsedThisMonth ?? 0)}</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Credits Used This Month</p>
+            <div className="rounded-lg bg-bg-sunken p-4">
+              <p className="text-2xl font-bold text-text-primary">{formatNumber(usage?.creditsUsedThisMonth ?? 0)}</p>
+              <p className="text-sm text-text-muted">Credits Used This Month</p>
             </div>
-            <div className="rounded-lg bg-gray-50 dark:bg-gray-800 p-4">
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatNumber(usage?.generationsCount ?? 0)}</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Generations</p>
+            <div className="rounded-lg bg-bg-sunken p-4">
+              <p className="text-2xl font-bold text-text-primary">{formatNumber(usage?.generationsCount ?? 0)}</p>
+              <p className="text-sm text-text-muted">Generations</p>
             </div>
-            <div className="rounded-lg bg-gray-50 dark:bg-gray-800 p-4">
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatNumber(usage?.totalAudioMinutes ?? 0)}</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Audio Minutes</p>
+            <div className="rounded-lg bg-bg-sunken p-4">
+              <p className="text-2xl font-bold text-text-primary">{formatNumber(usage?.totalAudioMinutes ?? 0)}</p>
+              <p className="text-sm text-text-muted">Audio Minutes</p>
             </div>
           </div>
         )}
       </section>
 
-      <section className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Payment Method</h2>
+      <section className="rounded-lg border border-border-subtle bg-bg-elevated p-6">
+        <h2 className="text-xl font-semibold text-text-primary mb-6">Payment Method</h2>
 
-        <div className="flex items-center justify-between p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+        <div className="flex items-center justify-between p-4 rounded-lg border border-border-subtle bg-bg-sunken">
           <div className="flex items-center gap-4">
-            <div className="h-10 w-16 rounded bg-gradient-to-r from-blue-600 to-blue-800 flex items-center justify-center text-white text-xs font-bold">
+            <div className="h-10 w-16 rounded bg-gradient-to-r from-indigo to-indigo-dark flex items-center justify-center text-white text-xs font-bold">
               VISA
             </div>
             <div>
-              <p className="font-medium text-gray-900 dark:text-white">•••• •••• •••• 4242</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Expires 12/2027</p>
+              <p className="font-medium text-text-primary">•••• •••• •••• 4242</p>
+              <p className="text-sm text-text-muted">Expires 12/2027</p>
             </div>
           </div>
-          <button className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
+          <button className="text-sm text-text-link hover:underline">
             Update
           </button>
         </div>
       </section>
 
-      <section className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Billing History</h2>
+      <section className="rounded-lg border border-border-subtle bg-bg-elevated p-6">
+        <h2 className="text-xl font-semibold text-text-primary mb-6">Billing History</h2>
         
         {isLoadingPayments ? (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-12 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
+              <div key={i} className="h-12 bg-bg-sunken rounded animate-pulse" />
             ))}
           </div>
         ) : paymentsError ? (
           <div className="text-center py-8">
-            <p className="text-red-600 dark:text-red-400 mb-4">{paymentsError}</p>
+            <p className="text-state-error-text mb-4">{paymentsError}</p>
             <button
               onClick={() => fetchPaymentHistory()}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition-colors"
+              className="rounded-lg bg-indigo px-4 py-2 text-white hover:bg-indigo-dark transition-colors"
             >
               Try Again
             </button>
           </div>
         ) : payments.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-gray-500 dark:text-gray-400">No payment history yet</p>
-            <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
+            <p className="text-text-muted">No payment history yet</p>
+            <p className="text-sm text-text-muted mt-1">
               Your purchases will appear here
             </p>
           </div>
@@ -254,31 +254,31 @@ export default function BillingSettingsPage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-200 dark:border-gray-700">
-                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">Date</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">Pack</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">Credits</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">Amount</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">Status</th>
+                <tr className="border-b border-border-subtle">
+                  <th className="text-left py-3 px-4 text-sm font-medium text-text-muted">Date</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-text-muted">Pack</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-text-muted">Credits</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-text-muted">Amount</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-text-muted">Status</th>
                 </tr>
               </thead>
               <tbody>
                 {payments.map((payment) => (
-                  <tr key={payment.id} className="border-b border-gray-100 dark:border-gray-800">
-                    <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">
+                  <tr key={payment.id} className="border-b border-border-subtle">
+                    <td className="py-3 px-4 text-sm text-text-primary">
                       {new Date(payment.createdAt).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'short',
                         day: 'numeric'
                       })}
                     </td>
-                    <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">
+                    <td className="py-3 px-4 text-sm text-text-primary">
                       {payment.packName}
                     </td>
-                     <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">
+                     <td className="py-3 px-4 text-sm text-text-primary">
                        +{formatNumber(payment.creditsAdded)}
                      </td>
-                    <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">
+                    <td className="py-3 px-4 text-sm text-text-primary">
                       {new Intl.NumberFormat('en-US', {
                         style: 'currency',
                         currency: payment.currency.toUpperCase()
@@ -287,12 +287,12 @@ export default function BillingSettingsPage() {
                     <td className="py-3 px-4">
                       <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
                         payment.status === 'completed' 
-                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                          ? 'bg-success-subtle text-state-success-text'
                           : payment.status === 'pending'
-                          ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                          ? 'bg-warning-subtle text-state-warning-text'
                           : payment.status === 'refunded'
-                          ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
-                          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                          ? 'bg-bg-sunken text-text-muted'
+                          : 'bg-error-subtle text-state-error-text'
                       }`}>
                         {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
                       </span>

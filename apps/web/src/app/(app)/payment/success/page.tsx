@@ -94,11 +94,11 @@ export default function PaymentSuccessPage() {
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-2xl mx-auto">
         {/* Success Card */}
-        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-8 text-center">
+        <div className="rounded-lg border border-border-subtle bg-bg-elevated p-8 text-center">
           {/* Success Icon */}
-          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-100 dark:bg-green-900">
+          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-success-subtle">
             <svg
-              className="h-12 w-12 text-green-600 dark:text-green-400"
+              className="h-12 w-12 text-state-success-text"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -113,48 +113,48 @@ export default function PaymentSuccessPage() {
           </div>
 
           {/* Headline */}
-          <h1 className="mb-4 text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="mb-4 text-3xl font-bold text-text-primary font-heading">
             Payment Successful!
           </h1>
 
           {/* Pack Details or Fallback */}
           {packInfo ? (
             <div className="mb-6">
-              <p className="text-lg text-gray-700 dark:text-gray-300 mb-2">
+              <p className="text-lg text-text-secondary mb-2">
                 You purchased the <span className="font-semibold">{packInfo.name}</span> pack
               </p>
-               <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+               <p className="text-2xl font-bold text-success">
                  {formatNumber(packInfo.credits)} credits added
                </p>
             </div>
           ) : (
-            <p className="mb-6 text-lg text-gray-700 dark:text-gray-300">
+            <p className="mb-6 text-lg text-text-secondary">
               Your credits have been added to your account!
             </p>
           )}
 
           {/* Current Balance */}
-          <div className="mb-8 rounded-lg bg-gray-50 dark:bg-gray-800 p-4">
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+          <div className="mb-8 rounded-lg bg-bg-sunken p-4">
+            <p className="text-sm text-text-muted mb-1">
               Current Balance
             </p>
-             <p className="text-3xl font-bold text-gray-900 dark:text-white">
+             <p className="text-3xl font-bold text-text-primary">
                {formatNumber(creditsRemaining)}
              </p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">credits</p>
+            <p className="text-sm text-text-muted">credits</p>
           </div>
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/dashboard"
-              className="rounded-lg bg-blue-600 px-6 py-3 text-white font-medium hover:bg-blue-700 transition-colors"
+              className="rounded-lg bg-indigo px-6 py-3 text-white font-medium hover:bg-indigo-dark transition-colors"
             >
               Go to Dashboard
             </Link>
             <Link
               href="/settings/billing"
-              className="rounded-lg border border-gray-200 dark:border-gray-700 px-6 py-3 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              className="rounded-lg border border-border-subtle px-6 py-3 text-text-secondary font-medium hover:bg-bg-sunken transition-colors"
             >
               View Billing
             </Link>
