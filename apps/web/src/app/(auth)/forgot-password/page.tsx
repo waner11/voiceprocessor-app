@@ -39,24 +39,24 @@ export default function ForgotPasswordPage() {
     });
   };
 
-   if (isSubmitted) {
-     return (
-       <div className="space-y-6 text-center">
-         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-900/50">
-           <svg
-             className="h-6 w-6 text-green-400"
-             fill="none"
-             viewBox="0 0 24 24"
-             stroke="currentColor"
-           >
-             <path
-               strokeLinecap="round"
-               strokeLinejoin="round"
-               strokeWidth={2}
-               d="M5 13l4 4L19 7"
-             />
-           </svg>
-         </div>
+    if (isSubmitted) {
+      return (
+        <div className="space-y-6 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-success-subtle">
+            <svg
+              className="h-6 w-6 text-state-success-text"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+          </div>
          <h1 className="text-2xl font-bold text-text-primary">Check your email</h1>
          <p className="text-text-secondary">
            We&apos;ve sent a password reset link to your email address. Please

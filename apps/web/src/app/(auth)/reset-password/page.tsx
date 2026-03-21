@@ -47,24 +47,24 @@ function ResetPasswordContent() {
     );
   };
 
-   if (!token) {
-     return (
-       <div className="space-y-6 text-center">
-         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-900/50">
-           <svg
-             className="h-6 w-6 text-red-400"
-             fill="none"
-             viewBox="0 0 24 24"
-             stroke="currentColor"
-           >
-             <path
-               strokeLinecap="round"
-               strokeLinejoin="round"
-               strokeWidth={2}
-               d="M6 18L18 6M6 6l12 12"
-             />
-           </svg>
-         </div>
+    if (!token) {
+      return (
+        <div className="space-y-6 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-state-error-bg">
+            <svg
+              className="h-6 w-6 text-state-error-text"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </div>
          <h1 className="text-2xl font-bold text-text-primary">Invalid reset link</h1>
          <p className="text-text-secondary">
            Invalid or missing reset link. Please request a new password reset.
@@ -79,24 +79,24 @@ function ResetPasswordContent() {
      );
    }
 
-   if (isSuccess) {
-     return (
-       <div className="space-y-6 text-center">
-         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-900/50">
-           <svg
-             className="h-6 w-6 text-green-400"
-             fill="none"
-             viewBox="0 0 24 24"
-             stroke="currentColor"
-           >
-             <path
-               strokeLinecap="round"
-               strokeLinejoin="round"
-               strokeWidth={2}
-               d="M5 13l4 4L19 7"
-             />
-           </svg>
-         </div>
+    if (isSuccess) {
+      return (
+        <div className="space-y-6 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-success-subtle">
+            <svg
+              className="h-6 w-6 text-state-success-text"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+          </div>
          <h1 className="text-2xl font-bold text-text-primary">
            Password reset successfully
          </h1>
