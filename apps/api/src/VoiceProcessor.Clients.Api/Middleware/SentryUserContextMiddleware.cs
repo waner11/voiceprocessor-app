@@ -16,9 +16,9 @@ public class SentryUserContextMiddleware
     {
         var currentUserService = context.RequestServices.GetRequiredService<ICurrentUserService>();
 
-        if (currentUserService.IsAuthenticated)
+        SentrySdk.ConfigureScope(scope =>
         {
-            SentrySdk.ConfigureScope(scope =>
+            if (currentUserService.IsAuthenticated)
             {
                 scope.User = new SentryUser
                 {
@@ -30,8 +30,12 @@ public class SentryUserContextMiddleware
                         { "AuthMethod", currentUserService.AuthMethod ?? "unknown" }
                     }
                 };
-            });
-        }
+            }
+            else
+            {
+                scope.User = null;
+            }
+        });
 
         await _next(context);
     }

@@ -17,83 +17,98 @@ public class SentryUserContextMiddlewareTests
     public async Task InvokeAsync_AuthenticatedUser_ConfiguresSentryScopeWithUserData()
     {
         // Arrange
-        using var sentryHandle = SentrySdk.Init(options =>
+        var sentryHandle = SentrySdk.Init(options =>
         {
             options.Dsn = "https://examplePublicKey@o0.ingest.sentry.io/0";
             options.IsGlobalModeEnabled = true;
         });
 
-        var userId = Guid.NewGuid();
-        var mockCurrentUser = new Mock<ICurrentUserService>();
-        mockCurrentUser.Setup(x => x.IsAuthenticated).Returns(true);
-        mockCurrentUser.Setup(x => x.UserId).Returns(userId);
-        mockCurrentUser.Setup(x => x.Email).Returns("user@example.com");
-        mockCurrentUser.Setup(x => x.Tier).Returns("free");
-        mockCurrentUser.Setup(x => x.AuthMethod).Returns("password");
-
-        var services = new ServiceCollection();
-        services.AddSingleton(mockCurrentUser.Object);
-        var sp = services.BuildServiceProvider();
-
-        var context = new DefaultHttpContext { RequestServices = sp };
-        var nextCalled = false;
-        var middleware = new SentryUserContextMiddleware(_ =>
+        try
         {
-            nextCalled = true;
-            return Task.CompletedTask;
-        });
+            var userId = Guid.NewGuid();
+            var mockCurrentUser = new Mock<ICurrentUserService>();
+            mockCurrentUser.Setup(x => x.IsAuthenticated).Returns(true);
+            mockCurrentUser.Setup(x => x.UserId).Returns(userId);
+            mockCurrentUser.Setup(x => x.Email).Returns("user@example.com");
+            mockCurrentUser.Setup(x => x.Tier).Returns("free");
+            mockCurrentUser.Setup(x => x.AuthMethod).Returns("password");
 
-        // Act
-        await middleware.InvokeAsync(context);
+            var services = new ServiceCollection();
+            services.AddSingleton(mockCurrentUser.Object);
+            var sp = services.BuildServiceProvider();
 
-        // Assert
-        nextCalled.Should().BeTrue();
+            var context = new DefaultHttpContext { RequestServices = sp };
+            var nextCalled = false;
+            var middleware = new SentryUserContextMiddleware(_ =>
+            {
+                nextCalled = true;
+                return Task.CompletedTask;
+            });
 
-        SentryUser? capturedUser = null;
-        SentrySdk.ConfigureScope(scope => capturedUser = scope.User);
+            // Act
+            await middleware.InvokeAsync(context);
 
-        capturedUser.Should().NotBeNull("scope.User should be set for authenticated users");
-        capturedUser!.Id.Should().Be(userId.ToString());
-        capturedUser.Email.Should().Be("user@example.com");
-        capturedUser.Other.Should().Contain("Tier", "free");
-        capturedUser.Other.Should().Contain("AuthMethod", "password");
+            // Assert
+            nextCalled.Should().BeTrue();
+
+            SentryUser? capturedUser = null;
+            SentrySdk.ConfigureScope(s => capturedUser = s.User);
+
+            capturedUser.Should().NotBeNull("scope.User should be set for authenticated users");
+            capturedUser!.Id.Should().Be(userId.ToString());
+            capturedUser.Email.Should().Be("user@example.com");
+            capturedUser.Other.Should().Contain("Tier", "free");
+            capturedUser.Other.Should().Contain("AuthMethod", "password");
+        }
+        finally
+        {
+            sentryHandle.Dispose();
+        }
     }
 
     [Fact]
     public async Task InvokeAsync_UnauthenticatedUser_DoesNotConfigureSentryScope()
     {
         // Arrange
-        using var sentryHandle = SentrySdk.Init(options =>
+        var sentryHandle = SentrySdk.Init(options =>
         {
             options.Dsn = "https://examplePublicKey@o0.ingest.sentry.io/0";
             options.IsGlobalModeEnabled = true;
         });
 
-        var mockCurrentUser = new Mock<ICurrentUserService>();
-        mockCurrentUser.Setup(x => x.IsAuthenticated).Returns(false);
-
-        var services = new ServiceCollection();
-        services.AddSingleton(mockCurrentUser.Object);
-        var sp = services.BuildServiceProvider();
-
-        var context = new DefaultHttpContext { RequestServices = sp };
-        var nextCalled = false;
-        var middleware = new SentryUserContextMiddleware(_ =>
+        try
         {
-            nextCalled = true;
-            return Task.CompletedTask;
-        });
+            var mockCurrentUser = new Mock<ICurrentUserService>();
+            mockCurrentUser.Setup(x => x.IsAuthenticated).Returns(false);
 
-        // Act
-        await middleware.InvokeAsync(context);
+            var services = new ServiceCollection();
+            services.AddSingleton(mockCurrentUser.Object);
+            var sp = services.BuildServiceProvider();
 
-        // Assert
-        nextCalled.Should().BeTrue();
+            var context = new DefaultHttpContext { RequestServices = sp };
+            var nextCalled = false;
+            var middleware = new SentryUserContextMiddleware(_ =>
+            {
+                nextCalled = true;
+                return Task.CompletedTask;
+            });
 
-        SentryUser? capturedUser = null;
-        SentrySdk.ConfigureScope(scope => capturedUser = scope.User);
+            // Act
+            await middleware.InvokeAsync(context);
 
-        capturedUser.Should().BeNull("scope.User must not be set for unauthenticated requests");
+            // Assert
+            nextCalled.Should().BeTrue();
+
+            SentryUser? capturedUser = null;
+            SentrySdk.ConfigureScope(s => capturedUser = s.User);
+
+            capturedUser?.Id.Should().BeNull("scope.User.Id must not be set for unauthenticated requests");
+            capturedUser?.Email.Should().BeNull("scope.User.Email must not be set for unauthenticated requests");
+        }
+        finally
+        {
+            sentryHandle.Dispose();
+        }
     }
 }
 
