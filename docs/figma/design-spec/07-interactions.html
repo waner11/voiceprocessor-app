@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>07 Interaction Notes — VP Design System</title>
+  <link rel="stylesheet" href="tokens.css">
+  <style>
+    .motion-demo {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: var(--space-6);
+    }
+
+    .motion-card {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: var(--space-6);
+    }
+
+    .motion-card h4 {
+      font: var(--text-h4);
+      margin-bottom: var(--space-1);
+    }
+
+    .motion-card .timing {
+      font: var(--text-mono);
+      color: var(--indigo);
+      margin-bottom: var(--space-3);
+    }
+
+    .motion-card p {
+      font: var(--text-body-s);
+      color: var(--text-muted);
+      margin-bottom: var(--space-4);
+    }
+
+    .demo-area {
+      background: var(--bg-sunken);
+      border-radius: var(--radius-sm);
+      padding: var(--space-5);
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .demo-label {
+      font: var(--text-label);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      position: absolute;
+      top: var(--space-2);
+      left: var(--space-3);
+    }
+
+    /* Page Transition */
+    .page-fade {
+      width: 200px;
+      height: 120px;
+      background: var(--bg-base);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font: var(--text-body-s);
+      color: var(--text-secondary);
+      animation: pageFadeSlide 3s var(--ease-default) infinite;
+    }
+
+    @keyframes pageFadeSlide {
+      0% { opacity: 0; transform: translateY(8px); }
+      15% { opacity: 1; transform: translateY(0); }
+      85% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-8px); }
+    }
+
+    /* Card Hover */
+    .hover-card-demo {
+      width: 200px;
+      height: 100px;
+      background: var(--bg-base);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-soft-1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font: var(--text-body-s);
+      color: var(--text-secondary);
+      transition: all 300ms var(--ease-default);
+      cursor: pointer;
+    }
+
+    .hover-card-demo:hover {
+      box-shadow: var(--shadow-soft-2);
+      transform: translateY(-2px);
+      border-color: var(--border-strong);
+    }
+
+    /* Button Press */
+    .press-btn-demo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 44px;
+      padding: 0 24px;
+      background: var(--indigo);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      font: var(--text-body-m);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 150ms var(--ease-default);
+    }
+
+    .press-btn-demo:hover {
+      background: var(--indigo-dark);
+    }
+
+    .press-btn-demo:active {
+      transform: scale(0.97);
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    /* Loading spinner */
+    .spinner-demo {
+      width: 24px;
+      height: 24px;
+      border: 2.5px solid var(--border-subtle);
+      border-top-color: var(--indigo);
+      border-radius: 50%;
+      animation: spin 700ms linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Progress bar */
+    .progress-demo {
+      width: 100%;
+      max-width: 280px;
+      height: 6px;
+      background: var(--neutral-100);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+
+    .progress-demo-fill {
+      height: 100%;
+      background: var(--indigo);
+      border-radius: var(--radius-full);
+      animation: progressFill 3s var(--ease-default) infinite;
+    }
+
+    @keyframes progressFill {
+      0% { width: 0%; }
+      80% { width: 100%; }
+      100% { width: 100%; }
+    }
+
+    /* Skeleton shimmer */
+    .skeleton-demo {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      width: 100%;
+      max-width: 280px;
+    }
+
+    .skeleton-line {
+      height: 14px;
+      background: linear-gradient(90deg, var(--neutral-50) 25%, var(--neutral-100) 50%, var(--neutral-50) 75%);
+      background-size: 200% 100%;
+      border-radius: var(--radius-xs);
+      animation: shimmer 1.5s ease infinite;
+    }
+
+    .skeleton-line:nth-child(1) { width: 60%; }
+    .skeleton-line:nth-child(2) { width: 100%; }
+    .skeleton-line:nth-child(3) { width: 80%; }
+    .skeleton-line:nth-child(4) { width: 45%; height: 10px; }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Pulse badge */
+    .pulse-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: 4px 12px;
+      background: var(--indigo-subtle);
+      color: var(--indigo);
+      border-radius: var(--radius-full);
+      font: var(--text-label);
+      font-weight: 500;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--indigo);
+      border-radius: 50%;
+      animation: pulse 2s ease infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    /* Toast slide */
+    .toast-demo {
+      width: 320px;
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-left: 3px solid var(--success);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3) var(--space-4);
+      box-shadow: var(--shadow-soft-2);
+      font: var(--text-body-s);
+      animation: toastSlide 4s var(--ease-default) infinite;
+    }
+
+    @keyframes toastSlide {
+      0% { opacity: 0; transform: translateX(100%); }
+      10% { opacity: 1; transform: translateX(0); }
+      80% { opacity: 1; transform: translateX(0); }
+      100% { opacity: 0; transform: translateX(100%); }
+    }
+
+    /* Waveform animation */
+    .waveform-demo {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      height: 32px;
+    }
+
+    .waveform-demo .bar {
+      width: 3px;
+      background: var(--indigo);
+      border-radius: 2px;
+      animation: waveBar 1.2s ease infinite;
+    }
+
+    .waveform-demo .bar:nth-child(1) { animation-delay: 0s; }
+    .waveform-demo .bar:nth-child(2) { animation-delay: 0.1s; }
+    .waveform-demo .bar:nth-child(3) { animation-delay: 0.2s; }
+    .waveform-demo .bar:nth-child(4) { animation-delay: 0.3s; }
+    .waveform-demo .bar:nth-child(5) { animation-delay: 0.4s; }
+    .waveform-demo .bar:nth-child(6) { animation-delay: 0.5s; }
+    .waveform-demo .bar:nth-child(7) { animation-delay: 0.6s; }
+    .waveform-demo .bar:nth-child(8) { animation-delay: 0.7s; }
+
+    @keyframes waveBar {
+      0%, 100% { height: 8px; }
+      50% { height: 28px; }
+    }
+
+    /* Focus ring */
+    .focus-demo-input {
+      width: 240px;
+      height: 44px;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 0 var(--space-4);
+      font: var(--text-body-m);
+      outline: none;
+      transition: all 150ms var(--ease-default);
+      background: var(--bg-base);
+    }
+
+    .focus-demo-input:focus {
+      border-color: var(--indigo);
+      box-shadow: var(--shadow-focus);
+    }
+
+    /* Status flow */
+    .status-flow {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+    }
+
+    .status-step {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font: var(--text-label);
+      font-weight: 500;
+    }
+
+    .status-step.pending { background: var(--neutral-50); color: var(--text-muted); }
+    .status-step.analyzing { background: var(--state-info-bg); color: var(--state-info-text); }
+    .status-step.chunking { background: var(--state-info-bg); color: var(--state-info-text); }
+    .status-step.processing { background: var(--indigo-subtle); color: var(--indigo); }
+    .status-step.merging { background: var(--indigo-subtle); color: var(--indigo); }
+    .status-step.completed { background: var(--state-success-bg); color: var(--state-success-text); }
+    .status-step.failed { background: var(--state-error-bg); color: var(--state-error-text); }
+    .status-step.cancelled { background: var(--neutral-50); color: var(--text-muted); }
+
+    .status-arrow {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    /* Easing visualization */
+    .easing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-4);
+    }
+
+    .easing-card {
+      text-align: center;
+    }
+
+    .easing-card .name {
+      font: var(--text-label);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-2);
+    }
+
+    .easing-card .value {
+      font: var(--text-mono);
+      color: var(--text-secondary);
+      margin-bottom: var(--space-3);
+    }
+
+    .easing-track {
+      width: 100%;
+      height: 4px;
+      background: var(--neutral-100);
+      border-radius: 2px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .easing-ball {
+      width: 16px;
+      height: 16px;
+      background: var(--indigo);
+      border-radius: 50%;
+      position: absolute;
+      top: -6px;
+    }
+
+    .easing-ball.ease-fast {
+      animation: easeBall 1.5s cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
+    }
+
+    .easing-ball.ease-normal {
+      animation: easeBall 3s cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
+    }
+
+    .easing-ball.ease-slow {
+      animation: easeBall 5s cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
+    }
+
+    @keyframes easeBall {
+      0%, 100% { left: 0; }
+      50% { left: calc(100% - 16px); }
+    }
+
+    /* Modal animation */
+    .modal-anim-demo {
+      position: relative;
+      width: 100%;
+      height: 160px;
+    }
+
+    .modal-overlay-demo {
+      position: absolute;
+      inset: 0;
+      background: rgba(41, 41, 41, 0.5);
+      border-radius: var(--radius-sm);
+      animation: overlayFade 4s ease infinite;
+    }
+
+    .modal-card-demo {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 200px;
+      height: 80px;
+      background: var(--bg-base);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-elevated);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font: var(--text-body-s);
+      color: var(--text-secondary);
+      animation: modalEnter 4s ease infinite;
+    }
+
+    @keyframes overlayFade {
+      0% { opacity: 0; }
+      15% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    @keyframes modalEnter {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
+      15% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
+    }
+  </style>
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+</head>
+<body>
+  <nav class="spec-nav">
+    <span class="logo">VP Design System</span>
+    <a href="index.html">Index</a>
+    <a href="00-foundations.html">Foundations</a>
+    <a href="01-marketing.html">Marketing</a>
+    <a href="02-auth.html">Auth</a>
+    <a href="03-app-shell.html">App Shell</a>
+    <a href="04-core-flows.html">Core Flows</a>
+    <a href="05-settings.html">Settings</a>
+    <a href="06-components.html">Components</a>
+    <a href="07-interactions.html" class="active">Interactions</a>
+  </nav>
+
+  <div class="spec-page">
+    <h1 style="font: var(--text-h1); margin-bottom: var(--space-2);">Interaction Notes</h1>
+    <p style="font: var(--text-body-l); color: var(--text-muted); margin-bottom: var(--space-12);">Motion behaviors, transitions, and animation patterns for VoiceProcessor.</p>
+
+    <!-- Timing & Easing -->
+    <section class="spec-section">
+      <h2 class="spec-section-title">Timing &amp; Easing</h2>
+      <p class="spec-section-desc">Three duration tiers with a shared easing curve. Intentional and sparse — no excessive bounce.</p>
+
+      <div class="easing-grid">
+        <div class="easing-card">
+          <div class="name">Fast</div>
+          <div class="value">150ms</div>
+          <div class="easing-track">
+            <div class="easing-ball ease-fast"></div>
+          </div>
+          <p style="font: var(--text-body-s); color: var(--text-muted); margin-top: var(--space-2);">Micro-interactions: button press, focus ring, toggle</p>
+        </div>
+        <div class="easing-card">
+          <div class="name">Normal</div>
+          <div class="value">300ms</div>
+          <div class="easing-track">
+            <div class="easing-ball ease-normal"></div>
+          </div>
+          <p style="font: var(--text-body-s); color: var(--text-muted); margin-top: var(--space-2);">Card hover, dropdown open, tab switch, toast enter</p>
+        </div>
+        <div class="easing-card">
+          <div class="name">Slow</div>
+          <div class="value">500ms</div>
+          <div class="easing-track">
+            <div class="easing-ball ease-slow"></div>
+          </div>
+          <p style="font: var(--text-body-s); color: var(--text-muted); margin-top: var(--space-2);">Page transition, modal enter/exit, skeleton fade</p>
+        </div>
+      </div>
+
+      <p style="font: var(--text-mono); color: var(--text-secondary); margin-top: var(--space-4);">Easing: cubic-bezier(0.25, 0.1, 0.25, 1) — smooth deceleration, no bounce</p>
+    </section>
+
+    <!-- Motion Patterns -->
+    <section class="spec-section">
+      <h2 class="spec-section-title">Motion Patterns</h2>
+      <p class="spec-section-desc">Live demos of each motion pattern. Hover or observe to see the behavior.</p>
+
+      <div class="motion-demo">
+        <!-- Page Transition -->
+        <div class="motion-card">
+          <h4>Page Transition</h4>
+          <div class="timing">500ms ease | fade + slide-up 8px</div>
+          <p>Subtle vertical shift when navigating between pages. Content fades in from below.</p>
+          <div class="demo-area">
+            <div class="demo-label">Auto-playing</div>
+            <div class="page-fade">Page Content</div>
+          </div>
+        </div>
+
+        <!-- Card Hover -->
+        <div class="motion-card">
+          <h4>Card Hover Elevation</h4>
+          <div class="timing">300ms ease | translateY(-2px) + shadow</div>
+          <p>Interactive cards lift slightly on hover with enhanced shadow. Hover below to see.</p>
+          <div class="demo-area">
+            <div class="demo-label">Hover me</div>
+            <div class="hover-card-demo">Hover this card</div>
+          </div>
+        </div>
+
+        <!-- Button Press -->
+        <div class="motion-card">
+          <h4>Button Press Feedback</h4>
+          <div class="timing">150ms ease | scale(0.97) + inset shadow</div>
+          <p>Buttons scale down subtly on click for tactile feedback. Click to see.</p>
+          <div class="demo-area">
+            <div class="demo-label">Click me</div>
+            <button class="press-btn-demo">Press Me</button>
+          </div>
+        </div>
+
+        <!-- Focus Ring -->
+        <div class="motion-card">
+          <h4>Focus Ring</h4>
+          <div class="timing">150ms ease | border-color + box-shadow</div>
+          <p>Inputs show an indigo border and soft glow on focus. Click the input.</p>
+          <div class="demo-area">
+            <div class="demo-label">Focus me</div>
+            <input class="focus-demo-input" type="text" placeholder="Click to focus...">
+          </div>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div class="motion-card">
+          <h4>Loading Spinner</h4>
+          <div class="timing">700ms linear | continuous rotation</div>
+          <p>Used in buttons and inline loading states. Single arc spinner.</p>
+          <div class="demo-area">
+            <div class="demo-label">Auto-playing</div>
+            <div class="spinner-demo"></div>
+          </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="motion-card">
+          <h4>Progress / Loading Bar</h4>
+          <div class="timing">Variable | ease fill</div>
+          <p>Determinate progress for generation steps, uploads, and usage meters.</p>
+          <div class="demo-area">
+            <div class="demo-label">Auto-playing</div>
+            <div class="progress-demo">
+              <div class="progress-demo-fill"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Skeleton Shimmer -->
+        <div class="motion-card">
+          <h4>Skeleton Loading</h4>
+          <div class="timing">1.5s ease | gradient sweep</div>
+          <p>Content placeholders with a subtle shimmer effect while data loads.</p>
+          <div class="demo-area">
+            <div class="demo-label">Auto-playing</div>
+            <div class="skeleton-demo">
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Audio Waveform -->
+        <div class="motion-card">
+          <h4>Audio Waveform</h4>
+          <div class="timing">1.2s ease | staggered bar animation</div>
+          <p>Animated waveform bars indicate active audio playback on voice cards and players.</p>
+          <div class="demo-area">
+            <div class="demo-label">Auto-playing</div>
+            <div class="waveform-demo">
+              <div class="bar" style="height: 12px;"></div>
+              <div class="bar" style="height: 20px;"></div>
+              <div class="bar" style="height: 8px;"></div>
+              <div class="bar" style="height: 24px;"></div>
+              <div class="bar" style="height: 16px;"></div>
+              <div class="bar" style="height: 28px;"></div>
+              <div class="bar" style="height: 10px;"></div>
+              <div class="bar" style="height: 18px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Toast Notification -->
+        <div class="motion-card">
+          <h4>Toast Notification</h4>
+          <div class="timing">300ms ease | slide from right + fade</div>
+          <p>Toasts slide in from the right edge and auto-dismiss after a delay.</p>
+          <div class="demo-area" style="justify-content: flex-end; overflow: hidden;">
+            <div class="demo-label">Auto-playing</div>
+            <div class="toast-demo">Generation completed successfully</div>
+          </div>
+        </div>
+
+        <!-- Modal Enter -->
+        <div class="motion-card">
+          <h4>Modal Enter / Exit</h4>
+          <div class="timing">500ms ease | overlay fade + card scale</div>
+          <p>Overlay fades in while the modal card scales up from 95% to 100%.</p>
+          <div class="demo-area" style="padding: 0;">
+            <div class="modal-anim-demo">
+              <div class="modal-overlay-demo"></div>
+              <div class="modal-card-demo">Modal Content</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pulse Badge -->
+        <div class="motion-card">
+          <h4>Processing Pulse</h4>
+          <div class="timing">2s ease | opacity + scale pulse</div>
+          <p>Pulsing dot indicates ongoing processing or real-time updates.</p>
+          <div class="demo-area">
+            <div class="demo-label">Auto-playing</div>
+            <span class="pulse-badge"><span class="pulse-dot"></span> Processing</span>
+          </div>
+        </div>
+
+        <!-- Dropdown -->
+        <div class="motion-card">
+          <h4>Dropdown Open</h4>
+          <div class="timing">300ms ease | opacity + translateY(4px)</div>
+          <p>Dropdowns fade in with a subtle downward shift from the trigger.</p>
+          <div class="demo-area">
+            <div class="demo-label">Spec only</div>
+            <div style="text-align: center;">
+              <div style="font: var(--text-body-s); color: var(--text-secondary); padding: 8px 16px; background: var(--bg-base); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); display: inline-block;">Trigger</div>
+              <div style="margin-top: 4px; font: var(--text-body-s); color: var(--text-secondary); padding: 8px 16px; background: var(--bg-base); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); box-shadow: var(--shadow-soft-2); display: inline-block;">
+                origin: top<br>transform: translateY(4px) &rarr; 0
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Generation Status States -->
+    <section class="spec-section">
+      <h2 class="spec-section-title">Generation Status Flow</h2>
+      <p class="spec-section-desc">The lifecycle of a generation job. Each state has a corresponding visual treatment.</p>
+
+      <div style="background: var(--bg-base); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-8);">
+        <h4 style="font: var(--text-h4); margin-bottom: var(--space-4);">Happy Path</h4>
+        <div class="status-flow" style="margin-bottom: var(--space-8);">
+          <span class="status-step pending">Pending</span>
+          <span class="status-arrow">&rarr;</span>
+          <span class="status-step analyzing">Analyzing</span>
+          <span class="status-arrow">&rarr;</span>
+          <span class="status-step chunking">Chunking</span>
+          <span class="status-arrow">&rarr;</span>
+          <span class="status-step processing"><span class="pulse-dot" style="width: 6px; height: 6px; display: inline-block; margin-right: 4px;"></span>Processing</span>
+          <span class="status-arrow">&rarr;</span>
+          <span class="status-step merging">Merging</span>
+          <span class="status-arrow">&rarr;</span>
+          <span class="status-step completed">Completed</span>
+        </div>
+
+        <h4 style="font: var(--text-h4); margin-bottom: var(--space-4);">Error Path</h4>
+        <div class="status-flow" style="margin-bottom: var(--space-8);">
+          <span class="status-step pending">Pending</span>
+          <span class="status-arrow">&rarr;</span>
+          <span class="status-step processing"><span class="pulse-dot" style="width: 6px; height: 6px; display: inline-block; margin-right: 4px;"></span>Processing</span>
+          <span class="status-arrow">&rarr;</span>
+          <span class="status-step failed">Failed</span>
+        </div>
+
+        <h4 style="font: var(--text-h4); margin-bottom: var(--space-4);">Cancelled</h4>
+        <div class="status-flow">
+          <span class="status-step pending">Pending</span>
+          <span class="status-arrow">&rarr;</span>
+          <span class="status-step cancelled">Cancelled</span>
+        </div>
+      </div>
+
+      <div style="margin-top: var(--space-6); display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: var(--space-4);">
+        <div style="padding: var(--space-4); background: var(--bg-base); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);">
+          <div class="spec-label">Pending</div>
+          <p style="font: var(--text-body-s); color: var(--text-secondary);">Neutral gray pill. Static. Job is queued.</p>
+        </div>
+        <div style="padding: var(--space-4); background: var(--bg-base); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);">
+          <div class="spec-label">Analyzing / Chunking</div>
+          <p style="font: var(--text-body-s); color: var(--text-secondary);">Sky blue pill. Static. Pre-processing text.</p>
+        </div>
+        <div style="padding: var(--space-4); background: var(--bg-base); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);">
+          <div class="spec-label">Processing / Merging</div>
+          <p style="font: var(--text-body-s); color: var(--text-secondary);">Indigo pill with pulsing dot. Active generation.</p>
+        </div>
+        <div style="padding: var(--space-4); background: var(--bg-base); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);">
+          <div class="spec-label">Completed</div>
+          <p style="font: var(--text-body-s); color: var(--text-secondary);">Green pill. Audio ready for playback and download.</p>
+        </div>
+        <div style="padding: var(--space-4); background: var(--bg-base); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);">
+          <div class="spec-label">Failed</div>
+          <p style="font: var(--text-body-s); color: var(--text-secondary);">Red pill. Error occurred. Shows retry option.</p>
+        </div>
+        <div style="padding: var(--space-4); background: var(--bg-base); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);">
+          <div class="spec-label">Cancelled</div>
+          <p style="font: var(--text-body-s); color: var(--text-secondary);">Gray pill. User-initiated cancellation.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Guidelines -->
+    <section class="spec-section">
+      <h2 class="spec-section-title">Animation Guidelines</h2>
+      <p class="spec-section-desc">Rules for applying motion consistently across the product.</p>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6);">
+        <div style="background: var(--state-success-bg); border: 1px solid var(--state-success-border); border-radius: var(--radius-md); padding: var(--space-6);">
+          <h4 style="font: var(--text-h4); color: var(--state-success-text); margin-bottom: var(--space-3);">Do</h4>
+          <ul style="font: var(--text-body-s); color: var(--text-secondary); list-style: none; display: flex; flex-direction: column; gap: var(--space-2);">
+            <li>Use motion to provide feedback (button press, focus, success)</li>
+            <li>Keep transitions under 500ms</li>
+            <li>Use the shared easing curve for consistency</li>
+            <li>Animate properties that are GPU-accelerated (transform, opacity)</li>
+            <li>Respect prefers-reduced-motion</li>
+            <li>Use subtle elevation changes on hover for interactive elements</li>
+          </ul>
+        </div>
+        <div style="background: var(--state-error-bg); border: 1px solid var(--state-error-border); border-radius: var(--radius-md); padding: var(--space-6);">
+          <h4 style="font: var(--text-h4); color: var(--state-error-text); margin-bottom: var(--space-3);">Don't</h4>
+          <ul style="font: var(--text-body-s); color: var(--text-secondary); list-style: none; display: flex; flex-direction: column; gap: var(--space-2);">
+            <li>Use bounce or spring physics (feels playful, not premium)</li>
+            <li>Animate layout properties (width, height, margin, padding)</li>
+            <li>Stack multiple simultaneous animations</li>
+            <li>Add motion for decorative purposes only</li>
+            <li>Use delays longer than 100ms on UI feedback</li>
+            <li>Animate anything during scrolling</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Reduced Motion -->
+    <section class="spec-section">
+      <h2 class="spec-section-title">Accessibility: Reduced Motion</h2>
+      <p class="spec-section-desc">When prefers-reduced-motion is set, all transitions reduce to instant or minimal fade.</p>
+
+      <div style="background: var(--bg-base); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-6);">
+        <pre style="font: var(--text-mono); color: var(--text-secondary); white-space: pre-wrap;">@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}</pre>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

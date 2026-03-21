@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VoiceProcessor — Redesign v1 Design Spec</title>
+  <link rel="stylesheet" href="tokens.css">
+  <style>
+    .index-hero {
+      text-align: center;
+      padding: var(--space-16) var(--space-8) var(--space-12);
+    }
+
+    .index-hero h1 {
+      font: var(--text-display);
+      color: var(--text-primary);
+      margin-bottom: var(--space-3);
+    }
+
+    .index-hero .subtitle {
+      font: var(--text-body-l);
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto var(--space-2);
+    }
+
+    .index-hero .version {
+      font: var(--text-label);
+      color: var(--indigo);
+      background: var(--indigo-subtle);
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+      display: inline-block;
+      margin-top: var(--space-4);
+    }
+
+    .pages-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: var(--space-6);
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--space-8) var(--space-16);
+    }
+
+    .page-card {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: var(--space-6);
+      text-decoration: none;
+      color: inherit;
+      transition: all var(--duration-normal) var(--ease-default);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .page-card:hover {
+      border-color: var(--border-strong);
+      box-shadow: var(--shadow-soft-2);
+      transform: translateY(-2px);
+    }
+
+    .page-card .page-num {
+      font: var(--text-mono);
+      color: var(--indigo);
+      font-size: 11px;
+    }
+
+    .page-card h2 {
+      font: var(--text-h3);
+      color: var(--text-primary);
+    }
+
+    .page-card p {
+      font: var(--text-body-s);
+      color: var(--text-muted);
+      flex: 1;
+    }
+
+    .page-card .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+    }
+
+    .page-card .tag {
+      font: var(--text-label);
+      color: var(--text-secondary);
+      background: var(--bg-sunken);
+      padding: 2px 8px;
+      border-radius: var(--radius-xs);
+    }
+
+    .serve-info {
+      max-width: 800px;
+      margin: 0 auto var(--space-16);
+      padding: 0 var(--space-8);
+    }
+
+    .serve-card {
+      background: var(--neutral-900);
+      border-radius: var(--radius-md);
+      padding: var(--space-6);
+      color: #E5E5E5;
+    }
+
+    .serve-card h3 {
+      font: var(--text-h4);
+      color: #FFFFFF;
+      margin-bottom: var(--space-3);
+    }
+
+    .serve-card p {
+      font: var(--text-body-s);
+      color: var(--neutral-300);
+      margin-bottom: var(--space-4);
+    }
+
+    .serve-card code {
+      display: block;
+      font: var(--text-mono);
+      font-size: 14px;
+      background: rgba(255,255,255,0.06);
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-sm);
+      margin-bottom: var(--space-2);
+      color: var(--teal-light);
+    }
+
+    .serve-card .note {
+      font: var(--text-body-s);
+      color: var(--neutral-500);
+      margin-top: var(--space-3);
+    }
+  </style>
+</head>
+<body>
+  <nav class="spec-nav">
+    <span class="logo">VP Design System</span>
+    <a href="index.html" class="active">Index</a>
+    <a href="00-foundations.html">Foundations</a>
+    <a href="01-marketing.html">Marketing</a>
+    <a href="02-auth.html">Auth</a>
+    <a href="03-app-shell.html">App Shell</a>
+    <a href="04-core-flows.html">Core Flows</a>
+    <a href="05-settings.html">Settings</a>
+    <a href="06-components.html">Components</a>
+    <a href="07-interactions.html">Interactions</a>
+  </nav>
+
+  <div class="index-hero">
+    <h1>VoiceProcessor</h1>
+    <p class="subtitle">Redesign v1 — Full design spec for the multi-provider TTS platform. Premium, calm, audio-native.</p>
+    <span class="version">Design Spec v1.0</span>
+  </div>
+
+  <div class="pages-grid">
+    <a href="00-foundations.html" class="page-card">
+      <span class="page-num">00</span>
+      <h2>Foundations</h2>
+      <p>Design tokens: typography, color system, spacing, radius, shadows, and responsive grids.</p>
+      <div class="tag-row">
+        <span class="tag">DM Sans</span>
+        <span class="tag">Inter</span>
+        <span class="tag">7 neutrals</span>
+        <span class="tag">6 accents</span>
+        <span class="tag">3 grids</span>
+      </div>
+    </a>
+
+    <a href="01-marketing.html" class="page-card">
+      <span class="page-num">01</span>
+      <h2>Marketing</h2>
+      <p>Landing page: hero, trust strip, interactive demo, features mosaic, pricing, API section, footer.</p>
+      <div class="tag-row">
+        <span class="tag">Desktop 1440</span>
+        <span class="tag">Mobile 390</span>
+        <span class="tag">7 sections</span>
+      </div>
+    </a>
+
+    <a href="02-auth.html" class="page-card">
+      <span class="page-num">02</span>
+      <h2>Auth</h2>
+      <p>Authentication flows: login, register, forgot password, reset password with OAuth integration.</p>
+      <div class="tag-row">
+        <span class="tag">4 screens</span>
+        <span class="tag">OAuth</span>
+        <span class="tag">Dark shell</span>
+      </div>
+    </a>
+
+    <a href="03-app-shell.html" class="page-card">
+      <span class="page-num">03</span>
+      <h2>App Shell</h2>
+      <p>Header states, desktop and mobile navigation, layout structure, empty and loading states.</p>
+      <div class="tag-row">
+        <span class="tag">3 header states</span>
+        <span class="tag">Mobile nav</span>
+        <span class="tag">Skeleton</span>
+      </div>
+    </a>
+
+    <a href="04-core-flows.html" class="page-card">
+      <span class="page-num">04</span>
+      <h2>Core Flows</h2>
+      <p>Dashboard, generate page, generations list, generation detail, and voices catalog.</p>
+      <div class="tag-row">
+        <span class="tag">6 screens</span>
+        <span class="tag">Desktop + Mobile</span>
+        <span class="tag">Data tables</span>
+      </div>
+    </a>
+
+    <a href="05-settings.html" class="page-card">
+      <span class="page-num">05</span>
+      <h2>Settings &amp; Billing</h2>
+      <p>Profile, API keys, connections, billing with credit packs, and payment result pages.</p>
+      <div class="tag-row">
+        <span class="tag">6 screens</span>
+        <span class="tag">Forms</span>
+        <span class="tag">Payments</span>
+      </div>
+    </a>
+
+    <a href="06-components.html" class="page-card">
+      <span class="page-num">06</span>
+      <h2>Components</h2>
+      <p>Full component library: buttons, inputs, cards, badges, audio player, modals, and more with all states.</p>
+      <div class="tag-row">
+        <span class="tag">17 components</span>
+        <span class="tag">All states</span>
+        <span class="tag">Variants</span>
+      </div>
+    </a>
+
+    <a href="07-interactions.html" class="page-card">
+      <span class="page-num">07</span>
+      <h2>Interaction Notes</h2>
+      <p>Motion patterns, transitions, easing, loading states, and generation status lifecycle.</p>
+      <div class="tag-row">
+        <span class="tag">12 patterns</span>
+        <span class="tag">Live demos</span>
+        <span class="tag">Guidelines</span>
+      </div>
+    </a>
+  </div>
+
+  <div class="serve-info">
+    <div class="serve-card">
+      <h3>Serving Locally</h3>
+      <p>To view the full design spec in your browser, serve this directory with any static file server:</p>
+      <code>cd docs/figma/design-spec && python3 -m http.server 3333</code>
+      <code>cd docs/figma/design-spec && npx serve -p 3333</code>
+      <p class="note">Then open http://localhost:3333 in your browser. Use Figma's Code-to-Canvas to capture screens.</p>
+    </div>
+  </div>
+</body>
+</html>

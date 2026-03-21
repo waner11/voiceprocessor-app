@@ -1,0 +1,2074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Core Flows — VP Design System</title>
+  <link rel="stylesheet" href="tokens.css">
+  <style>
+    /* ========== APP HEADER (shared across screens) ========== */
+    .app-header {
+      height: 56px;
+      background: var(--bg-base);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      padding: 0 var(--space-6);
+      gap: var(--space-6);
+    }
+
+    .app-header-logo {
+      font: var(--text-h4);
+      color: var(--indigo);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex-shrink: 0;
+    }
+
+    .app-header-logo svg { flex-shrink: 0; }
+
+    .app-header-nav {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+
+    .app-header-nav a {
+      font: var(--text-body-s);
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-sm);
+      transition: all var(--duration-fast) var(--ease-default);
+    }
+
+    .app-header-nav a:hover { color: var(--text-primary); background: var(--bg-sunken); }
+    .app-header-nav a.active { color: var(--indigo); background: var(--indigo-subtle); font-weight: 500; }
+
+    .app-header-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+    }
+
+    .app-header-credits {
+      font: var(--text-body-s);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .app-header-credits strong {
+      color: var(--indigo);
+      font-weight: 600;
+    }
+
+    .app-header-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-full);
+      background: var(--indigo-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font: var(--text-label);
+      color: var(--indigo);
+      font-weight: 600;
+    }
+
+    /* ========== SCREEN CONTENT AREA ========== */
+    .screen-content {
+      background: var(--bg-surface);
+      min-height: 600px;
+    }
+
+    .content-wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--space-8);
+    }
+
+    /* ========== STAT CARDS ========== */
+    .stat-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-6);
+      margin-bottom: var(--space-8);
+    }
+
+    .stat-card {
+      background: var(--bg-base);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-soft-1);
+      padding: var(--space-6);
+    }
+
+    .stat-card-label {
+      font: var(--text-body-s);
+      color: var(--text-muted);
+      margin-bottom: var(--space-2);
+    }
+
+    .stat-card-value {
+      font: var(--text-h1);
+      color: var(--text-primary);
+      margin-bottom: var(--space-1);
+    }
+
+    .stat-card-value.indigo { color: var(--indigo); }
+
+    .stat-card-sub {
+      font: var(--text-body-s);
+      color: var(--text-muted);
+    }
+
+    /* ========== DATA TABLE ========== */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font: var(--text-body-s);
+    }
+
+    .data-table th {
+      font: var(--text-label);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      text-align: left;
+      padding: var(--space-3) var(--space-4);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .data-table td {
+      padding: var(--space-3) var(--space-4);
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      vertical-align: middle;
+    }
+
+    .data-table tr:last-child td { border-bottom: none; }
+
+    .data-table tbody tr:hover { background: var(--bg-sunken); }
+
+    /* ========== BADGES ========== */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      padding: 2px var(--space-2);
+      border-radius: var(--radius-xs);
+      font: var(--text-label);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .badge-success {
+      background: var(--state-success-bg);
+      color: var(--state-success-text);
+      border: 1px solid var(--state-success-border);
+    }
+
+    .badge-error {
+      background: var(--state-error-bg);
+      color: var(--state-error-text);
+      border: 1px solid var(--state-error-border);
+    }
+
+    .badge-indigo {
+      background: var(--indigo-subtle);
+      color: var(--indigo);
+      border: 1px solid var(--indigo-muted);
+    }
+
+    .badge-teal {
+      background: var(--teal-subtle);
+      color: var(--teal-dark);
+      border: 1px solid rgba(55, 200, 181, 0.25);
+    }
+
+    .badge-premium {
+      background: linear-gradient(135deg, var(--indigo-subtle), rgba(93,121,223,0.12));
+      color: var(--indigo-dark);
+      border: 1px solid var(--indigo-muted);
+    }
+
+    /* Pulse animation for processing */
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: var(--radius-full);
+      background: var(--indigo);
+      animation: pulse-dot 1.5s ease-in-out infinite;
+    }
+
+    /* ========== BUTTONS ========== */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-6);
+      background: var(--indigo);
+      color: var(--text-inverse);
+      font: var(--text-body-m);
+      font-weight: 600;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background var(--duration-fast) var(--ease-default);
+      text-decoration: none;
+    }
+
+    .btn-primary:hover { background: var(--indigo-dark); }
+
+    .btn-primary-lg {
+      padding: var(--space-4) var(--space-8);
+      font-size: 16px;
+      border-radius: var(--radius-md);
+    }
+
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      background: var(--bg-base);
+      color: var(--text-secondary);
+      font: var(--text-body-s);
+      font-weight: 500;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      background: none;
+      color: var(--text-link);
+      font: var(--text-body-s);
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    /* ========== FORM ELEMENTS ========== */
+    .textarea-wrap {
+      position: relative;
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .textarea-wrap:focus-within {
+      border-color: var(--border-focus);
+      box-shadow: var(--shadow-focus);
+    }
+
+    .textarea-field {
+      width: 100%;
+      min-height: 300px;
+      padding: var(--space-4);
+      font: var(--text-body-m);
+      color: var(--text-primary);
+      border: none;
+      outline: none;
+      resize: vertical;
+      background: transparent;
+    }
+
+    .textarea-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: var(--space-2) var(--space-4);
+      border-top: 1px solid var(--border-subtle);
+      background: var(--bg-sunken);
+    }
+
+    .char-count {
+      font: var(--text-body-s);
+      color: var(--text-muted);
+    }
+
+    .action-chips {
+      display: flex;
+      gap: var(--space-3);
+      margin-top: var(--space-4);
+    }
+
+    .action-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      font: var(--text-body-s);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-default);
+    }
+
+    .action-chip:hover {
+      border-color: var(--border-strong);
+      background: var(--bg-sunken);
+    }
+
+    .lang-detect {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-top: var(--space-3);
+      font: var(--text-body-s);
+      color: var(--text-muted);
+    }
+
+    /* ========== SETTINGS CARD ========== */
+    .settings-card {
+      background: var(--bg-base);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-soft-1);
+      padding: var(--space-6);
+    }
+
+    .settings-section {
+      margin-bottom: var(--space-6);
+      padding-bottom: var(--space-6);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .settings-section:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .settings-section-label {
+      font: var(--text-label);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-3);
+    }
+
+    .voice-selected {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .voice-selected-info {
+      flex: 1;
+    }
+
+    .voice-selected-name {
+      font: var(--text-body-m);
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .voice-play-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-full);
+      background: var(--indigo-subtle);
+      border: 1px solid var(--indigo-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* Pill / Segment control */
+    .segment-control {
+      display: flex;
+      background: var(--bg-sunken);
+      border-radius: var(--radius-sm);
+      padding: 3px;
+      gap: 2px;
+    }
+
+    .segment-option {
+      flex: 1;
+      padding: var(--space-2) var(--space-3);
+      text-align: center;
+      font: var(--text-body-s);
+      font-weight: 500;
+      color: var(--text-secondary);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-default);
+      white-space: nowrap;
+    }
+
+    .segment-option:hover { color: var(--text-primary); }
+
+    .segment-option.active {
+      background: var(--bg-base);
+      color: var(--indigo);
+      box-shadow: var(--shadow-soft-1);
+    }
+
+    /* Cost estimate */
+    .cost-provider {
+      font: var(--text-body-s);
+      color: var(--text-secondary);
+      margin-bottom: var(--space-2);
+    }
+
+    .cost-value {
+      font: var(--text-h2);
+      color: var(--indigo);
+      margin-bottom: var(--space-1);
+    }
+
+    .cost-usd {
+      font: var(--text-body-s);
+      color: var(--text-muted);
+      margin-bottom: var(--space-2);
+    }
+
+    .cost-duration {
+      font: var(--text-body-s);
+      color: var(--text-secondary);
+      margin-bottom: var(--space-4);
+    }
+
+    .cost-alt {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-3);
+      background: var(--teal-subtle);
+      border-radius: var(--radius-sm);
+      font: var(--text-body-s);
+      color: var(--text-secondary);
+    }
+
+    /* ========== FILTER BAR ========== */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-6);
+      flex-wrap: wrap;
+    }
+
+    .filter-select {
+      padding: var(--space-2) var(--space-3);
+      padding-right: var(--space-8);
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      font: var(--text-body-s);
+      color: var(--text-primary);
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23767676' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+    }
+
+    .search-input {
+      padding: var(--space-2) var(--space-4);
+      padding-left: 36px;
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      font: var(--text-body-s);
+      color: var(--text-primary);
+      min-width: 240px;
+      position: relative;
+    }
+
+    .search-wrap {
+      position: relative;
+      display: inline-flex;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    /* ========== PAGINATION ========== */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: var(--space-6);
+      padding-top: var(--space-4);
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .pagination-info {
+      font: var(--text-body-s);
+      color: var(--text-muted);
+    }
+
+    .pagination-pages {
+      display: flex;
+      gap: var(--space-1);
+    }
+
+    .page-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-sm);
+      font: var(--text-body-s);
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border: 1px solid transparent;
+      background: none;
+    }
+
+    .page-btn:hover { background: var(--bg-sunken); }
+
+    .page-btn.active {
+      background: var(--indigo);
+      color: var(--text-inverse);
+    }
+
+    /* ========== AUDIO PLAYER ========== */
+    .audio-player {
+      background: var(--bg-base);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-soft-2);
+      padding: var(--space-6);
+      display: flex;
+      align-items: center;
+      gap: var(--space-5);
+      margin-bottom: var(--space-6);
+    }
+
+    .play-btn-lg {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-full);
+      background: var(--indigo);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background var(--duration-fast) var(--ease-default);
+    }
+
+    .play-btn-lg:hover { background: var(--indigo-dark); }
+
+    .waveform {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      height: 40px;
+    }
+
+    .waveform-bar {
+      width: 3px;
+      border-radius: 2px;
+      background: var(--neutral-300);
+      transition: background var(--duration-fast) var(--ease-default);
+    }
+
+    .waveform-bar.played {
+      background: var(--indigo);
+    }
+
+    .player-time {
+      font: var(--text-body-s);
+      color: var(--text-secondary);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .player-speed {
+      padding: var(--space-1) var(--space-2);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xs);
+      font: var(--text-body-s);
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: var(--bg-base);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .player-controls {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      flex-shrink: 0;
+    }
+
+    .player-icon-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+    }
+
+    .player-icon-btn:hover { background: var(--bg-sunken); }
+
+    /* ========== DETAIL CARDS ========== */
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-6);
+    }
+
+    .detail-card {
+      background: var(--bg-base);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-soft-1);
+      padding: var(--space-6);
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: var(--space-3) 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .detail-row:last-child { border-bottom: none; }
+
+    .detail-label {
+      font: var(--text-body-s);
+      color: var(--text-muted);
+    }
+
+    .detail-value {
+      font: var(--text-body-s);
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .expandable-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      padding: var(--space-4) 0;
+    }
+
+    .expandable-content {
+      padding: var(--space-4);
+      background: var(--bg-sunken);
+      border-radius: var(--radius-sm);
+      font: var(--text-body-s);
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: var(--space-4);
+    }
+
+    /* ========== FEEDBACK ========== */
+    .feedback-section {
+      margin-top: var(--space-6);
+    }
+
+    .feedback-buttons {
+      display: flex;
+      gap: var(--space-3);
+      margin-top: var(--space-3);
+      margin-bottom: var(--space-4);
+    }
+
+    .feedback-btn {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      background: var(--bg-base);
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: all var(--duration-fast) var(--ease-default);
+    }
+
+    .feedback-btn:hover {
+      border-color: var(--indigo);
+      color: var(--indigo);
+    }
+
+    .feedback-textarea {
+      width: 100%;
+      min-height: 80px;
+      padding: var(--space-3);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      font: var(--text-body-s);
+      color: var(--text-primary);
+      resize: vertical;
+    }
+
+    /* ========== VOICE CARDS GRID ========== */
+    .voice-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-6);
+    }
+
+    .voice-card {
+      background: var(--bg-base);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-soft-1);
+      padding: var(--space-5);
+      border: 2px solid transparent;
+      transition: all var(--duration-fast) var(--ease-default);
+      position: relative;
+    }
+
+    .voice-card:hover {
+      box-shadow: var(--shadow-soft-2);
+    }
+
+    .voice-card.selected {
+      border-color: var(--indigo);
+    }
+
+    .voice-card.selected::after {
+      content: '';
+      position: absolute;
+      top: var(--space-3);
+      right: var(--space-3);
+      width: 22px;
+      height: 22px;
+      border-radius: var(--radius-full);
+      background: var(--indigo);
+    }
+
+    .voice-card-top {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-3);
+    }
+
+    .voice-card-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      background: var(--indigo-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font: var(--text-body-m);
+      font-weight: 600;
+      color: var(--indigo);
+      flex-shrink: 0;
+    }
+
+    .voice-card-avatar.teal { background: var(--teal-subtle); color: var(--teal-dark); }
+    .voice-card-avatar.sky { background: var(--sky-subtle); color: var(--sky-dark); }
+
+    .voice-card-name {
+      font: var(--text-body-m);
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .voice-card-provider {
+      font: var(--text-body-s);
+      color: var(--text-muted);
+    }
+
+    .voice-card-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-4);
+      font: var(--text-body-s);
+      color: var(--text-secondary);
+    }
+
+    .voice-card-meta span {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+
+    .voice-card-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .voice-card-price {
+      font: var(--text-body-s);
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .voice-play-sm {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-full);
+      background: var(--bg-sunken);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: none;
+      color: var(--text-secondary);
+      transition: all var(--duration-fast) var(--ease-default);
+    }
+
+    .voice-play-sm:hover {
+      background: var(--indigo-subtle);
+      color: var(--indigo);
+    }
+
+    .voice-card-badge {
+      position: absolute;
+      top: var(--space-3);
+      right: var(--space-3);
+    }
+
+    /* Playing state waveform */
+    @keyframes wave-anim {
+      0%, 100% { height: 8px; }
+      50% { height: 20px; }
+    }
+
+    .playing-wave {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      height: 24px;
+    }
+
+    .playing-wave span {
+      width: 3px;
+      border-radius: 2px;
+      background: var(--indigo);
+      animation: wave-anim 0.8s ease-in-out infinite;
+    }
+
+    .playing-wave span:nth-child(2) { animation-delay: 0.1s; }
+    .playing-wave span:nth-child(3) { animation-delay: 0.2s; }
+    .playing-wave span:nth-child(4) { animation-delay: 0.3s; }
+    .playing-wave span:nth-child(5) { animation-delay: 0.15s; }
+
+    /* ========== MOBILE GENERATE ========== */
+    .mobile-sticky-bar {
+      position: sticky;
+      bottom: 0;
+      background: var(--bg-base);
+      border-top: 1px solid var(--border-subtle);
+      padding: var(--space-4) var(--space-5);
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.06);
+    }
+
+    .mobile-sticky-bar .btn-primary {
+      width: 100%;
+    }
+
+    /* ========== METADATA ROW ========== */
+    .meta-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-5);
+      flex-wrap: wrap;
+    }
+
+    .meta-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-1) var(--space-3);
+      background: var(--bg-sunken);
+      border-radius: var(--radius-full);
+      font: var(--text-body-s);
+      color: var(--text-secondary);
+    }
+
+    .meta-separator {
+      width: 4px;
+      height: 4px;
+      border-radius: var(--radius-full);
+      background: var(--neutral-300);
+    }
+
+    /* ========== TWO-COLUMN LAYOUT ========== */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 0.67fr;
+      gap: var(--space-8);
+      align-items: start;
+    }
+
+    .sticky-col {
+      position: sticky;
+      top: 88px;
+    }
+
+    /* ========== BACK LINK ========== */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      font: var(--text-body-s);
+      color: var(--text-link);
+      text-decoration: none;
+      margin-bottom: var(--space-5);
+    }
+
+    .back-link:hover { text-decoration: underline; }
+
+    /* ========== TITLE ROW ========== */
+    .title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-6);
+      gap: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    /* ========== CHECKBOX ========== */
+    .fake-checkbox {
+      width: 16px;
+      height: 16px;
+      border: 1.5px solid var(--border-strong);
+      border-radius: 3px;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    .fake-checkbox.checked {
+      background: var(--indigo);
+      border-color: var(--indigo);
+    }
+
+    /* ========== ACTIONS MENU ========== */
+    .actions-dots {
+      display: flex;
+      gap: 3px;
+      cursor: pointer;
+      padding: var(--space-1);
+    }
+
+    .actions-dots span {
+      width: 4px;
+      height: 4px;
+      border-radius: var(--radius-full);
+      background: var(--text-muted);
+    }
+
+    /* ========== FAB ========== */
+    .fab {
+      position: absolute;
+      bottom: var(--space-8);
+      right: var(--space-8);
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-full);
+      background: var(--indigo);
+      box-shadow: var(--shadow-elevated);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background var(--duration-fast) var(--ease-default);
+    }
+
+    .fab:hover { background: var(--indigo-dark); }
+
+    /* ========== SCREEN FRAME OVERRIDES ========== */
+    .spec-frame-body.no-pad { padding: 0; }
+  </style>
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+</head>
+<body>
+
+  <!-- ========== NAVIGATION ========== -->
+  <nav class="spec-nav">
+    <span class="logo">VP Design System</span>
+    <a href="00-foundations.html">Foundations</a>
+    <a href="01-marketing.html">Marketing</a>
+    <a href="02-auth.html">Auth</a>
+    <a href="03-app-shell.html">App Shell</a>
+    <a href="04-core-flows.html" class="active">Core Flows</a>
+    <a href="05-settings.html">Settings</a>
+    <a href="06-components.html">Components</a>
+    <a href="07-interactions.html">Interactions</a>
+  </nav>
+
+  <main class="spec-page">
+
+    <section class="spec-section">
+      <h2 class="spec-section-title">Core App Flows</h2>
+      <p class="spec-section-desc">Primary screens for the VoiceProcessor application: Dashboard, Generate, Generations, Generation Detail, and Voice Library.</p>
+    </section>
+
+    <!-- ================================================================
+         1. DASHBOARD (Desktop 1440px)
+         ================================================================ -->
+    <section class="spec-section" id="dashboard">
+      <h3 class="spec-section-title">Dashboard</h3>
+      <p class="spec-section-desc">Landing screen after login. Shows account summary, recent activity, and quick actions.</p>
+
+      <div class="spec-frame">
+        <div class="spec-frame-label">
+          Dashboard — Desktop
+          <span class="dims">1440 &times; 900</span>
+        </div>
+        <div class="spec-frame-body no-pad">
+          <div class="screen-desktop" style="overflow: hidden;">
+
+            <!-- App Header -->
+            <header class="app-header">
+              <div class="app-header-logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="6" fill="#5D79DF"/><path d="M8 15V9M12 17V7M16 14V10" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+                VoiceProcessor
+              </div>
+              <nav class="app-header-nav">
+                <a href="#" class="active">Dashboard</a>
+                <a href="#">Generate</a>
+                <a href="#">Generations</a>
+                <a href="#">Voices</a>
+              </nav>
+              <div class="app-header-right">
+                <div class="app-header-credits">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#5D79DF" stroke-width="1.5"/><path d="M8 4.5v4l2.5 1.5" stroke="#5D79DF" stroke-width="1.5" stroke-linecap="round"/></svg>
+                  <strong>247</strong> credits
+                </div>
+                <div class="app-header-avatar">W</div>
+              </div>
+            </header>
+
+            <!-- Content -->
+            <div class="screen-content" style="position: relative; min-height: 780px;">
+              <div class="content-wrap">
+
+                <!-- Greeting -->
+                <h2 style="font: var(--text-h2); color: var(--text-primary); margin-bottom: var(--space-6);">Welcome back, Waner</h2>
+
+                <!-- Stat Cards -->
+                <div class="stat-cards">
+                  <div class="stat-card">
+                    <div class="stat-card-label">Credit Balance</div>
+                    <div class="stat-card-value indigo">247</div>
+                    <div class="stat-card-sub">credits remaining</div>
+                  </div>
+                  <div class="stat-card">
+                    <div class="stat-card-label">Total Generations</div>
+                    <div class="stat-card-value">38</div>
+                    <div class="stat-card-sub">audio files created</div>
+                  </div>
+                  <div class="stat-card">
+                    <div class="stat-card-label">Audio Duration</div>
+                    <div class="stat-card-value">2.4h</div>
+                    <div class="stat-card-sub">total generated</div>
+                  </div>
+                </div>
+
+                <!-- Recent Generations -->
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-5);">
+                  <h3 style="font: var(--text-h3); color: var(--text-primary);">Recent Generations</h3>
+                  <a href="#" class="btn-primary" style="text-decoration: none;">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    New Generation
+                  </a>
+                </div>
+
+                <div class="stat-card" style="padding: 0; overflow: hidden;">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>Title</th>
+                        <th>Provider</th>
+                        <th>Status</th>
+                        <th>Duration</th>
+                        <th>Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td style="font-weight: 500;">Chapter 1 - Introduction</td>
+                        <td>ElevenLabs</td>
+                        <td><span class="badge badge-success">Completed</span></td>
+                        <td>3:24</td>
+                        <td style="color: var(--text-muted);">Mar 15</td>
+                      </tr>
+                      <tr>
+                        <td style="font-weight: 500;">Product Demo Script</td>
+                        <td>OpenAI</td>
+                        <td><span class="badge badge-indigo"><span class="pulse-dot"></span> Processing</span></td>
+                        <td style="color: var(--text-muted);">--</td>
+                        <td style="color: var(--text-muted);">Mar 15</td>
+                      </tr>
+                      <tr>
+                        <td style="font-weight: 500;">Newsletter Audio</td>
+                        <td>Cartesia</td>
+                        <td><span class="badge badge-success">Completed</span></td>
+                        <td>1:47</td>
+                        <td style="color: var(--text-muted);">Mar 14</td>
+                      </tr>
+                      <tr>
+                        <td style="font-weight: 500;">Blog Post Narration</td>
+                        <td>Google Cloud</td>
+                        <td><span class="badge badge-error">Failed</span></td>
+                        <td style="color: var(--text-muted);">--</td>
+                        <td style="color: var(--text-muted);">Mar 13</td>
+                      </tr>
+                      <tr>
+                        <td style="font-weight: 500;">Training Module 3</td>
+                        <td>Amazon Polly</td>
+                        <td><span class="badge badge-success">Completed</span></td>
+                        <td>8:12</td>
+                        <td style="color: var(--text-muted);">Mar 12</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div style="padding: var(--space-3) var(--space-4); text-align: center; border-top: 1px solid var(--border-subtle);">
+                    <a href="#" class="btn-ghost">View all generations</a>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         2. GENERATE PAGE (Desktop 1440px)
+         ================================================================ -->
+    <section class="spec-section" id="generate-desktop">
+      <h3 class="spec-section-title">Generate Page</h3>
+      <p class="spec-section-desc">Two-column layout for text input (left) and voice/settings configuration (right).</p>
+
+      <div class="spec-frame">
+        <div class="spec-frame-label">
+          Generate — Desktop
+          <span class="dims">1440 &times; 960</span>
+        </div>
+        <div class="spec-frame-body no-pad">
+          <div class="screen-desktop" style="overflow: hidden;">
+
+            <!-- App Header -->
+            <header class="app-header">
+              <div class="app-header-logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="6" fill="#5D79DF"/><path d="M8 15V9M12 17V7M16 14V10" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+                VoiceProcessor
+              </div>
+              <nav class="app-header-nav">
+                <a href="#">Dashboard</a>
+                <a href="#" class="active">Generate</a>
+                <a href="#">Generations</a>
+                <a href="#">Voices</a>
+              </nav>
+              <div class="app-header-right">
+                <div class="app-header-credits">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#5D79DF" stroke-width="1.5"/><path d="M8 4.5v4l2.5 1.5" stroke="#5D79DF" stroke-width="1.5" stroke-linecap="round"/></svg>
+                  <strong>247</strong> credits
+                </div>
+                <div class="app-header-avatar">W</div>
+              </div>
+            </header>
+
+            <!-- Content -->
+            <div class="screen-content">
+              <div class="content-wrap">
+                <h2 style="font: var(--text-h2); color: var(--text-primary); margin-bottom: var(--space-6);">Create Generation</h2>
+
+                <div class="two-col">
+                  <!-- LEFT COLUMN -->
+                  <div>
+                    <div class="textarea-wrap">
+                      <textarea class="textarea-field" readonly>Welcome to the future of audio production. VoiceProcessor makes it easy to convert any text into natural-sounding speech. Whether you're creating audiobooks, podcasts, training materials, or product demos, our intelligent routing engine selects the best voice provider for your needs.</textarea>
+                      <div class="textarea-footer">
+                        <span class="char-count">142 / 500,000</span>
+                      </div>
+                    </div>
+
+                    <div class="action-chips">
+                      <span class="action-chip">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M3.5 5.5L7 9l3.5-3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" transform="rotate(180 7 5)"/><path d="M1 10v1.5A1.5 1.5 0 002.5 13h9a1.5 1.5 0 001.5-1.5V10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                        Upload Document
+                      </span>
+                      <span class="action-chip">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M9 5h4M9 9h4M5 9v4M9 1v4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                        Paste
+                      </span>
+                    </div>
+
+                    <div class="lang-detect">
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M1.5 7h11M7 1.5c-1.5 2-1.5 9 0 11M7 1.5c1.5 2 1.5 9 0 11" stroke="currentColor" stroke-width="1.2"/></svg>
+                      Detected: English
+                    </div>
+                  </div>
+
+                  <!-- RIGHT COLUMN -->
+                  <div class="sticky-col">
+                    <div class="settings-card">
+
+                      <!-- Voice Selection -->
+                      <div class="settings-section">
+                        <div class="settings-section-label">Select Voice</div>
+                        <div class="voice-selected">
+                          <div class="voice-play-btn">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 2.5v9l7.5-4.5L4 2.5z" fill="#5D79DF"/></svg>
+                          </div>
+                          <div class="voice-selected-info">
+                            <div class="voice-selected-name">Rachel — ElevenLabs</div>
+                          </div>
+                          <a href="#" class="btn-ghost" style="font-size: 12px;">Change voice</a>
+                        </div>
+                      </div>
+
+                      <!-- Routing Strategy -->
+                      <div class="settings-section">
+                        <div class="settings-section-label">Routing Strategy</div>
+                        <div class="segment-control">
+                          <div class="segment-option active">Balanced</div>
+                          <div class="segment-option">Best Quality</div>
+                          <div class="segment-option">Lowest Cost</div>
+                          <div class="segment-option">Fastest</div>
+                        </div>
+                      </div>
+
+                      <!-- Cost Estimate -->
+                      <div class="settings-section">
+                        <div class="settings-section-label">Cost Estimate</div>
+                        <div class="cost-provider">Provider: ElevenLabs</div>
+                        <div class="cost-value">3.2 credits</div>
+                        <div class="cost-usd">~$0.26</div>
+                        <div class="cost-duration">Duration estimate: ~2 min 15 sec</div>
+                        <div class="cost-alt">
+                          <span class="badge badge-teal">Best Value</span>
+                          Amazon Polly — 0.8 credits
+                        </div>
+                      </div>
+
+                      <!-- Generate Button -->
+                      <div>
+                        <button class="btn-primary btn-primary-lg" style="width: 100%;">
+                          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2v14M4 7l5-5 5 5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" transform="rotate(0 9 9)"/></svg>
+                          Generate
+                        </button>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         3. GENERATE PAGE (Mobile 390px)
+         ================================================================ -->
+    <section class="spec-section" id="generate-mobile">
+      <h3 class="spec-section-title">Generate Page — Mobile</h3>
+      <p class="spec-section-desc">Stacked vertical layout with sticky bottom generate bar.</p>
+
+      <div class="spec-frame">
+        <div class="spec-frame-label">
+          Generate — Mobile
+          <span class="dims">390 &times; 844</span>
+        </div>
+        <div class="spec-frame-body no-pad">
+          <div class="screen-mobile" style="overflow: hidden; min-height: 844px; display: flex; flex-direction: column;">
+
+            <!-- App Header (Mobile) -->
+            <header class="app-header" style="padding: 0 var(--space-4); gap: var(--space-3);">
+              <div class="app-header-logo" style="font-size: 16px; gap: var(--space-1);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="6" fill="#5D79DF"/><path d="M8 15V9M12 17V7M16 14V10" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+                VP
+              </div>
+              <nav class="app-header-nav" style="gap: 0;">
+                <a href="#" class="active" style="font-size: 12px; padding: var(--space-1) var(--space-2);">Generate</a>
+              </nav>
+              <div class="app-header-right" style="gap: var(--space-2);">
+                <div class="app-header-credits" style="font-size: 12px;">
+                  <strong>247</strong>
+                </div>
+                <div class="app-header-avatar" style="width: 28px; height: 28px; font-size: 11px;">W</div>
+              </div>
+            </header>
+
+            <!-- Content -->
+            <div class="screen-content" style="flex: 1; overflow-y: auto;">
+              <div style="padding: var(--space-5);">
+
+                <h2 style="font: var(--text-h3); color: var(--text-primary); margin-bottom: var(--space-4);">Create Generation</h2>
+
+                <!-- Textarea -->
+                <div class="textarea-wrap" style="margin-bottom: var(--space-4);">
+                  <textarea class="textarea-field" style="min-height: 200px;" readonly>Welcome to the future of audio production. VoiceProcessor makes it easy to convert any text into natural-sounding speech...</textarea>
+                  <div class="textarea-footer">
+                    <span class="char-count">142 / 500,000</span>
+                  </div>
+                </div>
+
+                <div class="action-chips" style="margin-bottom: var(--space-5);">
+                  <span class="action-chip" style="font-size: 12px;">
+                    <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M3.5 5.5L7 9l3.5-3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" transform="rotate(180 7 5)"/><path d="M1 10v1.5A1.5 1.5 0 002.5 13h9a1.5 1.5 0 001.5-1.5V10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                    Upload
+                  </span>
+                  <span class="action-chip" style="font-size: 12px;">
+                    <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M9 5h4M9 9h4M5 9v4M9 1v4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                    Paste
+                  </span>
+                </div>
+
+                <!-- Settings Card -->
+                <div class="settings-card">
+                  <div class="settings-section">
+                    <div class="settings-section-label">Select Voice</div>
+                    <div class="voice-selected">
+                      <div class="voice-play-btn" style="width: 32px; height: 32px;">
+                        <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M4 2.5v9l7.5-4.5L4 2.5z" fill="#5D79DF"/></svg>
+                      </div>
+                      <div class="voice-selected-info">
+                        <div class="voice-selected-name" style="font-size: 14px;">Rachel — ElevenLabs</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="settings-section">
+                    <div class="settings-section-label">Routing Strategy</div>
+                    <div class="segment-control">
+                      <div class="segment-option active" style="font-size: 11px; padding: var(--space-1) var(--space-2);">Balanced</div>
+                      <div class="segment-option" style="font-size: 11px; padding: var(--space-1) var(--space-2);">Quality</div>
+                      <div class="segment-option" style="font-size: 11px; padding: var(--space-1) var(--space-2);">Cost</div>
+                      <div class="segment-option" style="font-size: 11px; padding: var(--space-1) var(--space-2);">Fast</div>
+                    </div>
+                  </div>
+
+                  <div class="settings-section" style="margin-bottom: 0; padding-bottom: 0; border-bottom: none;">
+                    <div class="settings-section-label">Cost Estimate</div>
+                    <div style="display: flex; align-items: baseline; gap: var(--space-3);">
+                      <div class="cost-value" style="font: var(--text-h3); margin-bottom: 0;">3.2 credits</div>
+                      <div class="cost-usd" style="margin-bottom: 0;">~$0.26</div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Sticky Bottom Bar -->
+            <div class="mobile-sticky-bar">
+              <button class="btn-primary btn-primary-lg" style="width: 100%;">
+                Generate — 3.2 credits
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         4. GENERATIONS LIST (Desktop 1440px)
+         ================================================================ -->
+    <section class="spec-section" id="generations-list">
+      <h3 class="spec-section-title">Generations List</h3>
+      <p class="spec-section-desc">Filterable table of all audio generations with status, search, and pagination.</p>
+
+      <div class="spec-frame">
+        <div class="spec-frame-label">
+          Generations — Desktop
+          <span class="dims">1440 &times; 960</span>
+        </div>
+        <div class="spec-frame-body no-pad">
+          <div class="screen-desktop" style="overflow: hidden;">
+
+            <!-- App Header -->
+            <header class="app-header">
+              <div class="app-header-logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="6" fill="#5D79DF"/><path d="M8 15V9M12 17V7M16 14V10" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+                VoiceProcessor
+              </div>
+              <nav class="app-header-nav">
+                <a href="#">Dashboard</a>
+                <a href="#">Generate</a>
+                <a href="#" class="active">Generations</a>
+                <a href="#">Voices</a>
+              </nav>
+              <div class="app-header-right">
+                <div class="app-header-credits">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#5D79DF" stroke-width="1.5"/><path d="M8 4.5v4l2.5 1.5" stroke="#5D79DF" stroke-width="1.5" stroke-linecap="round"/></svg>
+                  <strong>247</strong> credits
+                </div>
+                <div class="app-header-avatar">W</div>
+              </div>
+            </header>
+
+            <!-- Content -->
+            <div class="screen-content">
+              <div class="content-wrap">
+
+                <div class="title-row">
+                  <h2 style="font: var(--text-h2); color: var(--text-primary);">Your Generations</h2>
+                  <div class="search-wrap">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="#767676" stroke-width="1.3"/><path d="M9.5 9.5L13 13" stroke="#767676" stroke-width="1.3" stroke-linecap="round"/></svg>
+                    <input class="search-input" type="text" placeholder="Search generations..." value="">
+                  </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="filter-bar">
+                  <select class="filter-select">
+                    <option>All Statuses</option>
+                  </select>
+                  <select class="filter-select">
+                    <option>All Providers</option>
+                  </select>
+                  <select class="filter-select">
+                    <option>Date Range</option>
+                  </select>
+                  <select class="filter-select" style="margin-left: auto;">
+                    <option>Sort: Newest first</option>
+                  </select>
+                </div>
+
+                <!-- Table -->
+                <div class="stat-card" style="padding: 0; overflow: hidden;">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th style="width: 32px;"><span class="fake-checkbox"></span></th>
+                        <th>Title</th>
+                        <th>Provider</th>
+                        <th>Voice</th>
+                        <th>Status</th>
+                        <th>Characters</th>
+                        <th>Duration</th>
+                        <th>Date</th>
+                        <th style="width: 40px;"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><span class="fake-checkbox"></span></td>
+                        <td style="font-weight: 500;">Chapter 1 - Introduction</td>
+                        <td>ElevenLabs</td>
+                        <td>Rachel</td>
+                        <td><span class="badge badge-success">Completed</span></td>
+                        <td>3,420</td>
+                        <td>3:24</td>
+                        <td style="color: var(--text-muted);">Mar 15</td>
+                        <td><div class="actions-dots"><span></span><span></span><span></span></div></td>
+                      </tr>
+                      <tr>
+                        <td><span class="fake-checkbox"></span></td>
+                        <td style="font-weight: 500;">Product Demo Script</td>
+                        <td>OpenAI</td>
+                        <td>Nova</td>
+                        <td><span class="badge badge-indigo"><span class="pulse-dot"></span> Processing</span></td>
+                        <td>2,180</td>
+                        <td style="color: var(--text-muted);">--</td>
+                        <td style="color: var(--text-muted);">Mar 15</td>
+                        <td><div class="actions-dots"><span></span><span></span><span></span></div></td>
+                      </tr>
+                      <tr>
+                        <td><span class="fake-checkbox"></span></td>
+                        <td style="font-weight: 500;">Newsletter Audio</td>
+                        <td>Cartesia</td>
+                        <td>Sofia</td>
+                        <td><span class="badge badge-success">Completed</span></td>
+                        <td>1,890</td>
+                        <td>1:47</td>
+                        <td style="color: var(--text-muted);">Mar 14</td>
+                        <td><div class="actions-dots"><span></span><span></span><span></span></div></td>
+                      </tr>
+                      <tr>
+                        <td><span class="fake-checkbox"></span></td>
+                        <td style="font-weight: 500;">Blog Post Narration</td>
+                        <td>Google Cloud</td>
+                        <td>James</td>
+                        <td><span class="badge badge-error">Failed</span></td>
+                        <td>4,520</td>
+                        <td style="color: var(--text-muted);">--</td>
+                        <td style="color: var(--text-muted);">Mar 13</td>
+                        <td><div class="actions-dots"><span></span><span></span><span></span></div></td>
+                      </tr>
+                      <tr>
+                        <td><span class="fake-checkbox"></span></td>
+                        <td style="font-weight: 500;">Training Module 3</td>
+                        <td>Amazon Polly</td>
+                        <td>Emma</td>
+                        <td><span class="badge badge-success">Completed</span></td>
+                        <td>12,340</td>
+                        <td>8:12</td>
+                        <td style="color: var(--text-muted);">Mar 12</td>
+                        <td><div class="actions-dots"><span></span><span></span><span></span></div></td>
+                      </tr>
+                      <tr>
+                        <td><span class="fake-checkbox"></span></td>
+                        <td style="font-weight: 500;">Onboarding Welcome</td>
+                        <td>ElevenLabs</td>
+                        <td>Aria</td>
+                        <td><span class="badge badge-success">Completed</span></td>
+                        <td>980</td>
+                        <td>0:58</td>
+                        <td style="color: var(--text-muted);">Mar 11</td>
+                        <td><div class="actions-dots"><span></span><span></span><span></span></div></td>
+                      </tr>
+                      <tr>
+                        <td><span class="fake-checkbox"></span></td>
+                        <td style="font-weight: 500;">Q4 Report Summary</td>
+                        <td>Deepgram</td>
+                        <td>Chen</td>
+                        <td><span class="badge badge-success">Completed</span></td>
+                        <td>6,750</td>
+                        <td>5:02</td>
+                        <td style="color: var(--text-muted);">Mar 10</td>
+                        <td><div class="actions-dots"><span></span><span></span><span></span></div></td>
+                      </tr>
+                      <tr>
+                        <td><span class="fake-checkbox"></span></td>
+                        <td style="font-weight: 500;">Meditation Script</td>
+                        <td>Cartesia</td>
+                        <td>Sofia</td>
+                        <td><span class="badge badge-success">Completed</span></td>
+                        <td>3,200</td>
+                        <td>4:30</td>
+                        <td style="color: var(--text-muted);">Mar 9</td>
+                        <td><div class="actions-dots"><span></span><span></span><span></span></div></td>
+                      </tr>
+                      <tr>
+                        <td><span class="fake-checkbox"></span></td>
+                        <td style="font-weight: 500;">API Documentation</td>
+                        <td>OpenAI</td>
+                        <td>Marcus</td>
+                        <td><span class="badge badge-success">Completed</span></td>
+                        <td>8,900</td>
+                        <td>6:45</td>
+                        <td style="color: var(--text-muted);">Mar 8</td>
+                        <td><div class="actions-dots"><span></span><span></span><span></span></div></td>
+                      </tr>
+                      <tr>
+                        <td><span class="fake-checkbox"></span></td>
+                        <td style="font-weight: 500;">Course Intro Voiceover</td>
+                        <td>FishAudio</td>
+                        <td>Oliver</td>
+                        <td><span class="badge badge-success">Completed</span></td>
+                        <td>1,450</td>
+                        <td>1:18</td>
+                        <td style="color: var(--text-muted);">Mar 7</td>
+                        <td><div class="actions-dots"><span></span><span></span><span></span></div></td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  <!-- Pagination -->
+                  <div class="pagination" style="padding: var(--space-3) var(--space-4);">
+                    <div class="pagination-info">Showing 1-10 of 47</div>
+                    <div class="pagination-pages">
+                      <button class="page-btn">&lsaquo;</button>
+                      <button class="page-btn active">1</button>
+                      <button class="page-btn">2</button>
+                      <button class="page-btn">3</button>
+                      <button class="page-btn">4</button>
+                      <button class="page-btn">5</button>
+                      <button class="page-btn">&rsaquo;</button>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         5. GENERATION DETAIL (Desktop 1440px)
+         ================================================================ -->
+    <section class="spec-section" id="generation-detail">
+      <h3 class="spec-section-title">Generation Detail</h3>
+      <p class="spec-section-desc">Detailed view of a completed generation with audio player, metadata, text content, and feedback.</p>
+
+      <div class="spec-frame">
+        <div class="spec-frame-label">
+          Generation Detail — Desktop
+          <span class="dims">1440 &times; 1060</span>
+        </div>
+        <div class="spec-frame-body no-pad">
+          <div class="screen-desktop" style="overflow: hidden;">
+
+            <!-- App Header -->
+            <header class="app-header">
+              <div class="app-header-logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="6" fill="#5D79DF"/><path d="M8 15V9M12 17V7M16 14V10" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+                VoiceProcessor
+              </div>
+              <nav class="app-header-nav">
+                <a href="#">Dashboard</a>
+                <a href="#">Generate</a>
+                <a href="#" class="active">Generations</a>
+                <a href="#">Voices</a>
+              </nav>
+              <div class="app-header-right">
+                <div class="app-header-credits">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#5D79DF" stroke-width="1.5"/><path d="M8 4.5v4l2.5 1.5" stroke="#5D79DF" stroke-width="1.5" stroke-linecap="round"/></svg>
+                  <strong>247</strong> credits
+                </div>
+                <div class="app-header-avatar">W</div>
+              </div>
+            </header>
+
+            <!-- Content -->
+            <div class="screen-content">
+              <div class="content-wrap">
+
+                <a href="#" class="back-link">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  Back to Generations
+                </a>
+
+                <h2 style="font: var(--text-h2); color: var(--text-primary); margin-bottom: var(--space-4);">Chapter 1 - Introduction</h2>
+
+                <!-- Metadata -->
+                <div class="meta-row">
+                  <span class="meta-chip">ElevenLabs</span>
+                  <span class="meta-chip">Rachel</span>
+                  <span class="meta-chip">3,420 characters</span>
+                  <span class="meta-chip">Mar 15, 2026</span>
+                  <span class="badge badge-success" style="font-size: 13px; padding: var(--space-1) var(--space-3);">Completed</span>
+                </div>
+
+                <!-- Audio Player -->
+                <div class="audio-player">
+                  <div class="play-btn-lg">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M6 3.5v13l10.5-6.5L6 3.5z" fill="#fff"/></svg>
+                  </div>
+                  <div class="waveform">
+                    <!-- Generate waveform bars - first ~40% played -->
+                    <div class="waveform-bar played" style="height: 12px;"></div>
+                    <div class="waveform-bar played" style="height: 20px;"></div>
+                    <div class="waveform-bar played" style="height: 28px;"></div>
+                    <div class="waveform-bar played" style="height: 16px;"></div>
+                    <div class="waveform-bar played" style="height: 32px;"></div>
+                    <div class="waveform-bar played" style="height: 24px;"></div>
+                    <div class="waveform-bar played" style="height: 36px;"></div>
+                    <div class="waveform-bar played" style="height: 20px;"></div>
+                    <div class="waveform-bar played" style="height: 28px;"></div>
+                    <div class="waveform-bar played" style="height: 14px;"></div>
+                    <div class="waveform-bar played" style="height: 22px;"></div>
+                    <div class="waveform-bar played" style="height: 30px;"></div>
+                    <div class="waveform-bar played" style="height: 18px;"></div>
+                    <div class="waveform-bar played" style="height: 26px;"></div>
+                    <div class="waveform-bar played" style="height: 34px;"></div>
+                    <div class="waveform-bar played" style="height: 22px;"></div>
+                    <div class="waveform-bar played" style="height: 16px;"></div>
+                    <div class="waveform-bar played" style="height: 28px;"></div>
+                    <div class="waveform-bar played" style="height: 20px;"></div>
+                    <div class="waveform-bar played" style="height: 24px;"></div>
+                    <div class="waveform-bar" style="height: 30px;"></div>
+                    <div class="waveform-bar" style="height: 18px;"></div>
+                    <div class="waveform-bar" style="height: 26px;"></div>
+                    <div class="waveform-bar" style="height: 14px;"></div>
+                    <div class="waveform-bar" style="height: 32px;"></div>
+                    <div class="waveform-bar" style="height: 20px;"></div>
+                    <div class="waveform-bar" style="height: 36px;"></div>
+                    <div class="waveform-bar" style="height: 22px;"></div>
+                    <div class="waveform-bar" style="height: 16px;"></div>
+                    <div class="waveform-bar" style="height: 28px;"></div>
+                    <div class="waveform-bar" style="height: 24px;"></div>
+                    <div class="waveform-bar" style="height: 12px;"></div>
+                    <div class="waveform-bar" style="height: 30px;"></div>
+                    <div class="waveform-bar" style="height: 18px;"></div>
+                    <div class="waveform-bar" style="height: 34px;"></div>
+                    <div class="waveform-bar" style="height: 20px;"></div>
+                    <div class="waveform-bar" style="height: 26px;"></div>
+                    <div class="waveform-bar" style="height: 14px;"></div>
+                    <div class="waveform-bar" style="height: 22px;"></div>
+                    <div class="waveform-bar" style="height: 28px;"></div>
+                    <div class="waveform-bar" style="height: 16px;"></div>
+                    <div class="waveform-bar" style="height: 32px;"></div>
+                    <div class="waveform-bar" style="height: 24px;"></div>
+                    <div class="waveform-bar" style="height: 20px;"></div>
+                    <div class="waveform-bar" style="height: 36px;"></div>
+                    <div class="waveform-bar" style="height: 18px;"></div>
+                    <div class="waveform-bar" style="height: 26px;"></div>
+                    <div class="waveform-bar" style="height: 30px;"></div>
+                    <div class="waveform-bar" style="height: 12px;"></div>
+                    <div class="waveform-bar" style="height: 22px;"></div>
+                  </div>
+                  <div class="player-time">1:24 / 3:24</div>
+                  <div class="player-speed">1x</div>
+                  <div class="player-controls">
+                    <div class="player-icon-btn" title="Download">
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M4.5 6.5L8 10l3.5-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 12v1.5A1.5 1.5 0 003.5 15h9a1.5 1.5 0 001.5-1.5V12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    </div>
+                    <div class="player-icon-btn" title="Volume">
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 6h2.5L8 3v10L4.5 10H2V6z" fill="currentColor"/><path d="M10.5 5.5a4 4 0 010 5M12 3.5a7 7 0 010 9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Details + Text -->
+                <div class="detail-grid">
+
+                  <!-- Generation Details -->
+                  <div class="detail-card">
+                    <h4 style="font: var(--text-h4); color: var(--text-primary); margin-bottom: var(--space-4);">Generation Details</h4>
+                    <div class="detail-row">
+                      <span class="detail-label">Provider</span>
+                      <span class="detail-value">ElevenLabs</span>
+                    </div>
+                    <div class="detail-row">
+                      <span class="detail-label">Voice</span>
+                      <span class="detail-value">Rachel</span>
+                    </div>
+                    <div class="detail-row">
+                      <span class="detail-label">Strategy</span>
+                      <span class="detail-value">Balanced</span>
+                    </div>
+                    <div class="detail-row">
+                      <span class="detail-label">Cost</span>
+                      <span class="detail-value" style="color: var(--indigo);">3.2 credits (~$0.26)</span>
+                    </div>
+                    <div class="detail-row">
+                      <span class="detail-label">Created at</span>
+                      <span class="detail-value">Mar 15, 2026, 2:34 PM</span>
+                    </div>
+                  </div>
+
+                  <!-- Text Content + Feedback -->
+                  <div>
+                    <div class="detail-card" style="margin-bottom: var(--space-6);">
+                      <div class="expandable-header">
+                        <h4 style="font: var(--text-h4); color: var(--text-primary);">Text Content</h4>
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="#767676" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      </div>
+                      <div class="expandable-content">
+                        Welcome to the future of audio production. VoiceProcessor makes it easy to convert any text into natural-sounding speech. Whether you're creating audiobooks, podcasts, training materials, or product demos, our intelligent routing engine selects the best voice provider for your needs. In this chapter, we'll explore the fundamentals of text-to-speech technology and how VoiceProcessor leverages multiple AI providers to deliver exceptional quality at competitive prices. Our platform supports over 40 premium voices across 12 languages, with automatic language detection and smart cost optimization.
+                      </div>
+                    </div>
+
+                    <div class="detail-card">
+                      <h4 style="font: var(--text-h4); color: var(--text-primary); margin-bottom: var(--space-2);">How was this generation?</h4>
+                      <div class="feedback-buttons">
+                        <button class="feedback-btn" title="Good">
+                          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M5 8v7M8 15h5a2 2 0 002-1.6l.9-5A1.5 1.5 0 0014.4 7H11V4a2 2 0 00-2-2L7 8H5a1 1 0 00-1 1v5a1 1 0 001 1z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                        <button class="feedback-btn" title="Poor">
+                          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M13 10V3M10 3H5a2 2 0 00-2 1.6l-.9 5A1.5 1.5 0 003.6 11H7v3a2 2 0 002 2l2-6h2a1 1 0 001-1V4a1 1 0 00-1-1z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                      </div>
+                      <textarea class="feedback-textarea" placeholder="Share additional feedback..." readonly></textarea>
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================
+         6. VOICES CATALOG (Desktop 1440px)
+         ================================================================ -->
+    <section class="spec-section" id="voices-catalog">
+      <h3 class="spec-section-title">Voices Catalog</h3>
+      <p class="spec-section-desc">Browsable grid of available voices with filtering, preview playback, and selection states.</p>
+
+      <div class="spec-frame">
+        <div class="spec-frame-label">
+          Voice Library — Desktop
+          <span class="dims">1440 &times; 1020</span>
+        </div>
+        <div class="spec-frame-body no-pad">
+          <div class="screen-desktop" style="overflow: hidden;">
+
+            <!-- App Header -->
+            <header class="app-header">
+              <div class="app-header-logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="6" fill="#5D79DF"/><path d="M8 15V9M12 17V7M16 14V10" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+                VoiceProcessor
+              </div>
+              <nav class="app-header-nav">
+                <a href="#">Dashboard</a>
+                <a href="#">Generate</a>
+                <a href="#">Generations</a>
+                <a href="#" class="active">Voices</a>
+              </nav>
+              <div class="app-header-right">
+                <div class="app-header-credits">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#5D79DF" stroke-width="1.5"/><path d="M8 4.5v4l2.5 1.5" stroke="#5D79DF" stroke-width="1.5" stroke-linecap="round"/></svg>
+                  <strong>247</strong> credits
+                </div>
+                <div class="app-header-avatar">W</div>
+              </div>
+            </header>
+
+            <!-- Content -->
+            <div class="screen-content">
+              <div class="content-wrap">
+
+                <div class="title-row">
+                  <h2 style="font: var(--text-h2); color: var(--text-primary);">Voice Library</h2>
+                  <div class="search-wrap">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="#767676" stroke-width="1.3"/><path d="M9.5 9.5L13 13" stroke="#767676" stroke-width="1.3" stroke-linecap="round"/></svg>
+                    <input class="search-input" type="text" placeholder="Search voices..." value="">
+                  </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="filter-bar">
+                  <select class="filter-select">
+                    <option>All Providers</option>
+                  </select>
+                  <select class="filter-select">
+                    <option>All Languages</option>
+                  </select>
+                  <select class="filter-select">
+                    <option>All Genders</option>
+                  </select>
+                  <select class="filter-select" style="margin-left: auto;">
+                    <option>Sort: Popular</option>
+                  </select>
+                </div>
+
+                <!-- Voice Cards Grid -->
+                <div class="voice-grid">
+
+                  <!-- 1. Rachel -->
+                  <div class="voice-card">
+                    <div class="voice-card-top">
+                      <div class="voice-card-avatar">R</div>
+                      <div>
+                        <div class="voice-card-name">Rachel</div>
+                        <div class="voice-card-provider">ElevenLabs</div>
+                      </div>
+                    </div>
+                    <div class="voice-card-meta">
+                      <span>English</span>
+                      <span class="meta-separator"></span>
+                      <span>Female</span>
+                    </div>
+                    <div class="voice-card-bottom">
+                      <div class="voice-card-price">2.4 cr/1k</div>
+                      <button class="voice-play-sm">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 2.5v9l7.5-4.5L4 2.5z" fill="currentColor"/></svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- 2. Marcus -->
+                  <div class="voice-card">
+                    <div class="voice-card-top">
+                      <div class="voice-card-avatar teal">M</div>
+                      <div>
+                        <div class="voice-card-name">Marcus</div>
+                        <div class="voice-card-provider">OpenAI</div>
+                      </div>
+                    </div>
+                    <div class="voice-card-meta">
+                      <span>English</span>
+                      <span class="meta-separator"></span>
+                      <span>Male</span>
+                    </div>
+                    <div class="voice-card-bottom">
+                      <div class="voice-card-price">1.8 cr/1k</div>
+                      <button class="voice-play-sm">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 2.5v9l7.5-4.5L4 2.5z" fill="currentColor"/></svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- 3. Sofia — Playing state -->
+                  <div class="voice-card" style="box-shadow: var(--shadow-soft-2);">
+                    <div class="voice-card-top">
+                      <div class="voice-card-avatar sky">S</div>
+                      <div>
+                        <div class="voice-card-name">Sofia</div>
+                        <div class="voice-card-provider">Cartesia</div>
+                      </div>
+                    </div>
+                    <div class="voice-card-meta">
+                      <span>English / Spanish</span>
+                      <span class="meta-separator"></span>
+                      <span>Female</span>
+                    </div>
+                    <div class="voice-card-bottom">
+                      <div class="voice-card-price">2.0 cr/1k</div>
+                      <div class="playing-wave">
+                        <span style="height: 12px;"></span>
+                        <span style="height: 20px;"></span>
+                        <span style="height: 8px;"></span>
+                        <span style="height: 16px;"></span>
+                        <span style="height: 10px;"></span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 4. James — Best Value -->
+                  <div class="voice-card">
+                    <span class="voice-card-badge"><span class="badge badge-teal">Best Value</span></span>
+                    <div class="voice-card-top">
+                      <div class="voice-card-avatar teal">J</div>
+                      <div>
+                        <div class="voice-card-name">James</div>
+                        <div class="voice-card-provider">Google Cloud</div>
+                      </div>
+                    </div>
+                    <div class="voice-card-meta">
+                      <span>English</span>
+                      <span class="meta-separator"></span>
+                      <span>Male</span>
+                    </div>
+                    <div class="voice-card-bottom">
+                      <div class="voice-card-price">0.6 cr/1k</div>
+                      <button class="voice-play-sm">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 2.5v9l7.5-4.5L4 2.5z" fill="currentColor"/></svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- 5. Aria — Premium + Selected -->
+                  <div class="voice-card selected">
+                    <span class="voice-card-badge"><span class="badge badge-premium">Premium</span></span>
+                    <div class="voice-card-top">
+                      <div class="voice-card-avatar">A</div>
+                      <div>
+                        <div class="voice-card-name">Aria</div>
+                        <div class="voice-card-provider">ElevenLabs</div>
+                      </div>
+                    </div>
+                    <div class="voice-card-meta">
+                      <span>English</span>
+                      <span class="meta-separator"></span>
+                      <span>Female</span>
+                    </div>
+                    <div class="voice-card-bottom">
+                      <div class="voice-card-price">3.2 cr/1k</div>
+                      <button class="voice-play-sm">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 2.5v9l7.5-4.5L4 2.5z" fill="currentColor"/></svg>
+                      </button>
+                    </div>
+                    <!-- Checkmark overlay on ::after pseudo -->
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="position: absolute; top: 17px; right: 17px; z-index: 1;"><path d="M2.5 6.5L5 9l4.5-6" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </div>
+
+                  <!-- 6. Chen -->
+                  <div class="voice-card">
+                    <div class="voice-card-top">
+                      <div class="voice-card-avatar sky">C</div>
+                      <div>
+                        <div class="voice-card-name">Chen</div>
+                        <div class="voice-card-provider">Deepgram</div>
+                      </div>
+                    </div>
+                    <div class="voice-card-meta">
+                      <span>English / Chinese</span>
+                      <span class="meta-separator"></span>
+                      <span>Male</span>
+                    </div>
+                    <div class="voice-card-bottom">
+                      <div class="voice-card-price">1.2 cr/1k</div>
+                      <button class="voice-play-sm">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 2.5v9l7.5-4.5L4 2.5z" fill="currentColor"/></svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- 7. Emma -->
+                  <div class="voice-card">
+                    <div class="voice-card-top">
+                      <div class="voice-card-avatar teal">E</div>
+                      <div>
+                        <div class="voice-card-name">Emma</div>
+                        <div class="voice-card-provider">Amazon Polly</div>
+                      </div>
+                    </div>
+                    <div class="voice-card-meta">
+                      <span>English</span>
+                      <span class="meta-separator"></span>
+                      <span>Female</span>
+                    </div>
+                    <div class="voice-card-bottom">
+                      <div class="voice-card-price">0.4 cr/1k</div>
+                      <button class="voice-play-sm">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 2.5v9l7.5-4.5L4 2.5z" fill="currentColor"/></svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- 8. Oliver -->
+                  <div class="voice-card">
+                    <div class="voice-card-top">
+                      <div class="voice-card-avatar">O</div>
+                      <div>
+                        <div class="voice-card-name">Oliver</div>
+                        <div class="voice-card-provider">FishAudio</div>
+                      </div>
+                    </div>
+                    <div class="voice-card-meta">
+                      <span>English</span>
+                      <span class="meta-separator"></span>
+                      <span>Male</span>
+                    </div>
+                    <div class="voice-card-bottom">
+                      <div class="voice-card-price">1.5 cr/1k</div>
+                      <button class="voice-play-sm">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 2.5v9l7.5-4.5L4 2.5z" fill="currentColor"/></svg>
+                      </button>
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+</body>
+</html>
