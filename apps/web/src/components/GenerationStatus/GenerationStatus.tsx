@@ -14,11 +14,11 @@ interface GenerationStatusProps {
 }
 
 const statusColors: Record<Status, string> = {
-  queued: "bg-yellow-100 text-yellow-800",
-  processing: "bg-blue-100 text-blue-800",
-  completed: "bg-green-100 text-green-800",
-  failed: "bg-red-100 text-red-800",
-  cancelled: "bg-gray-100 text-gray-800",
+  queued: "bg-warning-subtle text-state-warning-text",
+  processing: "bg-indigo-subtle text-indigo",
+  completed: "bg-success-subtle text-state-success-text",
+  failed: "bg-error-subtle text-state-error-text",
+  cancelled: "bg-bg-sunken text-text-muted",
 };
 
 const statusLabels: Record<Status, string> = {
@@ -66,16 +66,16 @@ export function GenerationStatus({
       {/* Progress bar */}
       {isActive && (
         <div className="space-y-2">
-          <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-bg-sunken">
             <div
               className={cn(
                 "h-full rounded-full transition-all duration-300",
-                status === "queued" ? "bg-yellow-500" : "bg-blue-500"
+                status === "queued" ? "bg-warning" : "bg-indigo"
               )}
               style={{ width: `${Math.max(progress, 2)}%` }}
             />
           </div>
-          <div className="flex items-center justify-between text-sm text-gray-500">
+          <div className="flex items-center justify-between text-sm text-text-muted">
             <span>{Math.round(progress)}%</span>
             {estimatedTimeRemaining !== undefined && (
               <span>~{formatTimeRemaining(estimatedTimeRemaining)} remaining</span>
@@ -87,15 +87,15 @@ export function GenerationStatus({
       {/* Current step */}
       {currentStep && isActive && (
         <div className="flex items-center gap-2 text-sm">
-          <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-blue-500" />
-          <span className="text-gray-600">{currentStep}</span>
+          <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-indigo" />
+          <span className="text-text-secondary">{currentStep}</span>
         </div>
       )}
 
       {/* Completion message */}
       {status === "completed" && (
-        <div className="rounded-lg bg-green-50 p-4">
-          <p className="text-sm text-green-800">
+        <div className="rounded-lg bg-success-subtle p-4">
+          <p className="text-sm text-state-success-text">
             Generation completed successfully! Your audio is ready to play.
           </p>
         </div>
@@ -103,9 +103,9 @@ export function GenerationStatus({
 
       {/* Error message */}
       {status === "failed" && error && (
-        <div className="rounded-lg bg-red-50 p-4">
-          <p className="text-sm font-medium text-red-800">Generation failed</p>
-          <p className="mt-1 text-sm text-red-600">{error}</p>
+        <div className="rounded-lg bg-error-subtle p-4">
+          <p className="text-sm font-medium text-state-error-text">Generation failed</p>
+          <p className="mt-1 text-sm text-error">{error}</p>
         </div>
       )}
 

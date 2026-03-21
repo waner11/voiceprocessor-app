@@ -132,7 +132,7 @@ export function AudioPlayer({
       <div
         ref={containerRef}
         className={cn(
-          "rounded-lg bg-gray-50 overflow-hidden",
+          "rounded-lg bg-bg-sunken overflow-hidden",
           !isReady && "animate-pulse"
         )}
       />
@@ -143,7 +143,7 @@ export function AudioPlayer({
           <button
             onClick={() => handleSkip(-10)}
             disabled={!isReady}
-            className="rounded-full p-2 hover:bg-gray-100 disabled:opacity-50"
+            className="rounded-full p-2 hover:bg-bg-sunken disabled:opacity-50"
             title="Back 10s"
           >
             ⏪
@@ -152,7 +152,7 @@ export function AudioPlayer({
           <button
             onClick={togglePlayPause}
             disabled={!isReady}
-            className="rounded-full bg-black p-3 text-white hover:bg-gray-800 disabled:opacity-50"
+            className="rounded-full bg-indigo p-3 text-white hover:bg-indigo-dark disabled:opacity-50"
           >
             {isPlaying ? "⏸" : "▶"}
           </button>
@@ -160,13 +160,13 @@ export function AudioPlayer({
           <button
             onClick={() => handleSkip(10)}
             disabled={!isReady}
-            className="rounded-full p-2 hover:bg-gray-100 disabled:opacity-50"
+            className="rounded-full p-2 hover:bg-bg-sunken disabled:opacity-50"
             title="Forward 10s"
           >
             ⏩
           </button>
 
-          <span className="ml-2 text-sm text-gray-500 tabular-nums">
+          <span className="ml-2 text-sm text-text-muted tabular-nums">
             {formatTime(currentTime)} / {formatTime(duration)}
           </span>
         </div>
@@ -190,13 +190,13 @@ export function AudioPlayer({
             <div className="flex gap-1">
               <button
                 onClick={() => onDownload("mp3")}
-                className="rounded border px-3 py-1 text-sm hover:bg-gray-50"
+                className="rounded border px-3 py-1 text-sm hover:bg-bg-sunken"
               >
                 MP3
               </button>
               <button
                 onClick={() => onDownload("wav")}
-                className="rounded border px-3 py-1 text-sm hover:bg-gray-50"
+                className="rounded border px-3 py-1 text-sm hover:bg-bg-sunken"
               >
                 WAV
               </button>
@@ -214,10 +214,10 @@ export function AudioPlayer({
               <button
                 key={chapter.id}
                 onClick={() => seekToChapter(chapter.startTime)}
-                className="flex w-full items-center justify-between rounded p-2 text-left text-sm hover:bg-gray-50"
+                className="flex w-full items-center justify-between rounded p-2 text-left text-sm hover:bg-bg-sunken"
               >
                 <span>{chapter.title}</span>
-                <span className="text-gray-500 tabular-nums">
+                <span className="text-text-muted tabular-nums">
                   {formatTime(chapter.startTime)}
                 </span>
               </button>

@@ -24,10 +24,10 @@ interface VoiceSelectorProps {
 }
 
 const providerColors: Record<Voice["provider"], string> = {
-  elevenlabs: "bg-purple-100 text-purple-700",
-  openai: "bg-green-100 text-green-700",
-  google: "bg-blue-100 text-blue-700",
-  polly: "bg-orange-100 text-orange-700",
+  elevenlabs: "bg-indigo-subtle text-indigo",
+  openai: "bg-success-subtle text-state-success-text",
+  google: "bg-indigo-subtle text-indigo",
+  polly: "bg-warning-subtle text-state-warning-text",
 };
 
 const qualityLabels: Record<Voice["quality"], string> = {
@@ -109,10 +109,10 @@ export function VoiceSelector({
     return (
       <div className={cn("space-y-4", className)}>
         <div className="animate-pulse space-y-4">
-          <div className="h-10 bg-gray-200 rounded" />
+          <div className="h-10 bg-bg-sunken rounded" />
           <div className="grid gap-4 md:grid-cols-2">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-24 bg-gray-200 rounded-lg" />
+              <div key={i} className="h-24 bg-bg-sunken rounded-lg" />
             ))}
           </div>
         </div>
@@ -179,14 +179,14 @@ export function VoiceSelector({
           className={cn(
             "flex items-center gap-1 rounded-lg border px-3 py-2 text-sm transition-colors",
             filter.showFavoritesOnly
-              ? "bg-red-50 border-red-200 text-red-700"
-              : "hover:bg-gray-50"
+              ? "bg-error-subtle border-state-error-border text-state-error-text"
+              : "hover:bg-bg-sunken"
           )}
         >
           <svg
             className={cn(
               "h-4 w-4",
-              filter.showFavoritesOnly ? "fill-red-500" : "fill-none"
+              filter.showFavoritesOnly ? "fill-error" : "fill-none"
             )}
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -200,7 +200,7 @@ export function VoiceSelector({
           </svg>
           Favorites
           {favoriteVoices.length > 0 && (
-            <span className="rounded-full bg-gray-200 px-1.5 text-xs">
+            <span className="rounded-full bg-bg-sunken px-1.5 text-xs">
               {favoriteVoices.length}
             </span>
           )}
@@ -210,7 +210,7 @@ export function VoiceSelector({
       {/* Voice cards */}
       <div className="grid gap-3 md:grid-cols-2">
         {filteredVoices.length === 0 ? (
-          <p className="col-span-2 text-center text-gray-500 py-8">
+          <p className="col-span-2 text-center text-text-muted py-8">
             {filter.showFavoritesOnly
               ? "No favorite voices yet. Click the heart icon to add favorites."
               : "No voices match your filters"}
@@ -225,8 +225,8 @@ export function VoiceSelector({
                 className={cn(
                   "flex items-start gap-3 rounded-lg border p-4 text-left transition-colors",
                   selectedVoiceId === voice.id
-                    ? "border-blue-500 bg-blue-50"
-                    : "hover:border-gray-300 hover:bg-gray-50"
+                    ? "border-indigo bg-indigo-subtle"
+                    : "hover:border-border-subtle hover:bg-bg-sunken"
                 )}
               >
                 <div className="flex-1 min-w-0">
@@ -241,7 +241,7 @@ export function VoiceSelector({
                       {voice.provider}
                     </span>
                   </div>
-                  <div className="mt-1 flex items-center gap-2 text-sm text-gray-500">
+                  <div className="mt-1 flex items-center gap-2 text-sm text-text-muted">
                     <span>{voice.language}</span>
                     <span>·</span>
                     <span>{voice.style}</span>
@@ -258,8 +258,8 @@ export function VoiceSelector({
                     className={cn(
                       "rounded-full p-2 transition-colors",
                       isFavorite
-                        ? "text-red-500 hover:bg-red-50"
-                        : "text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                        ? "text-error hover:bg-error-subtle"
+                        : "text-text-muted hover:bg-bg-sunken hover:text-text-secondary"
                     )}
                     title={isFavorite ? "Remove from favorites" : "Add to favorites"}
                   >
@@ -288,8 +288,8 @@ export function VoiceSelector({
                       className={cn(
                         "rounded-full p-2 transition-colors",
                         playingId === voice.id
-                          ? "bg-blue-500 text-white"
-                          : "bg-gray-100 hover:bg-gray-200"
+                          ? "bg-indigo text-white"
+                          : "bg-bg-sunken hover:bg-bg-surface"
                       )}
                     >
                       {playingId === voice.id ? "⏹" : "▶"}

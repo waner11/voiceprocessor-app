@@ -99,8 +99,8 @@ export function TextInput({
       <div
         className={cn(
           "relative rounded-lg border-2 transition-colors",
-          isDragOver ? "border-blue-500 bg-blue-50" : "border-gray-200",
-          isOverLimit && "border-red-500"
+          isDragOver ? "border-indigo bg-indigo-subtle" : "border-border-subtle",
+          isOverLimit && "border-state-error-border"
         )}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
@@ -114,8 +114,8 @@ export function TextInput({
         />
 
         {isDragOver && (
-          <div className="absolute inset-0 flex items-center justify-center bg-blue-50/90 rounded-lg">
-            <p className="text-blue-600 font-medium">Drop file here</p>
+          <div className="absolute inset-0 flex items-center justify-center bg-indigo-subtle/90 rounded-lg">
+            <p className="text-indigo font-medium">Drop file here</p>
           </div>
         )}
       </div>
@@ -123,17 +123,17 @@ export function TextInput({
       <div className="flex items-center justify-between text-sm">
         <div className="flex items-center gap-4">
           {detectedLanguage && (
-            <span className="rounded-full bg-gray-100 px-3 py-1 text-gray-600">
+            <span className="rounded-full bg-bg-sunken px-3 py-1 text-text-secondary">
               {detectedLanguage}
             </span>
           )}
           {contentType && (
-            <span className="text-gray-500">{contentType}</span>
+            <span className="text-text-muted">{contentType}</span>
           )}
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="text-blue-600 hover:underline"
+            className="text-text-link hover:underline"
           >
             Upload file
           </button>
@@ -149,7 +149,7 @@ export function TextInput({
          <span
            className={cn(
              "tabular-nums",
-             isOverLimit ? "text-red-500" : "text-gray-500"
+              isOverLimit ? "text-error" : "text-text-muted"
            )}
          >
            {formatNumber(characterCount)} / {formatNumber(maxLength)}

@@ -39,18 +39,18 @@ function ProviderList({ estimates }: ProviderListProps) {
         return (
           <div
             key={estimate.provider}
-            className="flex items-center justify-between rounded p-2 bg-gray-700/50"
+            className="flex items-center justify-between rounded p-2 bg-bg-sunken"
           >
             <div className="flex flex-col gap-1">
               <span>{estimate.provider}</span>
               <div className="flex gap-1">
                 {isPremium && (
-                  <span className="rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200 px-2 py-0.5 text-xs font-medium">
+                  <span className="rounded-full bg-warning-subtle text-state-warning-text px-2 py-0.5 text-xs font-medium">
                     Premium Quality (2x Credits)
                   </span>
                 )}
                 {isBestValue && (
-                  <span className="rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 px-2 py-0.5 text-xs font-medium">
+                  <span className="rounded-full bg-success-subtle text-state-success-text px-2 py-0.5 text-xs font-medium">
                     Best Value
                   </span>
                 )}
@@ -82,33 +82,33 @@ export function CostEstimate({
   selectedProvider,
 }: CostEstimateProps) {
   return (
-    <div className="rounded-xl bg-gradient-to-br from-gray-800 to-gray-900 dark:from-gray-800 dark:to-gray-950 p-6 text-white shadow-sm ring-1 ring-gray-700">
+    <div className="rounded-xl bg-bg-elevated p-6 text-text-primary shadow-sm ring-1 ring-border-subtle">
       <h2 className="mb-4 text-lg font-semibold">Estimated Credits</h2>
       {characterCount > 0 ? (
         <div className="space-y-4">
           <div className="flex items-baseline justify-between">
-            <span className="text-gray-400">Credits</span>
+            <span className="text-text-muted">Credits</span>
             <span className="text-3xl font-bold">
               {isEstimating ? (
                 <span className="text-xl">...</span>
               ) : costEstimate ? (
                 formatCredits(costEstimate.creditsRequired)
               ) : (
-                <span className="text-gray-400">—</span>
+                <span className="text-text-muted">—</span>
               )}
             </span>
           </div>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-               <span className="text-gray-400">Characters</span>
+               <span className="text-text-muted">Characters</span>
                <span>{formatNumber(costEstimate?.characterCount || characterCount)}</span>
              </div>
             <div className="flex justify-between">
-              <span className="text-gray-400">Est. Duration</span>
+              <span className="text-text-muted">Est. Duration</span>
               <span>~{Math.ceil(wordCount / 150)} min</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-400">Provider</span>
+              <span className="text-text-muted">Provider</span>
               <span>
                 {selectedProvider || costEstimate?.recommendedProvider || "Auto-select"}
               </span>
@@ -116,7 +116,7 @@ export function CostEstimate({
           </div>
            {costEstimate?.providerEstimates && costEstimate.providerEstimates.length > 1 && (
               <details className="mt-4 text-sm">
-                <summary className="cursor-pointer text-blue-400 hover:underline">
+                <summary className="cursor-pointer text-text-link hover:underline">
                   Compare all providers
                 </summary>
                 <div className="mt-2 space-y-2">
@@ -126,7 +126,7 @@ export function CostEstimate({
             )}
         </div>
       ) : (
-        <div className="py-4 text-center text-gray-400">
+        <div className="py-4 text-center text-text-muted">
           <p>Enter text to see cost estimate</p>
         </div>
       )}

@@ -132,7 +132,7 @@ export function VoicePreviewPlayer({
       <button
         disabled
         className={cn(
-          "rounded-full p-2 text-gray-300 dark:text-gray-600 cursor-not-allowed",
+          "rounded-full p-2 text-text-muted cursor-not-allowed",
           className
         )}
         aria-label="No preview available"
@@ -149,7 +149,7 @@ export function VoicePreviewPlayer({
       <button
         disabled
         className={cn(
-          "rounded-full p-2 text-red-400 dark:text-red-500 cursor-not-allowed",
+          "rounded-full p-2 text-error cursor-not-allowed",
           className
         )}
         aria-label="Preview unavailable"
@@ -165,7 +165,7 @@ export function VoicePreviewPlayer({
     return (
       <button
         disabled
-        className={cn("rounded-full p-2 text-blue-500 animate-pulse", className)}
+        className={cn("rounded-full p-2 text-indigo animate-pulse", className)}
         aria-label="Loading preview"
         title="Loading preview"
       >
@@ -180,7 +180,7 @@ export function VoicePreviewPlayer({
       <button
         onClick={handlePlayPause}
         className={cn(
-          "rounded-full p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30",
+          "rounded-full p-2 text-indigo hover:bg-indigo-subtle",
           className
         )}
         aria-label="Pause preview"
@@ -196,7 +196,7 @@ export function VoicePreviewPlayer({
     <button
       onClick={handlePlayPause}
       className={cn(
-        "rounded-full p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400",
+        "rounded-full p-2 text-text-muted hover:bg-bg-sunken hover:text-indigo",
         className
       )}
       aria-label="Preview voice"
