@@ -1,6 +1,5 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Moq;
 using VoiceProcessor.Clients.Api.Controllers;
 using VoiceProcessor.Clients.Api.Services;
@@ -13,16 +12,14 @@ public class UsageControllerTests
 {
     private readonly Mock<IAuthManager> _mockAuthManager;
     private readonly Mock<ICurrentUserService> _mockCurrentUser;
-    private readonly Mock<ILogger<UsageController>> _mockLogger;
     private readonly UsageController _controller;
 
     public UsageControllerTests()
     {
         _mockAuthManager = new Mock<IAuthManager>();
         _mockCurrentUser = new Mock<ICurrentUserService>();
-        _mockLogger = new Mock<ILogger<UsageController>>();
         
-        _controller = new UsageController(_mockAuthManager.Object, _mockCurrentUser.Object, _mockLogger.Object);
+        _controller = new UsageController(_mockAuthManager.Object, _mockCurrentUser.Object);
     }
 
     [Fact]
