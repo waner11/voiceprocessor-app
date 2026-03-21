@@ -171,6 +171,6 @@ describe("Provider Badges", () => {
       />
     );
     const premiumBadge = screen.getByText("Premium Quality (2x Credits)");
-    expect(premiumBadge.className).toMatch(/amber/);
+    expect(premiumBadge.className).toMatch(/warning/);
   });
 });

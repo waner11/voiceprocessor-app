@@ -144,13 +144,13 @@ export default function ProfileSettingsPage() {
 
   return (
     <div className="space-y-8">
-      <section className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
+      <section className="rounded-lg border border-border-subtle bg-bg-elevated p-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Profile Information</h2>
+          <h2 className="text-xl font-semibold text-text-primary">Profile Information</h2>
           {!isEditing && (
             <button
               onClick={() => setIsEditing(true)}
-              className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+              className="text-sm text-text-link hover:underline"
             >
               Edit
             </button>
@@ -160,32 +160,32 @@ export default function ProfileSettingsPage() {
         {isEditing ? (
           <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-text-secondary mb-1">
                 Name
               </label>
               <input
                 {...profileForm.register("name")}
                 type="text"
-                className="w-full max-w-md rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full max-w-md rounded-lg border border-border-subtle bg-bg-elevated px-4 py-2 text-text-primary focus:border-border-focus focus:outline-none focus:ring-1 focus:ring-border-focus"
               />
               {profileForm.formState.errors.name && (
-                <p className="mt-1 text-sm text-red-600">{profileForm.formState.errors.name.message}</p>
+                <p className="mt-1 text-sm text-state-error-text">{profileForm.formState.errors.name.message}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-text-secondary mb-1">
                 Email
               </label>
-              <p className="text-gray-900 dark:text-white">{user?.email || "--"}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Email cannot be changed</p>
+              <p className="text-text-primary">{user?.email || "--"}</p>
+              <p className="text-xs text-text-muted mt-1">Email cannot be changed</p>
             </div>
 
             <div className="flex gap-3 pt-2">
               <button
                 type="submit"
                 disabled={isUpdatingProfile}
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
+                className="rounded-lg bg-indigo px-4 py-2 text-sm text-white hover:bg-indigo-dark disabled:opacity-50"
               >
                 {isUpdatingProfile ? "Saving..." : "Save Changes"}
               </button>
@@ -195,7 +195,7 @@ export default function ProfileSettingsPage() {
                   setIsEditing(false);
                   profileForm.reset({ name: user?.name || "" });
                 }}
-                className="rounded-lg border border-gray-200 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                className="rounded-lg border border-border-subtle px-4 py-2 text-sm text-text-secondary hover:bg-bg-sunken"
               >
                 Cancel
               </button>
@@ -204,28 +204,28 @@ export default function ProfileSettingsPage() {
         ) : (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-text-secondary mb-1">
                 Name
               </label>
-              <p className="text-gray-900 dark:text-white">{user?.name || "--"}</p>
+              <p className="text-text-primary">{user?.name || "--"}</p>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-text-secondary mb-1">
                 Email
               </label>
-              <p className="text-gray-900 dark:text-white">{user?.email || "--"}</p>
+              <p className="text-text-primary">{user?.email || "--"}</p>
             </div>
           </div>
         )}
       </section>
 
-      <section className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Password</h2>
+      <section className="rounded-lg border border-border-subtle bg-bg-elevated p-6">
+        <h2 className="text-xl font-semibold text-text-primary mb-6">Password</h2>
 
         {user?.hasPassword ? (
           <form onSubmit={changePasswordForm.handleSubmit(onChangePasswordSubmit)} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-text-secondary mb-1">
                 Current Password
               </label>
               <input
@@ -233,15 +233,15 @@ export default function ProfileSettingsPage() {
                 type="password"
                 autoComplete="current-password"
                 placeholder="••••••••"
-                className="w-full max-w-md rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full max-w-md rounded-lg border border-border-subtle bg-bg-elevated px-4 py-2 text-text-primary placeholder-text-muted focus:border-border-focus focus:outline-none focus:ring-1 focus:ring-border-focus"
               />
               {changePasswordForm.formState.errors.currentPassword && (
-                <p className="mt-1 text-sm text-red-600">{changePasswordForm.formState.errors.currentPassword.message}</p>
+                <p className="mt-1 text-sm text-state-error-text">{changePasswordForm.formState.errors.currentPassword.message}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-text-secondary mb-1">
                 New Password
               </label>
               <input
@@ -249,15 +249,15 @@ export default function ProfileSettingsPage() {
                 type="password"
                 autoComplete="new-password"
                 placeholder="••••••••"
-                className="w-full max-w-md rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full max-w-md rounded-lg border border-border-subtle bg-bg-elevated px-4 py-2 text-text-primary placeholder-text-muted focus:border-border-focus focus:outline-none focus:ring-1 focus:ring-border-focus"
               />
               {changePasswordForm.formState.errors.newPassword && (
-                <p className="mt-1 text-sm text-red-600">{changePasswordForm.formState.errors.newPassword.message}</p>
+                <p className="mt-1 text-sm text-state-error-text">{changePasswordForm.formState.errors.newPassword.message}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-text-secondary mb-1">
                 Confirm New Password
               </label>
               <input
@@ -265,29 +265,29 @@ export default function ProfileSettingsPage() {
                 type="password"
                 autoComplete="new-password"
                 placeholder="••••••••"
-                className="w-full max-w-md rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full max-w-md rounded-lg border border-border-subtle bg-bg-elevated px-4 py-2 text-text-primary placeholder-text-muted focus:border-border-focus focus:outline-none focus:ring-1 focus:ring-border-focus"
               />
               {changePasswordForm.formState.errors.confirmPassword && (
-                <p className="mt-1 text-sm text-red-600">{changePasswordForm.formState.errors.confirmPassword.message}</p>
+                <p className="mt-1 text-sm text-state-error-text">{changePasswordForm.formState.errors.confirmPassword.message}</p>
               )}
             </div>
 
             <button
               type="submit"
               disabled={isChangingPassword}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
+              className="rounded-lg bg-indigo px-4 py-2 text-sm text-white hover:bg-indigo-dark disabled:opacity-50"
             >
               {isChangingPassword ? "Updating..." : "Update Password"}
             </button>
           </form>
         ) : (
           <form onSubmit={setPasswordForm.handleSubmit(onSetPasswordSubmit)} className="space-y-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-text-secondary">
               You signed up with a social account. Set a password to also log in with email.
             </p>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-text-secondary mb-1">
                 New Password
               </label>
               <input
@@ -295,15 +295,15 @@ export default function ProfileSettingsPage() {
                 type="password"
                 autoComplete="new-password"
                 placeholder="••••••••"
-                className="w-full max-w-md rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full max-w-md rounded-lg border border-border-subtle bg-bg-elevated px-4 py-2 text-text-primary placeholder-text-muted focus:border-border-focus focus:outline-none focus:ring-1 focus:ring-border-focus"
               />
               {setPasswordForm.formState.errors.newPassword && (
-                <p className="mt-1 text-sm text-red-600">{setPasswordForm.formState.errors.newPassword.message}</p>
+                <p className="mt-1 text-sm text-state-error-text">{setPasswordForm.formState.errors.newPassword.message}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-text-secondary mb-1">
                 Confirm Password
               </label>
               <input
@@ -311,17 +311,17 @@ export default function ProfileSettingsPage() {
                 type="password"
                 autoComplete="new-password"
                 placeholder="••••••••"
-                className="w-full max-w-md rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full max-w-md rounded-lg border border-border-subtle bg-bg-elevated px-4 py-2 text-text-primary placeholder-text-muted focus:border-border-focus focus:outline-none focus:ring-1 focus:ring-border-focus"
               />
               {setPasswordForm.formState.errors.confirmPassword && (
-                <p className="mt-1 text-sm text-red-600">{setPasswordForm.formState.errors.confirmPassword.message}</p>
+                <p className="mt-1 text-sm text-state-error-text">{setPasswordForm.formState.errors.confirmPassword.message}</p>
               )}
             </div>
 
             <button
               type="submit"
               disabled={isSettingPassword}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
+              className="rounded-lg bg-indigo px-4 py-2 text-sm text-white hover:bg-indigo-dark disabled:opacity-50"
             >
               {isSettingPassword ? "Setting..." : "Set Password"}
             </button>
@@ -329,14 +329,14 @@ export default function ProfileSettingsPage() {
         )}
       </section>
 
-      <section className="rounded-lg border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/30 p-6">
-        <h2 className="text-xl font-semibold text-red-800 dark:text-red-400 mb-4">Danger Zone</h2>
-        <p className="text-sm text-red-700 dark:text-red-400 mb-4">
+      <section className="rounded-lg border border-state-error-border bg-state-error-bg p-6">
+        <h2 className="text-xl font-semibold text-state-error-text mb-4">Danger Zone</h2>
+        <p className="text-sm text-state-error-text mb-4">
           Once you delete your account, there is no going back. Please be certain.
         </p>
         <button
           onClick={() => setShowDeleteDialog(true)}
-          className="rounded-lg border border-red-300 dark:border-red-800 px-4 py-2 text-sm text-red-700 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950"
+          className="rounded-lg border border-state-error-border px-4 py-2 text-sm text-state-error-text hover:bg-error-subtle"
         >
           Delete Account
         </button>
@@ -350,20 +350,20 @@ export default function ProfileSettingsPage() {
             onKeyDown={(e) => { if (e.key === 'Escape') setShowDeleteDialog(false); }}
           >
             <div
-              className="w-full max-w-md rounded-lg bg-white dark:bg-gray-900 p-6 shadow-xl"
+              className="w-full max-w-md rounded-lg bg-bg-elevated p-6 shadow-xl"
               role="dialog"
               aria-modal="true"
               aria-labelledby="delete-dialog-title"
             >
-            <h3 id="delete-dialog-title" className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Delete Account</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            <h3 id="delete-dialog-title" className="text-lg font-semibold text-text-primary mb-2">Delete Account</h3>
+            <p className="text-sm text-text-secondary mb-4">
               Your account will be deactivated. This action cannot be undone.
             </p>
 
             <form onSubmit={deleteAccountForm.handleSubmit(onDeleteAccountSubmit)} className="space-y-4">
               {user?.hasPassword && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-text-secondary mb-1">
                     Confirm your password
                   </label>
                   <input
@@ -372,7 +372,7 @@ export default function ProfileSettingsPage() {
                     autoComplete="current-password"
                     autoFocus
                     placeholder="••••••••"
-                    className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+                    className="w-full rounded-lg border border-border-subtle bg-bg-elevated px-4 py-2 text-text-primary placeholder-text-muted focus:border-state-error-border focus:outline-none focus:ring-1 focus:ring-state-error-border"
                   />
                 </div>
               )}
@@ -382,7 +382,7 @@ export default function ProfileSettingsPage() {
                   type="submit"
                   disabled={isDeletingAccount}
                   autoFocus={!user?.hasPassword}
-                  className="rounded-lg bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700 disabled:opacity-50"
+                  className="rounded-lg bg-error px-4 py-2 text-sm text-white hover:bg-error/80 disabled:opacity-50"
                 >
                   {isDeletingAccount ? "Deleting..." : "Confirm Delete"}
                 </button>
@@ -392,7 +392,7 @@ export default function ProfileSettingsPage() {
                     setShowDeleteDialog(false);
                     deleteAccountForm.reset();
                   }}
-                  className="rounded-lg border border-gray-200 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+                  className="rounded-lg border border-border-subtle px-4 py-2 text-sm text-text-secondary hover:bg-bg-sunken"
                 >
                   Cancel
                 </button>

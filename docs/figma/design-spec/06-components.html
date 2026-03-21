@@ -1,0 +1,2171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Components — VP Design System</title>
+  <link rel="stylesheet" href="tokens.css">
+  <style>
+    /* ========== PAGE-LEVEL ========== */
+    .spec-page { padding-top: var(--space-6); }
+
+    /* ========== COMPONENT SECTION ========== */
+    .comp-section {
+      margin-bottom: var(--space-16);
+    }
+    .comp-section-title {
+      font: var(--text-h2);
+      color: var(--text-primary);
+      margin-bottom: var(--space-2);
+    }
+    .comp-section-desc {
+      font: var(--text-body-l);
+      color: var(--text-muted);
+      margin-bottom: var(--space-8);
+    }
+    .comp-subsection {
+      margin-bottom: var(--space-8);
+    }
+    .comp-subsection-title {
+      font: var(--text-h4);
+      color: var(--text-secondary);
+      margin-bottom: var(--space-4);
+    }
+    .comp-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-4);
+      align-items: center;
+      margin-bottom: var(--space-6);
+    }
+    .comp-row-label {
+      font: var(--text-label);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      width: 100%;
+      margin-bottom: var(--space-1);
+    }
+    .comp-grid {
+      display: grid;
+      gap: var(--space-6);
+    }
+    .comp-grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .comp-grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .comp-grid-4 { grid-template-columns: repeat(4, 1fr); }
+    .comp-grid-auto { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+
+    .comp-card {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: var(--space-6);
+    }
+    .comp-card-label {
+      font: var(--text-label);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-4);
+    }
+
+    .variant-table {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    /* ========== BUTTONS ========== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      font-family: var(--font-body);
+      font-weight: 500;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-default);
+      white-space: nowrap;
+      position: relative;
+      text-decoration: none;
+    }
+    /* Sizes */
+    .btn-sm { height: 32px; padding: 0 var(--space-3); font-size: 13px; }
+    .btn-md { height: 40px; padding: 0 var(--space-4); font-size: 14px; }
+    .btn-lg { height: 48px; padding: 0 var(--space-6); font-size: 15px; }
+
+    /* Primary */
+    .btn-primary {
+      background: var(--indigo);
+      color: var(--text-inverse);
+    }
+    .btn-primary.hover,
+    .btn-primary:hover {
+      background: var(--indigo-dark);
+    }
+    .btn-primary.focus {
+      background: var(--indigo);
+      box-shadow: var(--shadow-focus);
+    }
+    .btn-primary.disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    .btn-primary.loading {
+      color: transparent;
+    }
+
+    /* Secondary */
+    .btn-secondary {
+      background: transparent;
+      color: var(--indigo);
+      border: 1px solid var(--indigo);
+    }
+    .btn-secondary.hover,
+    .btn-secondary:hover {
+      background: var(--indigo-subtle);
+    }
+    .btn-secondary.focus {
+      box-shadow: var(--shadow-focus);
+    }
+    .btn-secondary.disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    .btn-secondary.loading {
+      color: transparent;
+      border-color: var(--indigo-light);
+    }
+
+    /* Ghost */
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+    }
+    .btn-ghost.hover,
+    .btn-ghost:hover {
+      background: var(--bg-sunken);
+      color: var(--text-primary);
+    }
+    .btn-ghost.focus {
+      box-shadow: var(--shadow-focus);
+    }
+    .btn-ghost.disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    .btn-ghost.loading {
+      color: transparent;
+    }
+
+    /* Destructive */
+    .btn-destructive {
+      background: var(--error);
+      color: var(--text-inverse);
+    }
+    .btn-destructive.hover,
+    .btn-destructive:hover {
+      background: var(--error-dark);
+    }
+    .btn-destructive.focus {
+      background: var(--error);
+      box-shadow: 0 0 0 2px rgba(216, 78, 78, 0.3);
+    }
+    .btn-destructive.disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    .btn-destructive.loading {
+      color: transparent;
+    }
+
+    /* Loading spinner */
+    .btn .spinner {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+    .btn-secondary .spinner {
+      border-color: rgba(93,121,223,0.2);
+      border-top-color: var(--indigo);
+    }
+    .btn-ghost .spinner {
+      border-color: rgba(82,82,82,0.2);
+      border-top-color: var(--text-secondary);
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ========== INPUTS ========== */
+    .input-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+    }
+    .input-field-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .input {
+      width: 100%;
+      height: 44px;
+      padding: 12px 16px;
+      font: var(--text-body-m);
+      color: var(--text-primary);
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      outline: none;
+      transition: all var(--duration-fast) var(--ease-default);
+    }
+    .input::placeholder {
+      color: var(--text-muted);
+    }
+    .input.hover {
+      border-color: var(--border-strong);
+    }
+    .input.focus {
+      border-color: var(--indigo);
+      box-shadow: var(--shadow-focus);
+    }
+    .input.disabled {
+      opacity: 0.5;
+      background: var(--bg-sunken);
+      pointer-events: none;
+    }
+    .input.error {
+      border-color: var(--error);
+    }
+    .input.filled {
+      border-color: var(--border-strong);
+      color: var(--text-primary);
+    }
+    .input-error-msg {
+      font: var(--text-body-s);
+      color: var(--error);
+      margin-top: var(--space-1);
+    }
+    .input-icon {
+      position: absolute;
+      left: 12px;
+      color: var(--text-muted);
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+    }
+    .input-icon-right {
+      position: absolute;
+      right: 12px;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+    .input.has-icon-left {
+      padding-left: 40px;
+    }
+    .input.has-icon-right {
+      padding-right: 40px;
+    }
+
+    /* ========== TEXTAREA ========== */
+    .textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 12px 16px;
+      font: var(--text-body-m);
+      color: var(--text-primary);
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      outline: none;
+      resize: vertical;
+      transition: all var(--duration-fast) var(--ease-default);
+    }
+    .textarea::placeholder { color: var(--text-muted); }
+    .textarea.focus { border-color: var(--indigo); box-shadow: var(--shadow-focus); }
+    .textarea.disabled { opacity: 0.5; background: var(--bg-sunken); pointer-events: none; }
+    .textarea.error { border-color: var(--error); }
+    .textarea-wrap { position: relative; }
+    .textarea-count {
+      position: absolute;
+      bottom: 8px;
+      right: 12px;
+      font: var(--text-body-s);
+      color: var(--text-muted);
+    }
+
+    /* ========== SELECT ========== */
+    .select-wrap { position: relative; display: inline-block; width: 100%; }
+    .select {
+      width: 100%;
+      height: 44px;
+      padding: 12px 40px 12px 16px;
+      font: var(--text-body-m);
+      color: var(--text-primary);
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      transition: all var(--duration-fast) var(--ease-default);
+    }
+    .select.focus,
+    .select.open {
+      border-color: var(--indigo);
+      box-shadow: var(--shadow-focus);
+    }
+    .select.disabled { opacity: 0.5; background: var(--bg-sunken); pointer-events: none; }
+    .select.error { border-color: var(--error); }
+    .select-chevron {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: var(--text-muted);
+    }
+    .select-dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-elevated);
+      z-index: 10;
+      overflow: hidden;
+    }
+    .select-option {
+      padding: 10px 16px;
+      font: var(--text-body-m);
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: background var(--duration-fast) var(--ease-default);
+    }
+    .select-option:hover,
+    .select-option.hovered {
+      background: var(--indigo-subtle);
+    }
+    .select-option.selected {
+      color: var(--indigo);
+      font-weight: 500;
+    }
+
+    /* ========== TABS ========== */
+    .tabs-underline {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .tab-underline {
+      padding: var(--space-3) var(--space-4);
+      font: var(--text-body-m);
+      font-weight: 500;
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-default);
+    }
+    .tab-underline.hover { color: var(--text-primary); }
+    .tab-underline.active {
+      color: var(--indigo);
+      border-bottom-color: var(--indigo);
+    }
+
+    .tabs-pill {
+      display: inline-flex;
+      background: var(--bg-sunken);
+      border-radius: var(--radius-sm);
+      padding: 3px;
+      gap: 2px;
+    }
+    .tab-pill {
+      padding: var(--space-2) var(--space-4);
+      font: var(--text-body-s);
+      font-weight: 500;
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-default);
+    }
+    .tab-pill.hover { color: var(--text-primary); }
+    .tab-pill.active {
+      color: var(--text-primary);
+      background: var(--bg-base);
+      box-shadow: var(--shadow-soft-1);
+    }
+
+    /* ========== CHIPS / TAGS ========== */
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      font-family: var(--font-body);
+      font-weight: 500;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-sunken);
+      color: var(--text-secondary);
+      cursor: default;
+      transition: all var(--duration-fast) var(--ease-default);
+    }
+    .chip-sm { padding: 2px 10px; font-size: 12px; height: 24px; }
+    .chip-md { padding: 4px 14px; font-size: 13px; height: 30px; }
+    .chip.active {
+      background: var(--indigo-subtle);
+      color: var(--indigo);
+      border-color: var(--indigo-muted);
+    }
+    .chip .chip-remove {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      font-size: 10px;
+      line-height: 1;
+      cursor: pointer;
+      transition: background var(--duration-fast) var(--ease-default);
+    }
+    .chip .chip-remove:hover {
+      background: rgba(0,0,0,0.08);
+    }
+    .chip .provider-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ========== STATUS BADGES ========== */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      padding: 3px 10px;
+      font: var(--text-label);
+      border-radius: var(--radius-full);
+    }
+    .badge-success {
+      background: var(--state-success-bg);
+      color: var(--state-success-text);
+    }
+    .badge-warning {
+      background: var(--state-warning-bg);
+      color: var(--state-warning-text);
+    }
+    .badge-error {
+      background: var(--state-error-bg);
+      color: var(--state-error-text);
+    }
+    .badge-info {
+      background: var(--state-info-bg);
+      color: var(--state-info-text);
+    }
+    .badge-neutral {
+      background: var(--bg-sunken);
+      color: var(--text-muted);
+    }
+    .badge-processing {
+      background: var(--indigo-subtle);
+      color: var(--indigo);
+    }
+    .badge-processing .pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--indigo);
+      animation: pulse-badge 1.4s ease-in-out infinite;
+    }
+    @keyframes pulse-badge {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* ========== CARDS ========== */
+    .card {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-soft-1);
+      padding: var(--space-6);
+      transition: all var(--duration-normal) var(--ease-default);
+    }
+    .card.interactive:hover,
+    .card.interactive-hover {
+      box-shadow: var(--shadow-soft-2);
+      transform: translateY(-2px);
+    }
+    .card.selected {
+      border-color: var(--indigo);
+      box-shadow: 0 0 0 1px var(--indigo), var(--shadow-soft-1);
+    }
+
+    /* ========== VOICE CARD ========== */
+    .voice-card {
+      width: 280px;
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-soft-1);
+      padding: var(--space-5);
+      transition: all var(--duration-normal) var(--ease-default);
+      position: relative;
+    }
+    .voice-card:hover,
+    .voice-card.hover {
+      box-shadow: var(--shadow-soft-2);
+      transform: translateY(-2px);
+    }
+    .voice-card.selected {
+      border-color: var(--indigo);
+      box-shadow: 0 0 0 1px var(--indigo), var(--shadow-soft-1);
+    }
+    .voice-card.selected .vc-check {
+      display: flex;
+    }
+    .vc-check {
+      display: none;
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--indigo);
+      color: #fff;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+    .vc-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-2);
+    }
+    .vc-name {
+      font: var(--text-h4);
+      color: var(--text-primary);
+    }
+    .vc-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-3);
+    }
+    .vc-gender {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font: var(--text-body-s);
+      color: var(--text-muted);
+    }
+    .vc-sample {
+      font: var(--text-body-s);
+      color: var(--text-muted);
+      margin-bottom: var(--space-4);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .vc-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .vc-play {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--indigo);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background var(--duration-fast) var(--ease-default);
+    }
+    .vc-play:hover { background: var(--indigo-dark); }
+    .vc-cost {
+      font: var(--text-body-s);
+      color: var(--text-muted);
+    }
+    .vc-waveform {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      height: 20px;
+    }
+    .vc-waveform .bar {
+      width: 3px;
+      background: var(--indigo);
+      border-radius: 2px;
+      animation: waveform 0.8s ease-in-out infinite alternate;
+    }
+    .vc-waveform .bar:nth-child(2) { animation-delay: 0.1s; }
+    .vc-waveform .bar:nth-child(3) { animation-delay: 0.2s; }
+    .vc-waveform .bar:nth-child(4) { animation-delay: 0.3s; }
+    .vc-waveform .bar:nth-child(5) { animation-delay: 0.15s; }
+    @keyframes waveform {
+      0% { height: 6px; }
+      100% { height: 18px; }
+    }
+
+    /* ========== COST ESTIMATE CARD ========== */
+    .cost-card {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-soft-1);
+      padding: var(--space-6);
+      width: 300px;
+      position: relative;
+    }
+    .cost-card-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-4);
+    }
+    .cost-card-provider {
+      font: var(--text-label);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .cost-card-voice {
+      font: var(--text-h4);
+      color: var(--text-primary);
+    }
+    .cost-card-amount {
+      font: 700 32px/1.2 var(--font-heading);
+      color: var(--text-primary);
+      margin-bottom: var(--space-1);
+    }
+    .cost-card-usd {
+      font: var(--text-body-s);
+      color: var(--text-muted);
+      margin-bottom: var(--space-4);
+    }
+    .cost-card-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-2) 0;
+    }
+    .cost-card-row + .cost-card-row {
+      border-top: 1px solid var(--border-subtle);
+    }
+    .cost-card-row-label {
+      font: var(--text-body-s);
+      color: var(--text-muted);
+    }
+    .cost-card-row-value {
+      font: var(--text-body-s);
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+    .cost-badge {
+      position: absolute;
+      top: -10px;
+      right: 16px;
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+      font: var(--text-label);
+      font-weight: 600;
+    }
+    .cost-badge-value {
+      background: var(--teal-subtle);
+      color: var(--teal-dark);
+      border: 1px solid rgba(55,200,181,0.25);
+    }
+    .cost-badge-premium {
+      background: var(--indigo-subtle);
+      color: var(--indigo);
+      border: 1px solid var(--indigo-muted);
+    }
+
+    /* ========== AUDIO PLAYER BAR ========== */
+    .audio-player {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: var(--space-3) var(--space-5);
+      box-shadow: var(--shadow-soft-1);
+    }
+    .ap-play {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--indigo);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background var(--duration-fast) var(--ease-default);
+    }
+    .ap-play:hover { background: var(--indigo-dark); }
+    .ap-waveform {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      height: 32px;
+    }
+    .ap-waveform .bar {
+      flex: 1;
+      max-width: 4px;
+      border-radius: 2px;
+      background: var(--neutral-100);
+      transition: background var(--duration-fast) var(--ease-default);
+    }
+    .ap-waveform .bar.played {
+      background: var(--indigo);
+    }
+    .ap-time {
+      font: var(--text-body-s);
+      color: var(--text-muted);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .ap-speed {
+      padding: 4px 8px;
+      font: var(--text-label);
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: var(--bg-sunken);
+      border: none;
+      border-radius: var(--radius-xs);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .ap-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-1);
+      border-radius: var(--radius-xs);
+      transition: color var(--duration-fast) var(--ease-default);
+      flex-shrink: 0;
+    }
+    .ap-btn:hover { color: var(--text-primary); }
+    .ap-volume {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex-shrink: 0;
+    }
+    .ap-volume-track {
+      width: 64px;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--neutral-100);
+      position: relative;
+    }
+    .ap-volume-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: var(--text-muted);
+    }
+    /* skeleton loading state */
+    .ap-skeleton .bar {
+      background: var(--neutral-100);
+      animation: skeleton-pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes skeleton-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    .ap-playing .bar.played {
+      background: var(--indigo);
+    }
+
+    /* ========== MODAL ========== */
+    .modal-overlay {
+      background: var(--bg-overlay);
+      border-radius: var(--radius-md);
+      padding: var(--space-10);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 360px;
+    }
+    .modal {
+      background: var(--bg-elevated);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-elevated);
+      width: 100%;
+      max-width: 480px;
+      overflow: hidden;
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-6) var(--space-6) 0 var(--space-6);
+    }
+    .modal-title {
+      font: var(--text-h3);
+      color: var(--text-primary);
+    }
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-radius: var(--radius-xs);
+      transition: all var(--duration-fast) var(--ease-default);
+    }
+    .modal-close:hover { background: var(--bg-sunken); color: var(--text-primary); }
+    .modal-body {
+      padding: var(--space-4) var(--space-6);
+      font: var(--text-body-m);
+      color: var(--text-secondary);
+    }
+    .modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: var(--space-3);
+      padding: var(--space-4) var(--space-6) var(--space-6) var(--space-6);
+    }
+
+    /* ========== DROPDOWN MENU ========== */
+    .dropdown-wrap { position: relative; display: inline-block; }
+    .dropdown-panel {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      min-width: 200px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-elevated);
+      z-index: 20;
+      padding: var(--space-1) 0;
+      overflow: hidden;
+    }
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      font: var(--text-body-m);
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: background var(--duration-fast) var(--ease-default);
+    }
+    .dropdown-item:hover,
+    .dropdown-item.hovered {
+      background: var(--indigo-subtle);
+    }
+    .dropdown-item.destructive {
+      color: var(--error);
+    }
+    .dropdown-item.destructive:hover,
+    .dropdown-item.destructive.hovered {
+      background: var(--state-error-bg);
+    }
+    .dropdown-divider {
+      height: 1px;
+      background: var(--border-subtle);
+      margin: var(--space-1) 0;
+    }
+    .dropdown-item-icon {
+      width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+    .dropdown-item.destructive .dropdown-item-icon { color: var(--error); }
+
+    /* ========== PAGINATION ========== */
+    .pagination {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .page-btn {
+      min-width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font: var(--text-body-s);
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: none;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-default);
+      padding: 0 var(--space-2);
+    }
+    .page-btn:hover { background: var(--bg-sunken); }
+    .page-btn.active {
+      background: var(--indigo);
+      color: #fff;
+      border-color: var(--indigo);
+    }
+    .page-btn.arrow { border: none; }
+    .page-btn.arrow:hover { background: var(--bg-sunken); }
+    .pagination-info {
+      font: var(--text-body-s);
+      color: var(--text-muted);
+      margin-left: var(--space-4);
+    }
+
+    /* ========== TOAST / NOTIFICATION ========== */
+    .toast {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+      background: var(--bg-elevated);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-soft-2);
+      padding: var(--space-4) var(--space-4);
+      min-width: 320px;
+      max-width: 420px;
+      border-left: 3px solid;
+    }
+    .toast-success { border-left-color: var(--success); }
+    .toast-error { border-left-color: var(--error); }
+    .toast-warning { border-left-color: var(--warning); }
+    .toast-info { border-left-color: var(--sky); }
+    .toast-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .toast-success .toast-icon { color: var(--success); }
+    .toast-error .toast-icon { color: var(--error); }
+    .toast-warning .toast-icon { color: var(--warning); }
+    .toast-info .toast-icon { color: var(--sky); }
+    .toast-content { flex: 1; }
+    .toast-message {
+      font: var(--text-body-m);
+      color: var(--text-primary);
+    }
+    .toast-action {
+      font: var(--text-body-s);
+      font-weight: 500;
+      color: var(--indigo);
+      cursor: pointer;
+      margin-top: var(--space-1);
+    }
+    .toast-dismiss {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 2px;
+      flex-shrink: 0;
+    }
+    .toast-dismiss:hover { color: var(--text-primary); }
+
+    /* ========== SEARCH BAR ========== */
+    .search-bar {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .search-bar .input {
+      padding-left: 40px;
+      padding-right: 40px;
+    }
+    .search-bar .search-icon {
+      position: absolute;
+      left: 14px;
+      color: var(--text-muted);
+      pointer-events: none;
+      display: flex;
+    }
+    .search-bar .search-clear {
+      position: absolute;
+      right: 10px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--bg-sunken);
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      transition: all var(--duration-fast) var(--ease-default);
+    }
+    .search-bar .search-clear:hover {
+      background: var(--neutral-100);
+      color: var(--text-primary);
+    }
+
+    /* ========== SVG ICON HELPERS ========== */
+    .icon-16 { width: 16px; height: 16px; }
+    .icon-20 { width: 20px; height: 20px; }
+
+    /* ========== STATE TABLE ========== */
+    .state-table {
+      display: grid;
+      gap: var(--space-4);
+    }
+    .state-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+    }
+    .state-label {
+      width: 80px;
+      flex-shrink: 0;
+      font: var(--text-label);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .state-items {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    /* ========== DIVIDER ========== */
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border-subtle);
+      margin: var(--space-16) 0;
+    }
+  </style>
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+</head>
+<body>
+
+<!-- ==================== NAVIGATION ==================== -->
+<nav class="spec-nav">
+  <span class="logo">VP Design System</span>
+  <a href="index.html">Index</a>
+  <a href="00-foundations.html">Foundations</a>
+  <a href="01-marketing.html">Marketing</a>
+  <a href="02-auth.html">Auth</a>
+  <a href="03-app-shell.html">App Shell</a>
+  <a href="04-core-flows.html">Core Flows</a>
+  <a href="05-settings.html">Settings</a>
+  <a href="06-components.html" class="active">Components</a>
+  <a href="07-interactions.html">Interactions</a>
+</nav>
+
+<main class="spec-page">
+
+  <header style="margin-bottom: var(--space-12);">
+    <h1 style="font: var(--text-h1); color: var(--text-primary); margin-bottom: var(--space-2);">Component Library</h1>
+    <p style="font: var(--text-body-l); color: var(--text-muted); max-width: 640px;">Production-ready components built on the VP token system. Premium, calm aesthetics with soft contrast, rounded surfaces, and clear hierarchy. Every component uses the shared design tokens for colors, spacing, radius, shadows, and typography.</p>
+  </header>
+
+  <!-- ================================================================ -->
+  <!--  BUTTONS                                                          -->
+  <!-- ================================================================ -->
+  <section class="comp-section" id="buttons">
+    <h2 class="comp-section-title">Buttons</h2>
+    <p class="comp-section-desc">Four variants across three sizes. Each variant supports default, hover, focus, disabled, and loading states.</p>
+
+    <!-- Primary -->
+    <div class="comp-subsection">
+      <h3 class="comp-subsection-title">Primary</h3>
+      <div class="comp-card">
+        <div class="comp-card-label">Sizes</div>
+        <div class="comp-row" style="margin-bottom: var(--space-6);">
+          <button class="btn btn-primary btn-sm">Small</button>
+          <button class="btn btn-primary btn-md">Medium</button>
+          <button class="btn btn-primary btn-lg">Large</button>
+        </div>
+        <div class="comp-card-label">States (Medium)</div>
+        <div class="comp-row">
+          <button class="btn btn-primary btn-md">Default</button>
+          <button class="btn btn-primary btn-md hover">Hover</button>
+          <button class="btn btn-primary btn-md focus">Focus</button>
+          <button class="btn btn-primary btn-md disabled">Disabled</button>
+          <button class="btn btn-primary btn-md loading"><span class="spinner"></span>Loading</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Secondary -->
+    <div class="comp-subsection">
+      <h3 class="comp-subsection-title">Secondary</h3>
+      <div class="comp-card">
+        <div class="comp-card-label">Sizes</div>
+        <div class="comp-row" style="margin-bottom: var(--space-6);">
+          <button class="btn btn-secondary btn-sm">Small</button>
+          <button class="btn btn-secondary btn-md">Medium</button>
+          <button class="btn btn-secondary btn-lg">Large</button>
+        </div>
+        <div class="comp-card-label">States (Medium)</div>
+        <div class="comp-row">
+          <button class="btn btn-secondary btn-md">Default</button>
+          <button class="btn btn-secondary btn-md hover">Hover</button>
+          <button class="btn btn-secondary btn-md focus">Focus</button>
+          <button class="btn btn-secondary btn-md disabled">Disabled</button>
+          <button class="btn btn-secondary btn-md loading"><span class="spinner"></span>Loading</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ghost -->
+    <div class="comp-subsection">
+      <h3 class="comp-subsection-title">Ghost</h3>
+      <div class="comp-card">
+        <div class="comp-card-label">Sizes</div>
+        <div class="comp-row" style="margin-bottom: var(--space-6);">
+          <button class="btn btn-ghost btn-sm">Small</button>
+          <button class="btn btn-ghost btn-md">Medium</button>
+          <button class="btn btn-ghost btn-lg">Large</button>
+        </div>
+        <div class="comp-card-label">States (Medium)</div>
+        <div class="comp-row">
+          <button class="btn btn-ghost btn-md">Default</button>
+          <button class="btn btn-ghost btn-md hover">Hover</button>
+          <button class="btn btn-ghost btn-md focus">Focus</button>
+          <button class="btn btn-ghost btn-md disabled">Disabled</button>
+          <button class="btn btn-ghost btn-md loading"><span class="spinner"></span>Loading</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Destructive -->
+    <div class="comp-subsection">
+      <h3 class="comp-subsection-title">Destructive</h3>
+      <div class="comp-card">
+        <div class="comp-card-label">Sizes</div>
+        <div class="comp-row" style="margin-bottom: var(--space-6);">
+          <button class="btn btn-destructive btn-sm">Small</button>
+          <button class="btn btn-destructive btn-md">Medium</button>
+          <button class="btn btn-destructive btn-lg">Large</button>
+        </div>
+        <div class="comp-card-label">States (Medium)</div>
+        <div class="comp-row">
+          <button class="btn btn-destructive btn-md">Default</button>
+          <button class="btn btn-destructive btn-md hover">Hover</button>
+          <button class="btn btn-destructive btn-md focus">Focus</button>
+          <button class="btn btn-destructive btn-md disabled">Disabled</button>
+          <button class="btn btn-destructive btn-md loading"><span class="spinner"></span>Loading</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- ================================================================ -->
+  <!--  INPUTS                                                           -->
+  <!-- ================================================================ -->
+  <section class="comp-section" id="inputs">
+    <h2 class="comp-section-title">Input</h2>
+    <p class="comp-section-desc">Text, email, password (with show/hide toggle), and search inputs. Height 44px, 12px 16px padding, radius-sm, 1px border.</p>
+
+    <div class="comp-grid comp-grid-2">
+      <!-- Text Input States -->
+      <div class="comp-card">
+        <div class="comp-card-label">Text Input &mdash; States</div>
+        <div class="variant-table">
+          <div class="input-wrap">
+            <input class="input" type="text" placeholder="Default state" readonly>
+          </div>
+          <div class="input-wrap">
+            <input class="input hover" type="text" placeholder="Hover state" readonly>
+          </div>
+          <div class="input-wrap">
+            <input class="input focus" type="text" placeholder="Focus state" readonly>
+          </div>
+          <div class="input-wrap">
+            <input class="input disabled" type="text" placeholder="Disabled state" readonly>
+          </div>
+          <div class="input-wrap">
+            <input class="input error" type="text" value="Invalid value" readonly>
+            <span class="input-error-msg">This field is required</span>
+          </div>
+          <div class="input-wrap">
+            <input class="input filled" type="text" value="John Doe" readonly>
+          </div>
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="comp-card">
+        <div class="comp-card-label">Email Input</div>
+        <div class="variant-table">
+          <div class="input-wrap">
+            <input class="input" type="email" placeholder="email@example.com" readonly>
+          </div>
+          <div class="input-wrap">
+            <input class="input focus" type="email" placeholder="email@example.com" readonly>
+          </div>
+          <div class="input-wrap">
+            <input class="input error" type="email" value="not-an-email" readonly>
+            <span class="input-error-msg">Please enter a valid email address</span>
+          </div>
+          <div class="input-wrap">
+            <input class="input filled" type="email" value="user@voiceprocessor.io" readonly>
+          </div>
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="comp-card">
+        <div class="comp-card-label">Password Input (with toggle)</div>
+        <div class="variant-table">
+          <div class="input-wrap">
+            <div class="input-field-wrap">
+              <input class="input has-icon-right" type="password" value="mypassword" readonly>
+              <span class="input-icon-right">
+                <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z"/><circle cx="8" cy="8" r="2"/></svg>
+              </span>
+            </div>
+          </div>
+          <div class="input-wrap">
+            <div class="input-field-wrap">
+              <input class="input has-icon-right focus" type="text" value="mypassword" readonly>
+              <span class="input-icon-right">
+                <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z"/><circle cx="8" cy="8" r="2"/><line x1="2" y1="14" x2="14" y2="2"/></svg>
+              </span>
+            </div>
+          </div>
+          <div class="input-wrap">
+            <div class="input-field-wrap">
+              <input class="input has-icon-right error" type="password" value="123" readonly>
+              <span class="input-icon-right">
+                <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z"/><circle cx="8" cy="8" r="2"/></svg>
+              </span>
+            </div>
+            <span class="input-error-msg">Password must be at least 8 characters</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search -->
+      <div class="comp-card">
+        <div class="comp-card-label">Search Input</div>
+        <div class="variant-table">
+          <div class="input-wrap">
+            <div class="input-field-wrap">
+              <span class="input-icon">
+                <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="4.5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/></svg>
+              </span>
+              <input class="input has-icon-left" type="search" placeholder="Search voices..." readonly>
+            </div>
+          </div>
+          <div class="input-wrap">
+            <div class="input-field-wrap">
+              <span class="input-icon">
+                <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="4.5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/></svg>
+              </span>
+              <input class="input has-icon-left focus" type="search" placeholder="Search voices..." readonly>
+            </div>
+          </div>
+          <div class="input-wrap">
+            <div class="input-field-wrap">
+              <span class="input-icon">
+                <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="4.5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/></svg>
+              </span>
+              <input class="input has-icon-left filled" type="search" value="Neural" readonly>
+              <span class="input-icon-right" style="font-size: 14px; font-weight: 600;">&times;</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- ================================================================ -->
+  <!--  TEXTAREA                                                         -->
+  <!-- ================================================================ -->
+  <section class="comp-section" id="textarea">
+    <h2 class="comp-section-title">Textarea</h2>
+    <p class="comp-section-desc">Multi-line text input. Min-height 120px with optional character counter.</p>
+
+    <div class="comp-grid comp-grid-2">
+      <div class="comp-card">
+        <div class="comp-card-label">Default</div>
+        <textarea class="textarea" placeholder="Enter your text here..." readonly></textarea>
+      </div>
+      <div class="comp-card">
+        <div class="comp-card-label">Focus</div>
+        <textarea class="textarea focus" placeholder="Enter your text here..." readonly></textarea>
+      </div>
+      <div class="comp-card">
+        <div class="comp-card-label">Disabled</div>
+        <textarea class="textarea disabled" placeholder="This field is disabled" readonly></textarea>
+      </div>
+      <div class="comp-card">
+        <div class="comp-card-label">Error</div>
+        <div class="input-wrap">
+          <textarea class="textarea error" readonly>Too short</textarea>
+          <span class="input-error-msg">Text must be at least 50 characters</span>
+        </div>
+      </div>
+      <div class="comp-card" style="grid-column: 1 / -1;">
+        <div class="comp-card-label">With Character Count</div>
+        <div class="textarea-wrap">
+          <textarea class="textarea" readonly>The quick brown fox jumps over the lazy dog. This is a sample text to demonstrate the character count feature in the textarea component.</textarea>
+          <span class="textarea-count">128 / 5000</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- ================================================================ -->
+  <!--  SELECT                                                           -->
+  <!-- ================================================================ -->
+  <section class="comp-section" id="select">
+    <h2 class="comp-section-title">Select</h2>
+    <p class="comp-section-desc">Dropdown select with chevron indicator. Shows dropdown panel on open state.</p>
+
+    <div class="comp-grid comp-grid-4">
+      <!-- Default -->
+      <div class="comp-card">
+        <div class="comp-card-label">Default</div>
+        <div class="select-wrap">
+          <div class="select">Select a voice...</div>
+          <span class="select-chevron">
+            <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 6 8 10 12 6"/></svg>
+          </span>
+        </div>
+      </div>
+
+      <!-- Open / Active -->
+      <div class="comp-card">
+        <div class="comp-card-label">Open / Active</div>
+        <div class="select-wrap" style="position: relative;">
+          <div class="select open">Select a voice...</div>
+          <span class="select-chevron">
+            <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 10 8 6 12 10"/></svg>
+          </span>
+          <div class="select-dropdown" style="position: relative; top: 4px;">
+            <div class="select-option hovered">Nova (ElevenLabs)</div>
+            <div class="select-option">Aria (OpenAI)</div>
+            <div class="select-option">Onyx (OpenAI)</div>
+            <div class="select-option">Shimmer (Google)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Disabled -->
+      <div class="comp-card">
+        <div class="comp-card-label">Disabled</div>
+        <div class="select-wrap">
+          <div class="select disabled">Select a voice...</div>
+          <span class="select-chevron">
+            <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 6 8 10 12 6"/></svg>
+          </span>
+        </div>
+      </div>
+
+      <!-- Error -->
+      <div class="comp-card">
+        <div class="comp-card-label">Error</div>
+        <div class="input-wrap">
+          <div class="select-wrap">
+            <div class="select error">Select a voice...</div>
+            <span class="select-chevron">
+              <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 6 8 10 12 6"/></svg>
+            </span>
+          </div>
+          <span class="input-error-msg">Please select a voice</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- ================================================================ -->
+  <!--  TABS                                                             -->
+  <!-- ================================================================ -->
+  <section class="comp-section" id="tabs">
+    <h2 class="comp-section-title">Tabs</h2>
+    <p class="comp-section-desc">Two variants: underline tabs and pill/segmented tabs.</p>
+
+    <div class="comp-grid comp-grid-2">
+      <div class="comp-card">
+        <div class="comp-card-label">Underline Tabs</div>
+        <div class="tabs-underline">
+          <button class="tab-underline active">All Voices</button>
+          <button class="tab-underline">Favorites</button>
+          <button class="tab-underline hover">Recent</button>
+          <button class="tab-underline">Custom</button>
+        </div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-card-label">Pill / Segmented Tabs</div>
+        <div class="tabs-pill">
+          <button class="tab-pill active">Text</button>
+          <button class="tab-pill">Document</button>
+          <button class="tab-pill hover">URL</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- ================================================================ -->
+  <!--  CHIPS / TAGS                                                     -->
+  <!-- ================================================================ -->
+  <section class="comp-section" id="chips">
+    <h2 class="comp-section-title">Chips / Tags</h2>
+    <p class="comp-section-desc">Compact labels for filtering, categorization, and selection. Supports neutral, active, removable, and provider variants in two sizes.</p>
+
+    <div class="comp-grid comp-grid-2">
+      <div class="comp-card">
+        <div class="comp-card-label">Small</div>
+        <div class="comp-row">
+          <span class="chip chip-sm">Neutral</span>
+          <span class="chip chip-sm active">Active</span>
+          <span class="chip chip-sm">Removable <span class="chip-remove">&times;</span></span>
+          <span class="chip chip-sm"><span class="provider-dot" style="background: #5D79DF;"></span>ElevenLabs</span>
+          <span class="chip chip-sm"><span class="provider-dot" style="background: #37C8B5;"></span>Google</span>
+          <span class="chip chip-sm"><span class="provider-dot" style="background: #E3B256;"></span>OpenAI</span>
+        </div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-card-label">Medium</div>
+        <div class="comp-row">
+          <span class="chip chip-md">Neutral</span>
+          <span class="chip chip-md active">Active</span>
+          <span class="chip chip-md">Removable <span class="chip-remove">&times;</span></span>
+          <span class="chip chip-md"><span class="provider-dot" style="background: #5D79DF;"></span>ElevenLabs</span>
+          <span class="chip chip-md"><span class="provider-dot" style="background: #37C8B5;"></span>Google</span>
+          <span class="chip chip-md"><span class="provider-dot" style="background: #E3B256;"></span>OpenAI</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- ================================================================ -->
+  <!--  STATUS BADGES                                                    -->
+  <!-- ================================================================ -->
+  <section class="comp-section" id="badges">
+    <h2 class="comp-section-title">Status Badges</h2>
+    <p class="comp-section-desc">Pill-shaped status indicators with tinted backgrounds and semantic coloring.</p>
+
+    <div class="comp-card">
+      <div class="comp-row">
+        <span class="badge badge-success">
+          <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 8 7 11 12 5"/></svg>
+          Success
+        </span>
+        <span class="badge badge-warning">
+          <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 5v4"/><circle cx="8" cy="11.5" r="0.5" fill="currentColor"/></svg>
+          Warning
+        </span>
+        <span class="badge badge-error">
+          <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="5" x2="11" y2="11"/><line x1="11" y1="5" x2="5" y2="11"/></svg>
+          Error
+        </span>
+        <span class="badge badge-info">
+          <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="5.5"/><path d="M8 7v4"/><circle cx="8" cy="5" r="0.5" fill="currentColor"/></svg>
+          Info
+        </span>
+        <span class="badge badge-neutral">Neutral</span>
+        <span class="badge badge-processing">
+          <span class="pulse-dot"></span>
+          Processing
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- ================================================================ -->
+  <!--  CARDS                                                            -->
+  <!-- ================================================================ -->
+  <section class="comp-section" id="cards">
+    <h2 class="comp-section-title">Cards</h2>
+    <p class="comp-section-desc">Container component with three variants: default, interactive (hover lifts), and selected (indigo border).</p>
+
+    <div class="comp-grid comp-grid-3">
+      <div class="comp-card">
+        <div class="comp-card-label">Default</div>
+        <div class="card">
+          <p style="font: var(--text-h4); margin-bottom: var(--space-2);">Card Title</p>
+          <p style="font: var(--text-body-m); color: var(--text-secondary);">This is the default card variant with a subtle border and soft shadow.</p>
+        </div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-card-label">Interactive (Hover)</div>
+        <div class="card interactive-hover">
+          <p style="font: var(--text-h4); margin-bottom: var(--space-2);">Card Title</p>
+          <p style="font: var(--text-body-m); color: var(--text-secondary);">This card lifts on hover with an elevated shadow.</p>
+        </div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-card-label">Selected</div>
+        <div class="card selected">
+          <p style="font: var(--text-h4); margin-bottom: var(--space-2);">Card Title</p>
+          <p style="font: var(--text-body-m); color: var(--text-secondary);">This card has an indigo border indicating selection.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- ================================================================ -->
+  <!--  VOICE CARD                                                       -->
+  <!-- ================================================================ -->
+  <section class="comp-section" id="voice-card">
+    <h2 class="comp-section-title">Voice Card</h2>
+    <p class="comp-section-desc">Specialized card for displaying voice options. 280px wide with provider chip, gender label, sample text, play button, and cost display.</p>
+
+    <div class="comp-row" style="gap: var(--space-6); flex-wrap: wrap; align-items: flex-start;">
+      <!-- Default -->
+      <div>
+        <div class="comp-card-label">Default</div>
+        <div class="voice-card">
+          <div class="vc-check">
+            <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 8 7 11 12 5"/></svg>
+          </div>
+          <div class="vc-header">
+            <span class="vc-name">Nova</span>
+            <span class="chip chip-sm"><span class="provider-dot" style="background: #5D79DF;"></span>ElevenLabs</span>
+            <span class="chip chip-sm">EN</span>
+          </div>
+          <div class="vc-meta">
+            <span class="vc-gender">
+              <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="5" r="3"/><path d="M2 15c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
+              Female
+            </span>
+          </div>
+          <div class="vc-sample">"The quick brown fox jumps over the lazy dog near the riverbank"</div>
+          <div class="vc-footer">
+            <button class="vc-play">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><polygon points="3,1 12,7 3,13"/></svg>
+            </button>
+            <span class="vc-cost">2.4 credits/1k chars</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hover -->
+      <div>
+        <div class="comp-card-label">Hover</div>
+        <div class="voice-card hover">
+          <div class="vc-check">
+            <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 8 7 11 12 5"/></svg>
+          </div>
+          <div class="vc-header">
+            <span class="vc-name">Aria</span>
+            <span class="chip chip-sm"><span class="provider-dot" style="background: #E3B256;"></span>OpenAI</span>
+            <span class="chip chip-sm">EN</span>
+          </div>
+          <div class="vc-meta">
+            <span class="vc-gender">
+              <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="5" r="3"/><path d="M2 15c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
+              Female
+            </span>
+          </div>
+          <div class="vc-sample">"In the beginning was the Word, and the Word was with God"</div>
+          <div class="vc-footer">
+            <button class="vc-play">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><polygon points="3,1 12,7 3,13"/></svg>
+            </button>
+            <span class="vc-cost">1.8 credits/1k chars</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Selected -->
+      <div>
+        <div class="comp-card-label">Selected</div>
+        <div class="voice-card selected">
+          <div class="vc-check">
+            <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 8 7 11 12 5"/></svg>
+          </div>
+          <div class="vc-header">
+            <span class="vc-name">Onyx</span>
+            <span class="chip chip-sm"><span class="provider-dot" style="background: #E3B256;"></span>OpenAI</span>
+            <span class="chip chip-sm">EN</span>
+          </div>
+          <div class="vc-meta">
+            <span class="vc-gender">
+              <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="5" r="3"/><path d="M2 15c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
+              Male
+            </span>
+          </div>
+          <div class="vc-sample">"To be, or not to be, that is the question at hand"</div>
+          <div class="vc-footer">
+            <button class="vc-play">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><polygon points="3,1 12,7 3,13"/></svg>
+            </button>
+            <span class="vc-cost">1.8 credits/1k chars</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Playing -->
+      <div>
+        <div class="comp-card-label">Playing</div>
+        <div class="voice-card">
+          <div class="vc-check">
+            <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 8 7 11 12 5"/></svg>
+          </div>
+          <div class="vc-header">
+            <span class="vc-name">Shimmer</span>
+            <span class="chip chip-sm"><span class="provider-dot" style="background: #37C8B5;"></span>Google</span>
+            <span class="chip chip-sm">EN</span>
+          </div>
+          <div class="vc-meta">
+            <span class="vc-gender">
+              <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="5" r="3"/><path d="M2 15c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
+              Female
+            </span>
+          </div>
+          <div class="vc-sample">"She sells seashells by the seashore on a sunny day"</div>
+          <div class="vc-footer">
+            <div style="display: flex; align-items: center; gap: var(--space-2);">
+              <button class="vc-play" style="background: var(--indigo-dark);">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><rect x="3" y="2" width="3" height="10" rx="1"/><rect x="8" y="2" width="3" height="10" rx="1"/></svg>
+              </button>
+              <div class="vc-waveform">
+                <div class="bar" style="height: 10px;"></div>
+                <div class="bar" style="height: 16px;"></div>
+                <div class="bar" style="height: 8px;"></div>
+                <div class="bar" style="height: 18px;"></div>
+                <div class="bar" style="height: 12px;"></div>
+              </div>
+            </div>
+            <span class="vc-cost">0.9 credits/1k chars</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- ================================================================ -->
+  <!--  COST ESTIMATE CARD                                               -->
+  <!-- ================================================================ -->
+  <section class="comp-section" id="cost-card">
+    <h2 class="comp-section-title">Cost Estimate Card</h2>
+    <p class="comp-section-desc">Displays pricing and quality details for a selected voice configuration.</p>
+
+    <div class="comp-row" style="gap: var(--space-6); flex-wrap: wrap; align-items: flex-start;">
+      <!-- Standard -->
+      <div>
+        <div class="comp-card-label">Standard</div>
+        <div class="cost-card" style="margin-top: 16px;">
+          <div class="cost-card-header">
+            <div>
+              <div class="cost-card-provider">OpenAI</div>
+              <div class="cost-card-voice">Onyx</div>
+            </div>
+          </div>
+          <div class="cost-card-amount">12.4 <span style="font: var(--text-body-l); font-weight: 400; color: var(--text-muted);">credits</span></div>
+          <div class="cost-card-usd">~$0.62 USD</div>
+          <div class="cost-card-row">
+            <span class="cost-card-row-label">Quality</span>
+            <span class="badge badge-neutral">Standard</span>
+          </div>
+          <div class="cost-card-row">
+            <span class="cost-card-row-label">Est. Duration</span>
+            <span class="cost-card-row-value">4 min 32 sec</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Best Value -->
+      <div>
+        <div class="comp-card-label">Best Value</div>
+        <div class="cost-card" style="margin-top: 16px;">
+          <span class="cost-badge cost-badge-value">Best Value</span>
+          <div class="cost-card-header">
+            <div>
+              <div class="cost-card-provider">Google Cloud</div>
+              <div class="cost-card-voice">Shimmer</div>
+            </div>
+          </div>
+          <div class="cost-card-amount">6.2 <span style="font: var(--text-body-l); font-weight: 400; color: var(--text-muted);">credits</span></div>
+          <div class="cost-card-usd">~$0.31 USD</div>
+          <div class="cost-card-row">
+            <span class="cost-card-row-label">Quality</span>
+            <span class="badge badge-neutral">Standard</span>
+          </div>
+          <div class="cost-card-row">
+            <span class="cost-card-row-label">Est. Duration</span>
+            <span class="cost-card-row-value">4 min 32 sec</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Premium Quality -->
+      <div>
+        <div class="comp-card-label">Premium Quality</div>
+        <div class="cost-card" style="margin-top: 16px;">
+          <span class="cost-badge cost-badge-premium">Premium Quality</span>
+          <div class="cost-card-header">
+            <div>
+              <div class="cost-card-provider">ElevenLabs</div>
+              <div class="cost-card-voice">Nova</div>
+            </div>
+          </div>
+          <div class="cost-card-amount">24.8 <span style="font: var(--text-body-l); font-weight: 400; color: var(--text-muted);">credits</span></div>
+          <div class="cost-card-usd">~$1.24 USD</div>
+          <div class="cost-card-row">
+            <span class="cost-card-row-label">Quality</span>
+            <span class="badge badge-processing">Premium</span>
+          </div>
+          <div class="cost-card-row">
+            <span class="cost-card-row-label">Est. Duration</span>
+            <span class="cost-card-row-value">4 min 32 sec</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- ================================================================ -->
+  <!--  AUDIO PLAYER BAR                                                 -->
+  <!-- ================================================================ -->
+  <section class="comp-section" id="audio-player">
+    <h2 class="comp-section-title">Audio Player Bar</h2>
+    <p class="comp-section-desc">Horizontal audio player with play/pause, waveform visualization, time display, speed selector, download, and volume control.</p>
+
+    <div style="display: flex; flex-direction: column; gap: var(--space-6);">
+
+      <!-- Loading -->
+      <div class="comp-card">
+        <div class="comp-card-label">Loading (Skeleton)</div>
+        <div class="audio-player ap-skeleton">
+          <button class="ap-play" style="opacity: 0.5; pointer-events: none;">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><polygon points="3,1 12,7 3,13"/></svg>
+          </button>
+          <div class="ap-waveform">
+            <div class="bar" style="height: 12px;"></div><div class="bar" style="height: 20px;"></div><div class="bar" style="height: 8px;"></div>
+            <div class="bar" style="height: 16px;"></div><div class="bar" style="height: 24px;"></div><div class="bar" style="height: 10px;"></div>
+            <div class="bar" style="height: 18px;"></div><div class="bar" style="height: 14px;"></div><div class="bar" style="height: 22px;"></div>
+            <div class="bar" style="height: 8px;"></div><div class="bar" style="height: 16px;"></div><div class="bar" style="height: 20px;"></div>
+            <div class="bar" style="height: 10px;"></div><div class="bar" style="height: 18px;"></div><div class="bar" style="height: 12px;"></div>
+            <div class="bar" style="height: 24px;"></div><div class="bar" style="height: 14px;"></div><div class="bar" style="height: 8px;"></div>
+            <div class="bar" style="height: 20px;"></div><div class="bar" style="height: 16px;"></div>
+          </div>
+          <span class="ap-time" style="opacity: 0.5;">--:-- / --:--</span>
+          <button class="ap-speed" style="opacity: 0.5;">1x</button>
+          <button class="ap-btn" style="opacity: 0.5;">
+            <svg class="icon-20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14v3m0 0l-3-3m3 3l3-3"/><path d="M17 10V6a2 2 0 00-2-2H5a2 2 0 00-2 2v4"/></svg>
+          </button>
+          <div class="ap-volume" style="opacity: 0.5;">
+            <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h2.5L8 3v10L4.5 10H2V6z"/><path d="M11 5.5c.8.8 1.2 2 1.2 2.5s-.4 1.7-1.2 2.5"/></svg>
+            <div class="ap-volume-track"><div class="ap-volume-fill" style="width: 70%;"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Playing -->
+      <div class="comp-card">
+        <div class="comp-card-label">Playing</div>
+        <div class="audio-player ap-playing">
+          <button class="ap-play">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><rect x="3" y="2" width="3" height="10" rx="1"/><rect x="8" y="2" width="3" height="10" rx="1"/></svg>
+          </button>
+          <div class="ap-waveform">
+            <div class="bar played" style="height: 12px;"></div><div class="bar played" style="height: 20px;"></div><div class="bar played" style="height: 8px;"></div>
+            <div class="bar played" style="height: 16px;"></div><div class="bar played" style="height: 24px;"></div><div class="bar played" style="height: 10px;"></div>
+            <div class="bar played" style="height: 18px;"></div><div class="bar played" style="height: 14px;"></div><div class="bar played" style="height: 22px;"></div>
+            <div class="bar" style="height: 8px;"></div><div class="bar" style="height: 16px;"></div><div class="bar" style="height: 20px;"></div>
+            <div class="bar" style="height: 10px;"></div><div class="bar" style="height: 18px;"></div><div class="bar" style="height: 12px;"></div>
+            <div class="bar" style="height: 24px;"></div><div class="bar" style="height: 14px;"></div><div class="bar" style="height: 8px;"></div>
+            <div class="bar" style="height: 20px;"></div><div class="bar" style="height: 16px;"></div>
+          </div>
+          <span class="ap-time">1:24 / 4:32</span>
+          <button class="ap-speed">1.5x</button>
+          <button class="ap-btn">
+            <svg class="icon-20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14v3m0 0l-3-3m3 3l3-3"/><path d="M17 10V6a2 2 0 00-2-2H5a2 2 0 00-2 2v4"/></svg>
+          </button>
+          <div class="ap-volume">
+            <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h2.5L8 3v10L4.5 10H2V6z"/><path d="M11 5.5c.8.8 1.2 2 1.2 2.5s-.4 1.7-1.2 2.5"/></svg>
+            <div class="ap-volume-track"><div class="ap-volume-fill" style="width: 70%;"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paused -->
+      <div class="comp-card">
+        <div class="comp-card-label">Paused</div>
+        <div class="audio-player">
+          <button class="ap-play">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><polygon points="3,1 12,7 3,13"/></svg>
+          </button>
+          <div class="ap-waveform">
+            <div class="bar played" style="height: 12px;"></div><div class="bar played" style="height: 20px;"></div><div class="bar played" style="height: 8px;"></div>
+            <div class="bar played" style="height: 16px;"></div><div class="bar played" style="height: 24px;"></div><div class="bar played" style="height: 10px;"></div>
+            <div class="bar played" style="height: 18px;"></div><div class="bar played" style="height: 14px;"></div><div class="bar played" style="height: 22px;"></div>
+            <div class="bar" style="height: 8px;"></div><div class="bar" style="height: 16px;"></div><div class="bar" style="height: 20px;"></div>
+            <div class="bar" style="height: 10px;"></div><div class="bar" style="height: 18px;"></div><div class="bar" style="height: 12px;"></div>
+            <div class="bar" style="height: 24px;"></div><div class="bar" style="height: 14px;"></div><div class="bar" style="height: 8px;"></div>
+            <div class="bar" style="height: 20px;"></div><div class="bar" style="height: 16px;"></div>
+          </div>
+          <span class="ap-time">1:24 / 4:32</span>
+          <button class="ap-speed">1x</button>
+          <button class="ap-btn">
+            <svg class="icon-20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14v3m0 0l-3-3m3 3l3-3"/><path d="M17 10V6a2 2 0 00-2-2H5a2 2 0 00-2 2v4"/></svg>
+          </button>
+          <div class="ap-volume">
+            <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h2.5L8 3v10L4.5 10H2V6z"/><path d="M11 5.5c.8.8 1.2 2 1.2 2.5s-.4 1.7-1.2 2.5"/></svg>
+            <div class="ap-volume-track"><div class="ap-volume-fill" style="width: 70%;"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Completed -->
+      <div class="comp-card">
+        <div class="comp-card-label">Completed</div>
+        <div class="audio-player">
+          <button class="ap-play">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1,5 4,1 4,13 1,9"/><polyline points="7,5 10,1 10,13 7,9"/></svg>
+          </button>
+          <div class="ap-waveform">
+            <div class="bar played" style="height: 12px;"></div><div class="bar played" style="height: 20px;"></div><div class="bar played" style="height: 8px;"></div>
+            <div class="bar played" style="height: 16px;"></div><div class="bar played" style="height: 24px;"></div><div class="bar played" style="height: 10px;"></div>
+            <div class="bar played" style="height: 18px;"></div><div class="bar played" style="height: 14px;"></div><div class="bar played" style="height: 22px;"></div>
+            <div class="bar played" style="height: 8px;"></div><div class="bar played" style="height: 16px;"></div><div class="bar played" style="height: 20px;"></div>
+            <div class="bar played" style="height: 10px;"></div><div class="bar played" style="height: 18px;"></div><div class="bar played" style="height: 12px;"></div>
+            <div class="bar played" style="height: 24px;"></div><div class="bar played" style="height: 14px;"></div><div class="bar played" style="height: 8px;"></div>
+            <div class="bar played" style="height: 20px;"></div><div class="bar played" style="height: 16px;"></div>
+          </div>
+          <span class="ap-time">4:32 / 4:32</span>
+          <button class="ap-speed">2x</button>
+          <button class="ap-btn">
+            <svg class="icon-20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14v3m0 0l-3-3m3 3l3-3"/><path d="M17 10V6a2 2 0 00-2-2H5a2 2 0 00-2 2v4"/></svg>
+          </button>
+          <div class="ap-volume">
+            <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h2.5L8 3v10L4.5 10H2V6z"/><path d="M11 5.5c.8.8 1.2 2 1.2 2.5s-.4 1.7-1.2 2.5"/></svg>
+            <div class="ap-volume-track"><div class="ap-volume-fill" style="width: 70%;"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- ================================================================ -->
+  <!--  MODAL                                                            -->
+  <!-- ================================================================ -->
+  <section class="comp-section" id="modal">
+    <h2 class="comp-section-title">Modal</h2>
+    <p class="comp-section-desc">Overlay dialog with header, body, and footer action buttons. Max-width 480px, radius-lg, 24px padding.</p>
+
+    <div class="comp-card">
+      <div class="modal-overlay">
+        <div class="modal">
+          <div class="modal-header">
+            <span class="modal-title">Delete Project?</span>
+            <button class="modal-close">
+              <svg class="icon-20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="5" y1="5" x2="15" y2="15"/><line x1="15" y1="5" x2="5" y2="15"/></svg>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure you want to delete <strong>"My Audiobook"</strong>? This action cannot be undone and all associated audio files will be permanently removed.</p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-ghost btn-md">Cancel</button>
+            <button class="btn btn-destructive btn-md">Delete Project</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- ================================================================ -->
+  <!--  DROPDOWN MENU                                                    -->
+  <!-- ================================================================ -->
+  <section class="comp-section" id="dropdown">
+    <h2 class="comp-section-title">Dropdown Menu</h2>
+    <p class="comp-section-desc">Context menus triggered by a button. Supports icons, dividers, and destructive items.</p>
+
+    <div class="comp-grid comp-grid-3">
+      <!-- Default -->
+      <div class="comp-card">
+        <div class="comp-card-label">Default</div>
+        <div class="dropdown-wrap">
+          <button class="btn btn-secondary btn-md">Options</button>
+          <div class="dropdown-panel" style="position: relative; top: 4px;">
+            <div class="dropdown-item hovered">Edit</div>
+            <div class="dropdown-item">Duplicate</div>
+            <div class="dropdown-item">Move to folder</div>
+            <div class="dropdown-divider"></div>
+            <div class="dropdown-item">Archive</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- With Icons -->
+      <div class="comp-card">
+        <div class="comp-card-label">With Icons</div>
+        <div class="dropdown-wrap">
+          <button class="btn btn-secondary btn-md">Actions</button>
+          <div class="dropdown-panel" style="position: relative; top: 4px;">
+            <div class="dropdown-item">
+              <span class="dropdown-item-icon">
+                <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 2l3 3L5 14H2v-3L11 2z"/></svg>
+              </span>
+              Edit
+            </div>
+            <div class="dropdown-item hovered">
+              <span class="dropdown-item-icon">
+                <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/><path d="M9 4h3v3"/><path d="M7 12H4V9"/></svg>
+              </span>
+              Duplicate
+            </div>
+            <div class="dropdown-item">
+              <span class="dropdown-item-icon">
+                <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14v3m0 0l-3-3m3 3l3-3"/><path d="M17 10V6a2 2 0 00-2-2H5a2 2 0 00-2 2v4"/></svg>
+              </span>
+              Download
+            </div>
+            <div class="dropdown-divider"></div>
+            <div class="dropdown-item">
+              <span class="dropdown-item-icon">
+                <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="12" height="10" rx="1"/><path d="M2 7h12"/></svg>
+              </span>
+              Archive
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- With Destructive Item -->
+      <div class="comp-card">
+        <div class="comp-card-label">With Destructive Item</div>
+        <div class="dropdown-wrap">
+          <button class="btn btn-secondary btn-md">Manage</button>
+          <div class="dropdown-panel" style="position: relative; top: 4px;">
+            <div class="dropdown-item">
+              <span class="dropdown-item-icon">
+                <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 2l3 3L5 14H2v-3L11 2z"/></svg>
+              </span>
+              Rename
+            </div>
+            <div class="dropdown-item">
+              <span class="dropdown-item-icon">
+                <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14v3m0 0l-3-3m3 3l3-3"/><path d="M17 10V6a2 2 0 00-2-2H5a2 2 0 00-2 2v4"/></svg>
+              </span>
+              Export
+            </div>
+            <div class="dropdown-divider"></div>
+            <div class="dropdown-item destructive hovered">
+              <span class="dropdown-item-icon">
+                <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 4 4 14 12 14 13 4"/><line x1="1" y1="4" x2="15" y2="4"/><path d="M6 4V2h4v2"/></svg>
+              </span>
+              Delete
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- ================================================================ -->
+  <!--  PAGINATION                                                       -->
+  <!-- ================================================================ -->
+  <section class="comp-section" id="pagination">
+    <h2 class="comp-section-title">Pagination</h2>
+    <p class="comp-section-desc">Page navigation with numbered buttons, previous/next arrows, and result count.</p>
+
+    <div class="comp-card">
+      <div style="display: flex; align-items: center; gap: var(--space-4);">
+        <div class="pagination">
+          <button class="page-btn arrow">
+            <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="10 3 5 8 10 13"/></svg>
+          </button>
+          <button class="page-btn">1</button>
+          <button class="page-btn active">2</button>
+          <button class="page-btn">3</button>
+          <button class="page-btn">4</button>
+          <button class="page-btn">5</button>
+          <button class="page-btn" style="pointer-events: none; border: none;">...</button>
+          <button class="page-btn">15</button>
+          <button class="page-btn arrow">
+            <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 3 11 8 6 13"/></svg>
+          </button>
+        </div>
+        <span class="pagination-info">Showing 11-20 of 147</span>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- ================================================================ -->
+  <!--  TOAST / NOTIFICATION                                             -->
+  <!-- ================================================================ -->
+  <section class="comp-section" id="toasts">
+    <h2 class="comp-section-title">Toast / Notification</h2>
+    <p class="comp-section-desc">Non-modal feedback with semantic color-coded left borders, icons, optional action links, and dismiss buttons.</p>
+
+    <div style="display: flex; flex-direction: column; gap: var(--space-4);">
+
+      <!-- Success -->
+      <div class="toast toast-success">
+        <span class="toast-icon">
+          <svg class="icon-20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7"/><polyline points="7 10 9.5 12.5 13.5 7.5"/></svg>
+        </span>
+        <div class="toast-content">
+          <div class="toast-message">Audio generation complete! Your file is ready to download.</div>
+          <div class="toast-action">Download now</div>
+        </div>
+        <button class="toast-dismiss">
+          <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>
+        </button>
+      </div>
+
+      <!-- Error -->
+      <div class="toast toast-error">
+        <span class="toast-icon">
+          <svg class="icon-20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7"/><line x1="7.5" y1="7.5" x2="12.5" y2="12.5"/><line x1="12.5" y1="7.5" x2="7.5" y2="12.5"/></svg>
+        </span>
+        <div class="toast-content">
+          <div class="toast-message">Generation failed. The selected voice is temporarily unavailable.</div>
+          <div class="toast-action">Try a different voice</div>
+        </div>
+        <button class="toast-dismiss">
+          <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>
+        </button>
+      </div>
+
+      <!-- Warning -->
+      <div class="toast toast-warning">
+        <span class="toast-icon">
+          <svg class="icon-20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L2 17h16L10 3z"/><line x1="10" y1="8" x2="10" y2="12"/><circle cx="10" cy="14.5" r="0.5" fill="currentColor"/></svg>
+        </span>
+        <div class="toast-content">
+          <div class="toast-message">You have 12 credits remaining. Consider upgrading your plan.</div>
+          <div class="toast-action">View plans</div>
+        </div>
+        <button class="toast-dismiss">
+          <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>
+        </button>
+      </div>
+
+      <!-- Info -->
+      <div class="toast toast-info">
+        <span class="toast-icon">
+          <svg class="icon-20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7"/><line x1="10" y1="9" x2="10" y2="14"/><circle cx="10" cy="6.5" r="0.5" fill="currentColor"/></svg>
+        </span>
+        <div class="toast-content">
+          <div class="toast-message">New voices from ElevenLabs are now available in the voice library.</div>
+        </div>
+        <button class="toast-dismiss">
+          <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <!-- ================================================================ -->
+  <!--  SEARCH BAR                                                       -->
+  <!-- ================================================================ -->
+  <section class="comp-section" id="search-bar">
+    <h2 class="comp-section-title">Search Bar</h2>
+    <p class="comp-section-desc">Dedicated search input with icon prefix, placeholder text, and clear button when a value is present.</p>
+
+    <div class="comp-grid comp-grid-3">
+      <!-- Empty -->
+      <div class="comp-card">
+        <div class="comp-card-label">Empty</div>
+        <div class="search-bar">
+          <span class="search-icon">
+            <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="4.5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/></svg>
+          </span>
+          <input class="input" type="search" placeholder="Search voices, projects, or documents..." readonly>
+        </div>
+      </div>
+
+      <!-- Focused -->
+      <div class="comp-card">
+        <div class="comp-card-label">Focused</div>
+        <div class="search-bar">
+          <span class="search-icon">
+            <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="4.5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/></svg>
+          </span>
+          <input class="input focus" type="search" placeholder="Search voices, projects, or documents..." readonly>
+        </div>
+      </div>
+
+      <!-- With Value + Clear -->
+      <div class="comp-card">
+        <div class="comp-card-label">With Value + Clear</div>
+        <div class="search-bar">
+          <span class="search-icon">
+            <svg class="icon-16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="4.5"/><line x1="10.5" y1="10.5" x2="14" y2="14"/></svg>
+          </span>
+          <input class="input filled" type="search" value="Neural English female" readonly>
+          <button class="search-clear">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="2" x2="8" y2="8"/><line x1="8" y1="2" x2="2" y2="8"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

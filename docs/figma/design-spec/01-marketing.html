@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>01 — Marketing / Landing Page | VP Design System</title>
+  <link rel="stylesheet" href="tokens.css">
+  <style>
+    /* ========== PAGE-LEVEL STYLES ========== */
+    .spec-page { padding-bottom: 120px; }
+
+    /* ========== DESKTOP ARTBOARD ========== */
+    .landing {
+      font-family: var(--font-body);
+      color: var(--text-primary);
+      background: var(--bg-base);
+    }
+
+    /* ---------- HEADER ---------- */
+    .lp-header {
+      display: flex;
+      align-items: center;
+      height: 64px;
+      padding: 0 var(--space-10);
+      background: var(--bg-base);
+      border-bottom: 1px solid var(--border-subtle);
+      position: relative;
+      z-index: 10;
+    }
+    .lp-header .logo {
+      font: 600 20px/28px var(--font-heading);
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+      margin-right: var(--space-10);
+      flex-shrink: 0;
+    }
+    .lp-header nav {
+      display: flex;
+      gap: var(--space-6);
+    }
+    .lp-header nav a {
+      font: var(--text-body-m);
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color var(--duration-fast) var(--ease-default);
+    }
+    .lp-header nav a:hover { color: var(--text-primary); }
+    .lp-header .header-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: var(--space-5);
+    }
+    .lp-header .login-link {
+      font: 500 15px/24px var(--font-body);
+      color: var(--text-secondary);
+      text-decoration: none;
+    }
+    .lp-header .login-link:hover { color: var(--text-primary); }
+
+    /* ---------- BUTTONS ---------- */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 24px;
+      font: 500 15px/20px var(--font-body);
+      color: var(--text-inverse);
+      background: var(--indigo);
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      text-decoration: none;
+      transition: background var(--duration-fast) var(--ease-default), box-shadow var(--duration-fast) var(--ease-default);
+      white-space: nowrap;
+    }
+    .btn-primary:hover { background: var(--indigo-dark); }
+    .btn-primary.btn-sm { padding: 8px 18px; font-size: 13px; }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 24px;
+      font: 500 15px/20px var(--font-body);
+      color: var(--text-primary);
+      background: transparent;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all var(--duration-fast) var(--ease-default);
+      white-space: nowrap;
+    }
+    .btn-secondary:hover { background: var(--bg-sunken); border-color: var(--neutral-500); }
+    .btn-secondary.btn-sm { padding: 8px 18px; font-size: 13px; }
+
+    /* ---------- HERO ---------- */
+    .lp-hero {
+      text-align: center;
+      padding: 120px var(--space-10) 100px;
+      position: relative;
+      overflow: hidden;
+    }
+    .lp-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 800px 400px at 30% 20%, rgba(93,121,223,0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 600px 350px at 70% 60%, rgba(55,200,181,0.05) 0%, transparent 70%),
+        radial-gradient(ellipse 900px 200px at 50% 80%, rgba(78,199,224,0.04) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .lp-hero::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      height: 120px;
+      background:
+        repeating-linear-gradient(90deg, transparent, transparent 58px, rgba(93,121,223,0.04) 58px, rgba(93,121,223,0.04) 60px),
+        repeating-linear-gradient(90deg, transparent, transparent 118px, rgba(55,200,181,0.03) 118px, rgba(55,200,181,0.03) 120px);
+      mask-image: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
+      -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
+      pointer-events: none;
+    }
+    .lp-hero h1 {
+      font: var(--text-display);
+      color: var(--text-primary);
+      max-width: 720px;
+      margin: 0 auto var(--space-6);
+      position: relative;
+      letter-spacing: -0.02em;
+    }
+    .lp-hero .subheading {
+      font: var(--text-body-l);
+      color: var(--text-muted);
+      max-width: 560px;
+      margin: 0 auto var(--space-10);
+      position: relative;
+    }
+    .lp-hero .cta-group {
+      display: flex;
+      gap: var(--space-4);
+      justify-content: center;
+      position: relative;
+    }
+
+    /* ---------- TRUST STRIP ---------- */
+    .lp-trust {
+      padding: var(--space-10) var(--space-10);
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+      text-align: center;
+    }
+    .lp-trust .trust-label {
+      font: var(--text-label);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: var(--space-6);
+    }
+    .lp-trust .providers {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: var(--space-10);
+      flex-wrap: wrap;
+    }
+    .lp-trust .provider {
+      font: 500 14px/20px var(--font-body);
+      color: var(--neutral-500);
+      letter-spacing: 0.01em;
+    }
+
+    /* ---------- DEMO MODULE ---------- */
+    .lp-demo {
+      padding: 80px var(--space-10);
+    }
+    .lp-demo .section-title {
+      font: var(--text-h2);
+      text-align: center;
+      margin-bottom: var(--space-12);
+      letter-spacing: -0.01em;
+    }
+    .demo-card {
+      max-width: 720px;
+      margin: 0 auto;
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft-2);
+      overflow: hidden;
+    }
+    .demo-card .textarea {
+      width: 100%;
+      padding: var(--space-5) var(--space-6);
+      font: var(--text-body-m);
+      color: var(--text-primary);
+      background: var(--bg-surface);
+      border: none;
+      border-bottom: 1px solid var(--border-subtle);
+      min-height: 80px;
+      resize: none;
+    }
+    .demo-card .voice-pills {
+      display: flex;
+      gap: var(--space-3);
+      padding: var(--space-5) var(--space-6);
+    }
+    .voice-pill {
+      padding: 6px 16px;
+      font: var(--text-body-s);
+      color: var(--text-secondary);
+      background: var(--bg-sunken);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .voice-pill.active {
+      color: var(--indigo-dark);
+      background: var(--indigo-subtle);
+      border-color: var(--indigo-light);
+    }
+    .demo-player {
+      padding: var(--space-5) var(--space-6);
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      border-top: 1px solid var(--border-subtle);
+    }
+    .play-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-full);
+      background: var(--indigo);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .play-btn svg { color: white; }
+    .waveform-placeholder {
+      flex: 1;
+      height: 32px;
+      background: var(--bg-sunken);
+      border-radius: var(--radius-xs);
+      position: relative;
+      overflow: hidden;
+    }
+    .waveform-placeholder::after {
+      content: '';
+      position: absolute;
+      inset: 4px 8px;
+      background:
+        repeating-linear-gradient(90deg,
+          var(--neutral-300) 0px, var(--neutral-300) 2px,
+          transparent 2px, transparent 5px
+        );
+      mask-image: url("data:image/svg+xml,%3Csvg width='400' height='24' viewBox='0 0 400 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,12 Q10,4 20,12 Q30,20 40,12 Q50,4 60,12 Q70,20 80,12 Q90,6 100,12 Q110,18 120,12 Q130,4 140,12 Q150,20 160,12 Q170,8 180,12 Q190,16 200,12 Q210,4 220,12 Q230,20 240,12 Q250,6 260,12 Q270,18 280,12 Q290,4 300,12 Q310,20 320,12 Q330,8 340,12 Q350,16 360,12 Q370,4 380,12 Q390,20 400,12' stroke='black' stroke-width='24' fill='none'/%3E%3C/svg%3E");
+      -webkit-mask-image: url("data:image/svg+xml,%3Csvg width='400' height='24' viewBox='0 0 400 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,12 Q10,4 20,12 Q30,20 40,12 Q50,4 60,12 Q70,20 80,12 Q90,6 100,12 Q110,18 120,12 Q130,4 140,12 Q150,20 160,12 Q170,8 180,12 Q190,16 200,12 Q210,4 220,12 Q230,20 240,12 Q250,6 260,12 Q270,18 280,12 Q290,4 300,12 Q310,20 320,12 Q330,8 340,12 Q350,16 360,12 Q370,4 380,12 Q390,20 400,12' stroke='black' stroke-width='24' fill='none'/%3E%3C/svg%3E");
+      mask-size: 100% 100%;
+      -webkit-mask-size: 100% 100%;
+    }
+    .demo-time {
+      font: var(--text-mono);
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+    .demo-cta {
+      padding: var(--space-5) var(--space-6);
+      border-top: 1px solid var(--border-subtle);
+      text-align: center;
+    }
+
+    /* ---------- FEATURES MOSAIC ---------- */
+    .lp-features {
+      padding: 80px var(--space-10);
+      background: var(--bg-surface);
+    }
+    .lp-features .section-title {
+      font: var(--text-h2);
+      text-align: center;
+      margin-bottom: var(--space-12);
+      letter-spacing: -0.01em;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-6);
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+    .feature-card {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: var(--space-6);
+      transition: box-shadow var(--duration-normal) var(--ease-default);
+    }
+    .feature-card:hover { box-shadow: var(--shadow-soft-2); }
+    .feature-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: var(--space-5);
+    }
+    .feature-icon svg {
+      width: 22px;
+      height: 22px;
+      stroke-width: 1.75;
+    }
+    .feature-icon.accent-indigo { background: var(--indigo-subtle); color: var(--indigo); }
+    .feature-icon.accent-teal { background: var(--teal-subtle); color: var(--teal-dark); }
+    .feature-icon.accent-sky { background: var(--sky-subtle); color: var(--sky-dark); }
+    .feature-icon.accent-success { background: var(--success-subtle); color: var(--success-dark); }
+    .feature-icon.accent-warning { background: var(--warning-subtle); color: var(--warning-dark); }
+    .feature-icon.accent-error { background: var(--error-subtle); color: var(--error-dark); }
+    .feature-card h4 {
+      font: var(--text-h4);
+      margin-bottom: var(--space-2);
+    }
+    .feature-card p {
+      font: var(--text-body-s);
+      color: var(--text-muted);
+    }
+
+    /* ---------- PRICING ---------- */
+    .lp-pricing {
+      padding: 80px var(--space-10);
+    }
+    .lp-pricing .section-title {
+      font: var(--text-h2);
+      text-align: center;
+      margin-bottom: var(--space-12);
+      letter-spacing: -0.01em;
+    }
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-6);
+      max-width: 960px;
+      margin: 0 auto;
+      align-items: start;
+    }
+    .pricing-card {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: var(--space-8);
+      display: flex;
+      flex-direction: column;
+    }
+    .pricing-card.featured {
+      border-color: var(--teal);
+      box-shadow: var(--shadow-soft-3);
+      position: relative;
+      transform: translateY(-8px);
+    }
+    .pricing-badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 4px 14px;
+      font: var(--text-label);
+      color: var(--text-inverse);
+      background: var(--teal);
+      border-radius: var(--radius-full);
+      white-space: nowrap;
+    }
+    .pricing-card .tier-name {
+      font: var(--text-h4);
+      margin-bottom: var(--space-1);
+    }
+    .pricing-card .tier-credits {
+      font: var(--text-body-s);
+      color: var(--text-muted);
+      margin-bottom: var(--space-5);
+    }
+    .pricing-card .tier-price {
+      font: 700 40px/48px var(--font-heading);
+      color: var(--text-primary);
+      margin-bottom: var(--space-6);
+    }
+    .pricing-card .tier-price span {
+      font: var(--text-body-s);
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+    .pricing-features {
+      list-style: none;
+      margin-bottom: var(--space-8);
+      flex: 1;
+    }
+    .pricing-features li {
+      font: var(--text-body-s);
+      color: var(--text-secondary);
+      padding: var(--space-2) 0;
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .pricing-features li svg {
+      width: 16px;
+      height: 16px;
+      color: var(--success);
+      flex-shrink: 0;
+    }
+    .pricing-card .btn-primary,
+    .pricing-card .btn-secondary {
+      width: 100%;
+      justify-content: center;
+    }
+
+    /* ---------- API SECTION ---------- */
+    .lp-api {
+      padding: 80px var(--space-10);
+      background: var(--bg-surface);
+    }
+    .lp-api .section-title {
+      font: var(--text-h2);
+      text-align: center;
+      margin-bottom: var(--space-12);
+      letter-spacing: -0.01em;
+    }
+    .api-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-10);
+      max-width: 1080px;
+      margin: 0 auto;
+      align-items: center;
+    }
+    .code-block {
+      background: var(--neutral-900);
+      border-radius: var(--radius-md);
+      padding: var(--space-6);
+      overflow-x: auto;
+    }
+    .code-block pre {
+      font: var(--text-mono);
+      color: #E0E0E0;
+      white-space: pre;
+      line-height: 22px;
+    }
+    .code-block .kw { color: var(--indigo-light); }
+    .code-block .str { color: var(--teal-light); }
+    .code-block .flag { color: var(--warning-light); }
+    .api-text h3 {
+      font: var(--text-h3);
+      margin-bottom: var(--space-4);
+    }
+    .api-text p {
+      font: var(--text-body-m);
+      color: var(--text-muted);
+      margin-bottom: var(--space-6);
+    }
+    .api-text a {
+      font: 500 15px/24px var(--font-body);
+      color: var(--text-link);
+      text-decoration: none;
+    }
+    .api-text a:hover { text-decoration: underline; }
+
+    /* ---------- FOOTER ---------- */
+    .lp-footer {
+      padding: var(--space-16) var(--space-10) var(--space-8);
+      border-top: 1px solid var(--border-subtle);
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: var(--space-10);
+      margin-bottom: var(--space-12);
+    }
+    .footer-brand .logo {
+      font: 600 20px/28px var(--font-heading);
+      color: var(--text-primary);
+      margin-bottom: var(--space-3);
+    }
+    .footer-brand .tagline {
+      font: var(--text-body-s);
+      color: var(--text-muted);
+    }
+    .footer-col h5 {
+      font: var(--text-label);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: var(--space-4);
+    }
+    .footer-col ul {
+      list-style: none;
+    }
+    .footer-col li {
+      margin-bottom: var(--space-2);
+    }
+    .footer-col a {
+      font: var(--text-body-s);
+      color: var(--text-secondary);
+      text-decoration: none;
+    }
+    .footer-col a:hover { color: var(--text-primary); }
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: var(--space-6);
+      border-top: 1px solid var(--border-subtle);
+    }
+    .footer-bottom .copyright {
+      font: var(--text-body-s);
+      color: var(--text-muted);
+    }
+    .footer-bottom .social-links {
+      display: flex;
+      gap: var(--space-5);
+    }
+    .footer-bottom .social-links a {
+      font: var(--text-body-s);
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+    .footer-bottom .social-links a:hover { color: var(--text-primary); }
+
+    /* ========== MOBILE OVERRIDES ========== */
+    .landing.mobile .lp-header {
+      padding: 0 var(--space-5);
+    }
+    .landing.mobile .lp-header nav { display: none; }
+    .landing.mobile .lp-header .login-link { display: none; }
+    .landing.mobile .lp-header .btn-primary { display: none; }
+    .landing.mobile .hamburger { display: flex; }
+
+    .hamburger {
+      display: none;
+      margin-left: auto;
+      width: 36px;
+      height: 36px;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+    }
+    .hamburger svg { color: var(--text-primary); }
+
+    .landing.mobile .lp-hero {
+      padding: 64px var(--space-5) 56px;
+    }
+    .landing.mobile .lp-hero h1 {
+      font: 700 32px/40px var(--font-heading);
+      letter-spacing: -0.02em;
+    }
+    .landing.mobile .lp-hero .subheading {
+      font: var(--text-body-m);
+    }
+    .landing.mobile .lp-hero .cta-group {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .landing.mobile .lp-trust {
+      padding: var(--space-6) var(--space-5);
+    }
+    .landing.mobile .lp-trust .providers {
+      justify-content: flex-start;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      gap: var(--space-6);
+      padding-bottom: var(--space-2);
+    }
+
+    .landing.mobile .lp-demo {
+      padding: 48px var(--space-5);
+    }
+    .landing.mobile .lp-demo .section-title {
+      font: var(--text-h3);
+    }
+    .landing.mobile .demo-card .voice-pills {
+      flex-wrap: wrap;
+    }
+
+    .landing.mobile .lp-features {
+      padding: 48px var(--space-5);
+    }
+    .landing.mobile .lp-features .section-title {
+      font: var(--text-h3);
+    }
+    .landing.mobile .features-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-4);
+    }
+
+    .landing.mobile .lp-pricing {
+      padding: 48px var(--space-5);
+    }
+    .landing.mobile .lp-pricing .section-title {
+      font: var(--text-h3);
+    }
+    .landing.mobile .pricing-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-5);
+    }
+    .landing.mobile .pricing-card.featured {
+      transform: none;
+    }
+
+    .landing.mobile .lp-api {
+      padding: 48px var(--space-5);
+    }
+    .landing.mobile .lp-api .section-title {
+      font: var(--text-h3);
+    }
+    .landing.mobile .api-content {
+      grid-template-columns: 1fr;
+      gap: var(--space-6);
+    }
+    .landing.mobile .code-block pre {
+      font-size: 11px;
+      line-height: 18px;
+    }
+
+    .landing.mobile .lp-footer {
+      padding: var(--space-10) var(--space-5) var(--space-6);
+    }
+    .landing.mobile .footer-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-6);
+    }
+    .landing.mobile .footer-bottom {
+      flex-direction: column;
+      gap: var(--space-3);
+      text-align: center;
+    }
+
+    /* ========== ARTBOARD SCALING ========== */
+    .desktop-frame .spec-frame-body {
+      padding: 0;
+      overflow: hidden;
+    }
+    .mobile-frame .spec-frame-body {
+      padding: 0;
+      overflow: hidden;
+    }
+    .desktop-frame .landing {
+      width: 1440px;
+      transform-origin: top left;
+      transform: scale(0.85);
+    }
+    .desktop-frame .spec-frame-body {
+      /* shrink the container to fit */
+      height: auto;
+    }
+  </style>
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+</head>
+<body>
+
+<!-- ============================================================
+     SPEC NAVIGATION
+     ============================================================ -->
+<nav class="spec-nav">
+  <span class="logo">VP Design System</span>
+  <a href="01-marketing.html" class="active">01 Marketing</a>
+  <a href="02-auth.html">02 Auth</a>
+  <a href="03-app-shell.html">03 App Shell</a>
+  <a href="04-core-flows.html">04 Core Flows</a>
+  <a href="05-settings.html">05 Settings</a>
+  <a href="06-components.html">06 Components</a>
+  <a href="07-interactions.html">07 Interactions</a>
+</nav>
+
+<div class="spec-page">
+
+  <div class="spec-section">
+    <h2 class="spec-section-title">Marketing / Landing Page</h2>
+    <p class="spec-section-desc">Public-facing marketing page. Premium, calm, audio-native aesthetic with clear conversion hierarchy.</p>
+  </div>
+
+  <!-- ============================================================
+       DESKTOP RENDERING — 1440px
+       ============================================================ -->
+  <div class="spec-section">
+    <div class="spec-frame desktop-frame">
+      <div class="spec-frame-label">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Desktop
+        <span class="dims">1440 x auto</span>
+      </div>
+      <div class="spec-frame-body">
+        <div class="landing" style="width:1440px;">
+
+          <!-- HEADER -->
+          <header class="lp-header">
+            <div class="logo">VoiceProcessor</div>
+            <nav>
+              <a href="#">Features</a>
+              <a href="#">Pricing</a>
+              <a href="#">API</a>
+              <a href="#">Docs</a>
+            </nav>
+            <div class="header-right">
+              <a href="#" class="login-link">Log in</a>
+              <a href="#" class="btn-primary btn-sm">Get Started</a>
+            </div>
+          </header>
+
+          <!-- HERO -->
+          <section class="lp-hero">
+            <h1>Transform text into natural speech</h1>
+            <p class="subheading">Multi-provider TTS platform with smart routing. Get the best quality, cost, or speed &mdash; automatically.</p>
+            <div class="cta-group">
+              <a href="#" class="btn-primary">Start for Free</a>
+              <a href="#" class="btn-secondary">View API Docs</a>
+            </div>
+          </section>
+
+          <!-- TRUST STRIP -->
+          <section class="lp-trust">
+            <div class="trust-label">Powered by leading TTS providers</div>
+            <div class="providers">
+              <span class="provider">ElevenLabs</span>
+              <span class="provider">OpenAI</span>
+              <span class="provider">Google Cloud</span>
+              <span class="provider">Amazon Polly</span>
+              <span class="provider">FishAudio</span>
+              <span class="provider">Cartesia</span>
+              <span class="provider">Deepgram</span>
+            </div>
+          </section>
+
+          <!-- INTERACTIVE DEMO -->
+          <section class="lp-demo">
+            <h2 class="section-title">Hear the difference</h2>
+            <div class="demo-card">
+              <div class="textarea">Welcome to VoiceProcessor. This is a preview of our multi-provider text-to-speech platform.</div>
+              <div class="voice-pills">
+                <span class="voice-pill active">Natural (ElevenLabs)</span>
+                <span class="voice-pill">Professional (OpenAI)</span>
+                <span class="voice-pill">Expressive (Cartesia)</span>
+              </div>
+              <div class="demo-player">
+                <div class="play-btn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="white" stroke="none"><polygon points="6,3 20,12 6,21"/></svg>
+                </div>
+                <div class="waveform-placeholder"></div>
+                <span class="demo-time">0:00 / 0:04</span>
+              </div>
+              <div class="demo-cta">
+                <a href="#" class="btn-primary btn-sm">Try it free</a>
+              </div>
+            </div>
+          </section>
+
+          <!-- FEATURES MOSAIC -->
+          <section class="lp-features">
+            <h2 class="section-title">Built for serious audio production</h2>
+            <div class="features-grid">
+
+              <div class="feature-card">
+                <div class="feature-icon accent-indigo">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+                </div>
+                <h4>Smart Routing</h4>
+                <p>Automatically selects the best provider for your needs</p>
+              </div>
+
+              <div class="feature-card">
+                <div class="feature-icon accent-teal">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                </div>
+                <h4>50+ Voices</h4>
+                <p>Premium voices across 7 providers and multiple languages</p>
+              </div>
+
+              <div class="feature-card">
+                <div class="feature-icon accent-success">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <h4>Cost Optimization</h4>
+                <p>Real-time cost comparison across all providers</p>
+              </div>
+
+              <div class="feature-card">
+                <div class="feature-icon accent-sky">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                </div>
+                <h4>Document Upload</h4>
+                <p>Upload PDF, DOCX files and extract text with chapters</p>
+              </div>
+
+              <div class="feature-card">
+                <div class="feature-icon accent-warning">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                </div>
+                <h4>API Access</h4>
+                <p>Programmatic access with simple REST API</p>
+              </div>
+
+              <div class="feature-card">
+                <div class="feature-icon accent-error">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                </div>
+                <h4>Audio Management</h4>
+                <p>Track, replay, and download all your generations</p>
+              </div>
+
+            </div>
+          </section>
+
+          <!-- PRICING -->
+          <section class="lp-pricing">
+            <h2 class="section-title">Simple, credit-based pricing</h2>
+            <div class="pricing-grid">
+
+              <div class="pricing-card">
+                <div class="tier-name">Starter</div>
+                <div class="tier-credits">100 credits</div>
+                <div class="tier-price">$9 <span>/ one-time</span></div>
+                <ul class="pricing-features">
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    100 credits included
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Standard voice access
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Audio history
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Community support
+                  </li>
+                </ul>
+                <a href="#" class="btn-secondary">Get Started</a>
+              </div>
+
+              <div class="pricing-card featured">
+                <div class="pricing-badge">Most Popular</div>
+                <div class="tier-name">Pro</div>
+                <div class="tier-credits">500 credits</div>
+                <div class="tier-price">$39 <span>/ one-time</span></div>
+                <ul class="pricing-features">
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    500 credits included
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Premium voice access
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    API access
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Audio history &amp; downloads
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Email support
+                  </li>
+                </ul>
+                <a href="#" class="btn-primary">Get Started</a>
+              </div>
+
+              <div class="pricing-card">
+                <div class="tier-name">Studio</div>
+                <div class="tier-credits">2,000 credits</div>
+                <div class="tier-price">$129 <span>/ one-time</span></div>
+                <ul class="pricing-features">
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    2,000 credits included
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    All premium voices
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Full API access
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Audio history &amp; downloads
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Priority support
+                  </li>
+                </ul>
+                <a href="#" class="btn-secondary">Get Started</a>
+              </div>
+
+            </div>
+          </section>
+
+          <!-- API QUICK START -->
+          <section class="lp-api">
+            <h2 class="section-title">Integrate in minutes</h2>
+            <div class="api-content">
+              <div class="code-block">
+                <pre><span class="kw">curl</span> <span class="flag">-X</span> POST https://api.voiceprocessor.com/v1/generate \
+  <span class="flag">-H</span> <span class="str">"Authorization: Bearer YOUR_API_KEY"</span> \
+  <span class="flag">-H</span> <span class="str">"Content-Type: application/json"</span> \
+  <span class="flag">-d</span> <span class="str">'{"text": "Hello world", "voice": "natural-1"}'</span></pre>
+              </div>
+              <div class="api-text">
+                <h3>Single endpoint, every provider</h3>
+                <p>RESTful API with webhook support. Access all providers through a single, unified endpoint. Generate speech, list voices, and manage audio programmatically.</p>
+                <a href="#">View full documentation &rarr;</a>
+              </div>
+            </div>
+          </section>
+
+          <!-- FOOTER -->
+          <footer class="lp-footer">
+            <div class="footer-grid">
+              <div class="footer-brand">
+                <div class="logo">VoiceProcessor</div>
+                <div class="tagline">Multi-provider TTS platform</div>
+              </div>
+              <div class="footer-col">
+                <h5>Product</h5>
+                <ul>
+                  <li><a href="#">Features</a></li>
+                  <li><a href="#">Pricing</a></li>
+                  <li><a href="#">API</a></li>
+                  <li><a href="#">Voices</a></li>
+                </ul>
+              </div>
+              <div class="footer-col">
+                <h5>Resources</h5>
+                <ul>
+                  <li><a href="#">Documentation</a></li>
+                  <li><a href="#">Status</a></li>
+                  <li><a href="#">Changelog</a></li>
+                </ul>
+              </div>
+              <div class="footer-col">
+                <h5>Company</h5>
+                <ul>
+                  <li><a href="#">About</a></li>
+                  <li><a href="#">Contact</a></li>
+                  <li><a href="#">Privacy</a></li>
+                  <li><a href="#">Terms</a></li>
+                </ul>
+              </div>
+            </div>
+            <div class="footer-bottom">
+              <span class="copyright">&copy; 2026 VoiceProcessor</span>
+              <div class="social-links">
+                <a href="#">Twitter</a>
+                <a href="#">GitHub</a>
+                <a href="#">Discord</a>
+              </div>
+            </div>
+          </footer>
+
+        </div><!-- /.landing -->
+      </div><!-- /.spec-frame-body -->
+    </div><!-- /.spec-frame -->
+  </div><!-- /.spec-section -->
+
+
+  <!-- ============================================================
+       MOBILE RENDERING — 390px
+       ============================================================ -->
+  <div class="spec-section">
+    <div class="spec-frame mobile-frame">
+      <div class="spec-frame-label">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg>
+        Mobile
+        <span class="dims">390 x auto</span>
+      </div>
+      <div class="spec-frame-body">
+        <div class="landing mobile" style="width:390px;">
+
+          <!-- HEADER -->
+          <header class="lp-header">
+            <div class="logo">VoiceProcessor</div>
+            <nav>
+              <a href="#">Features</a>
+              <a href="#">Pricing</a>
+              <a href="#">API</a>
+              <a href="#">Docs</a>
+            </nav>
+            <div class="header-right">
+              <a href="#" class="login-link">Log in</a>
+              <a href="#" class="btn-primary btn-sm">Get Started</a>
+            </div>
+            <div class="hamburger">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </div>
+          </header>
+
+          <!-- HERO -->
+          <section class="lp-hero">
+            <h1>Transform text into natural speech</h1>
+            <p class="subheading">Multi-provider TTS platform with smart routing. Get the best quality, cost, or speed &mdash; automatically.</p>
+            <div class="cta-group">
+              <a href="#" class="btn-primary">Start for Free</a>
+              <a href="#" class="btn-secondary">View API Docs</a>
+            </div>
+          </section>
+
+          <!-- TRUST STRIP -->
+          <section class="lp-trust">
+            <div class="trust-label">Powered by leading TTS providers</div>
+            <div class="providers">
+              <span class="provider">ElevenLabs</span>
+              <span class="provider">OpenAI</span>
+              <span class="provider">Google Cloud</span>
+              <span class="provider">Amazon Polly</span>
+              <span class="provider">FishAudio</span>
+              <span class="provider">Cartesia</span>
+              <span class="provider">Deepgram</span>
+            </div>
+          </section>
+
+          <!-- INTERACTIVE DEMO -->
+          <section class="lp-demo">
+            <h2 class="section-title">Hear the difference</h2>
+            <div class="demo-card">
+              <div class="textarea">Welcome to VoiceProcessor. This is a preview of our multi-provider text-to-speech platform.</div>
+              <div class="voice-pills">
+                <span class="voice-pill active">Natural (ElevenLabs)</span>
+                <span class="voice-pill">Professional (OpenAI)</span>
+                <span class="voice-pill">Expressive (Cartesia)</span>
+              </div>
+              <div class="demo-player">
+                <div class="play-btn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="white" stroke="none"><polygon points="6,3 20,12 6,21"/></svg>
+                </div>
+                <div class="waveform-placeholder"></div>
+                <span class="demo-time">0:00 / 0:04</span>
+              </div>
+              <div class="demo-cta">
+                <a href="#" class="btn-primary btn-sm">Try it free</a>
+              </div>
+            </div>
+          </section>
+
+          <!-- FEATURES MOSAIC -->
+          <section class="lp-features">
+            <h2 class="section-title">Built for serious audio production</h2>
+            <div class="features-grid">
+
+              <div class="feature-card">
+                <div class="feature-icon accent-indigo">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+                </div>
+                <h4>Smart Routing</h4>
+                <p>Automatically selects the best provider for your needs</p>
+              </div>
+
+              <div class="feature-card">
+                <div class="feature-icon accent-teal">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                </div>
+                <h4>50+ Voices</h4>
+                <p>Premium voices across 7 providers and multiple languages</p>
+              </div>
+
+              <div class="feature-card">
+                <div class="feature-icon accent-success">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <h4>Cost Optimization</h4>
+                <p>Real-time cost comparison across all providers</p>
+              </div>
+
+              <div class="feature-card">
+                <div class="feature-icon accent-sky">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                </div>
+                <h4>Document Upload</h4>
+                <p>Upload PDF, DOCX files and extract text with chapters</p>
+              </div>
+
+              <div class="feature-card">
+                <div class="feature-icon accent-warning">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                </div>
+                <h4>API Access</h4>
+                <p>Programmatic access with simple REST API</p>
+              </div>
+
+              <div class="feature-card">
+                <div class="feature-icon accent-error">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                </div>
+                <h4>Audio Management</h4>
+                <p>Track, replay, and download all your generations</p>
+              </div>
+
+            </div>
+          </section>
+
+          <!-- PRICING -->
+          <section class="lp-pricing">
+            <h2 class="section-title">Simple, credit-based pricing</h2>
+            <div class="pricing-grid">
+
+              <div class="pricing-card">
+                <div class="tier-name">Starter</div>
+                <div class="tier-credits">100 credits</div>
+                <div class="tier-price">$9 <span>/ one-time</span></div>
+                <ul class="pricing-features">
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    100 credits included
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Standard voice access
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Audio history
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Community support
+                  </li>
+                </ul>
+                <a href="#" class="btn-secondary">Get Started</a>
+              </div>
+
+              <div class="pricing-card featured">
+                <div class="pricing-badge">Most Popular</div>
+                <div class="tier-name">Pro</div>
+                <div class="tier-credits">500 credits</div>
+                <div class="tier-price">$39 <span>/ one-time</span></div>
+                <ul class="pricing-features">
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    500 credits included
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Premium voice access
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    API access
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Audio history &amp; downloads
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Email support
+                  </li>
+                </ul>
+                <a href="#" class="btn-primary">Get Started</a>
+              </div>
+
+              <div class="pricing-card">
+                <div class="tier-name">Studio</div>
+                <div class="tier-credits">2,000 credits</div>
+                <div class="tier-price">$129 <span>/ one-time</span></div>
+                <ul class="pricing-features">
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    2,000 credits included
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    All premium voices
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Full API access
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Audio history &amp; downloads
+                  </li>
+                  <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    Priority support
+                  </li>
+                </ul>
+                <a href="#" class="btn-secondary">Get Started</a>
+              </div>
+
+            </div>
+          </section>
+
+          <!-- API QUICK START -->
+          <section class="lp-api">
+            <h2 class="section-title">Integrate in minutes</h2>
+            <div class="api-content">
+              <div class="code-block">
+                <pre><span class="kw">curl</span> <span class="flag">-X</span> POST \
+  https://api.voiceprocessor.com/v1/generate \
+  <span class="flag">-H</span> <span class="str">"Authorization: Bearer YOUR_API_KEY"</span> \
+  <span class="flag">-H</span> <span class="str">"Content-Type: application/json"</span> \
+  <span class="flag">-d</span> <span class="str">'{"text": "Hello world", "voice": "natural-1"}'</span></pre>
+              </div>
+              <div class="api-text">
+                <h3>Single endpoint, every provider</h3>
+                <p>RESTful API with webhook support. Access all providers through a single, unified endpoint.</p>
+                <a href="#">View full documentation &rarr;</a>
+              </div>
+            </div>
+          </section>
+
+          <!-- FOOTER -->
+          <footer class="lp-footer">
+            <div class="footer-grid">
+              <div class="footer-brand">
+                <div class="logo">VoiceProcessor</div>
+                <div class="tagline">Multi-provider TTS platform</div>
+              </div>
+              <div class="footer-col">
+                <h5>Product</h5>
+                <ul>
+                  <li><a href="#">Features</a></li>
+                  <li><a href="#">Pricing</a></li>
+                  <li><a href="#">API</a></li>
+                  <li><a href="#">Voices</a></li>
+                </ul>
+              </div>
+              <div class="footer-col">
+                <h5>Resources</h5>
+                <ul>
+                  <li><a href="#">Documentation</a></li>
+                  <li><a href="#">Status</a></li>
+                  <li><a href="#">Changelog</a></li>
+                </ul>
+              </div>
+              <div class="footer-col">
+                <h5>Company</h5>
+                <ul>
+                  <li><a href="#">About</a></li>
+                  <li><a href="#">Contact</a></li>
+                  <li><a href="#">Privacy</a></li>
+                  <li><a href="#">Terms</a></li>
+                </ul>
+              </div>
+            </div>
+            <div class="footer-bottom">
+              <span class="copyright">&copy; 2026 VoiceProcessor</span>
+              <div class="social-links">
+                <a href="#">Twitter</a>
+                <a href="#">GitHub</a>
+                <a href="#">Discord</a>
+              </div>
+            </div>
+          </footer>
+
+        </div><!-- /.landing.mobile -->
+      </div><!-- /.spec-frame-body -->
+    </div><!-- /.spec-frame -->
+  </div><!-- /.spec-section -->
+
+</div><!-- /.spec-page -->
+
+</body>
+</html>

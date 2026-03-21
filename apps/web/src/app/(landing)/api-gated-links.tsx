@@ -16,7 +16,7 @@ export function ApiGatedLinks({ type }: ApiGatedLinksProps) {
 
   if (type === 'nav') {
     return (
-      <Link href="/api-docs" className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+      <Link href="/api-docs" className="text-sm text-text-secondary hover:text-text-primary">
         API Docs
       </Link>
     );
@@ -26,22 +26,22 @@ export function ApiGatedLinks({ type }: ApiGatedLinksProps) {
     return (
       <Link
         href="/api-docs"
-        className="rounded-lg border border-gray-300 dark:border-gray-700 px-8 py-3 text-lg text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800"
+        className="rounded-lg border border-border-subtle px-8 py-3 text-lg text-text-primary hover:bg-bg-sunken"
       >
         View API Docs
       </Link>
     );
   }
 
-   if (type === 'footer') {
-     return (
-       <li>
-         <Link href="/api-docs" className="hover:text-gray-900 dark:hover:text-white">
-           API Documentation
-         </Link>
-       </li>
-     );
-   }
+    if (type === 'footer') {
+      return (
+        <li>
+          <Link href="/api-docs" className="hover:text-text-primary">
+            API Documentation
+          </Link>
+        </li>
+      );
+    }
 
   return null;
 }

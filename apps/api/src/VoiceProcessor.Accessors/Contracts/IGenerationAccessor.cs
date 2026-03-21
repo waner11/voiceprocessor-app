@@ -20,6 +20,11 @@ public interface IGenerationAccessor
 
     Task<Generation> CreateAsync(Generation generation, CancellationToken cancellationToken = default);
 
+    Task<(int GenerationCount, long TotalAudioDurationMs)> GetMonthlyStatsAsync(
+        Guid userId,
+        DateTime monthStart,
+        CancellationToken cancellationToken);
+
     Task UpdateAsync(Generation generation, CancellationToken cancellationToken = default);
 
     Task UpdateStatusAsync(

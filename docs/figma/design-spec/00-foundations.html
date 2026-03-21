@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Foundations — VP Design System</title>
+  <link rel="stylesheet" href="../design-spec/tokens.css">
+  <style>
+    /* ========== PAGE-SPECIFIC STYLES ========== */
+
+    /* Typography samples */
+    .type-row {
+      display: grid;
+      grid-template-columns: 200px 220px 1fr;
+      align-items: baseline;
+      padding: var(--space-5) 0;
+      border-bottom: 1px solid var(--border-subtle);
+      gap: var(--space-4);
+    }
+
+    .type-row:last-child { border-bottom: none; }
+
+    .type-name {
+      font: var(--text-label);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    .type-specs {
+      font: var(--text-mono);
+      color: var(--text-secondary);
+    }
+
+    .type-sample-display  { font: var(--text-display); }
+    .type-sample-h1       { font: var(--text-h1); }
+    .type-sample-h2       { font: var(--text-h2); }
+    .type-sample-h3       { font: var(--text-h3); }
+    .type-sample-h4       { font: var(--text-h4); }
+    .type-sample-body-l   { font: var(--text-body-l); }
+    .type-sample-body-m   { font: var(--text-body-m); }
+    .type-sample-body-s   { font: var(--text-body-s); }
+    .type-sample-label    { font: var(--text-label); text-transform: uppercase; letter-spacing: 0.05em; }
+    .type-sample-mono     { font: var(--text-mono); }
+
+    /* Color swatches */
+    .swatch-row {
+      display: flex;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .swatch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .swatch-color {
+      width: 80px;
+      height: 64px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .swatch-hex {
+      font: var(--text-mono);
+      color: var(--text-secondary);
+    }
+
+    .swatch-token {
+      font: var(--text-body-s);
+      color: var(--text-muted);
+    }
+
+    /* Accent group */
+    .accent-group {
+      margin-bottom: var(--space-6);
+    }
+
+    .accent-group-title {
+      font: var(--text-h4);
+      color: var(--text-primary);
+      margin-bottom: var(--space-3);
+    }
+
+    .accent-swatch-color {
+      width: 100px;
+      height: 64px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .accent-variant-label {
+      font: var(--text-label);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-top: var(--space-1);
+    }
+
+    /* Semantic aliases grid */
+    .semantic-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: var(--space-4);
+    }
+
+    .semantic-card {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: var(--space-4);
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .semantic-preview {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-xs);
+      flex-shrink: 0;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .semantic-text-preview {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-xs);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font: 600 16px/1 var(--font-heading);
+      background: var(--bg-sunken);
+    }
+
+    .semantic-border-preview {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-xs);
+      flex-shrink: 0;
+      background: var(--bg-base);
+    }
+
+    .semantic-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .semantic-token {
+      font: var(--text-body-s);
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .semantic-value {
+      font: var(--text-mono);
+      color: var(--text-muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* State rows */
+    .state-row {
+      display: flex;
+      gap: var(--space-3);
+      align-items: center;
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-sm);
+      margin-bottom: var(--space-3);
+    }
+
+    .state-label {
+      font: var(--text-body-s);
+      font-weight: 500;
+      min-width: 80px;
+    }
+
+    .state-chip {
+      padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-xs);
+      font: var(--text-body-s);
+      border-width: 1px;
+      border-style: solid;
+    }
+
+    /* Spacing bars */
+    .spacing-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      margin-bottom: var(--space-3);
+    }
+
+    .spacing-label {
+      font: var(--text-mono);
+      color: var(--text-secondary);
+      min-width: 100px;
+      text-align: right;
+    }
+
+    .spacing-bar {
+      height: 24px;
+      background: var(--indigo-muted);
+      border: 1px solid var(--indigo);
+      border-radius: var(--radius-xs);
+      transition: background var(--duration-fast) var(--ease-default);
+    }
+
+    .spacing-bar:hover {
+      background: var(--indigo-light);
+    }
+
+    .spacing-px {
+      font: var(--text-body-s);
+      color: var(--text-muted);
+      min-width: 40px;
+    }
+
+    /* Radius demos */
+    .radius-row {
+      display: flex;
+      gap: var(--space-6);
+      flex-wrap: wrap;
+    }
+
+    .radius-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .radius-demo {
+      width: 80px;
+      height: 80px;
+      background: var(--indigo-subtle);
+      border: 2px solid var(--indigo);
+    }
+
+    .radius-token {
+      font: var(--text-mono);
+      color: var(--text-secondary);
+    }
+
+    .radius-value {
+      font: var(--text-body-s);
+      color: var(--text-muted);
+    }
+
+    /* Shadow demos */
+    .shadow-row {
+      display: flex;
+      gap: var(--space-8);
+      flex-wrap: wrap;
+    }
+
+    .shadow-card {
+      width: 180px;
+      height: 120px;
+      background: var(--bg-base);
+      border-radius: var(--radius-md);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+    }
+
+    .shadow-token {
+      font: var(--text-mono);
+      color: var(--text-secondary);
+    }
+
+    .shadow-soft-1  { box-shadow: var(--shadow-soft-1); }
+    .shadow-soft-2  { box-shadow: var(--shadow-soft-2); }
+    .shadow-soft-3  { box-shadow: var(--shadow-soft-3); }
+    .shadow-focus   { box-shadow: var(--shadow-focus); }
+    .shadow-elevated { box-shadow: var(--shadow-elevated); }
+
+    /* Grid demos */
+    .grid-demo-wrap {
+      margin-bottom: var(--space-8);
+    }
+
+    .grid-demo-label {
+      font: var(--text-h4);
+      color: var(--text-primary);
+      margin-bottom: var(--space-1);
+    }
+
+    .grid-demo-specs {
+      font: var(--text-mono);
+      color: var(--text-muted);
+      margin-bottom: var(--space-4);
+    }
+
+    .grid-demo {
+      background: var(--bg-sunken);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      height: 120px;
+      position: relative;
+      display: flex;
+    }
+
+    .grid-margin {
+      background: transparent;
+      flex-shrink: 0;
+    }
+
+    .grid-columns {
+      flex: 1;
+      display: flex;
+      gap: 0;
+      min-width: 0;
+    }
+
+    .grid-col {
+      flex: 1;
+      background: var(--indigo-subtle);
+      border-left: 1px solid var(--indigo-muted);
+      border-right: 1px solid var(--indigo-muted);
+    }
+
+    .grid-gutter {
+      flex-shrink: 0;
+      background: transparent;
+    }
+
+    /* Sub-section headings */
+    .sub-heading {
+      font: var(--text-h3);
+      color: var(--text-primary);
+      margin-bottom: var(--space-5);
+      margin-top: var(--space-10);
+    }
+
+    .sub-heading:first-child {
+      margin-top: 0;
+    }
+
+    /* Section anchor offset for sticky nav */
+    .spec-section[id] {
+      scroll-margin-top: 60px;
+    }
+  </style>
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+</head>
+<body>
+
+  <!-- ========== NAVIGATION ========== -->
+  <nav class="spec-nav">
+    <span class="logo">VP Design System</span>
+    <a href="index.html">Index</a>
+    <a href="00-foundations.html" class="active">Foundations</a>
+    <a href="01-marketing.html">Marketing</a>
+    <a href="02-auth.html">Auth</a>
+    <a href="03-app-shell.html">App Shell</a>
+    <a href="04-core-flows.html">Core Flows</a>
+    <a href="05-settings.html">Settings</a>
+    <a href="06-components.html">Components</a>
+    <a href="07-interactions.html">Interactions</a>
+  </nav>
+
+  <main class="spec-page">
+
+    <!-- ========== TYPOGRAPHY ========== -->
+    <section class="spec-section" id="typography">
+      <h2 class="spec-section-title">Typography</h2>
+      <p class="spec-section-desc">Type styles defined for the VoiceProcessor design system, using DM Sans for headings and Inter for body text.</p>
+
+      <div class="spec-frame">
+        <div class="spec-frame-label">Type Scale</div>
+        <div class="spec-frame-body">
+
+          <div class="type-row">
+            <div class="type-name">Display</div>
+            <div class="type-specs">DM Sans / 56 / 64 / 700</div>
+            <div class="type-sample-display">Voice made simple</div>
+          </div>
+
+          <div class="type-row">
+            <div class="type-name">Heading 1</div>
+            <div class="type-specs">DM Sans / 40 / 48 / 700</div>
+            <div class="type-sample-h1">Transform your documents</div>
+          </div>
+
+          <div class="type-row">
+            <div class="type-name">Heading 2</div>
+            <div class="type-specs">DM Sans / 32 / 40 / 700</div>
+            <div class="type-sample-h2">Choose your voice</div>
+          </div>
+
+          <div class="type-row">
+            <div class="type-name">Heading 3</div>
+            <div class="type-specs">DM Sans / 24 / 32 / 600</div>
+            <div class="type-sample-h3">Processing settings</div>
+          </div>
+
+          <div class="type-row">
+            <div class="type-name">Heading 4</div>
+            <div class="type-specs">DM Sans / 20 / 28 / 600</div>
+            <div class="type-sample-h4">Upload your file</div>
+          </div>
+
+          <div class="type-row">
+            <div class="type-name">Body L</div>
+            <div class="type-specs">Inter / 16 / 26 / 400</div>
+            <div class="type-sample-body-l">Upload any document and convert it to natural-sounding speech in seconds. Supports PDF, DOCX, TXT, and EPUB formats.</div>
+          </div>
+
+          <div class="type-row">
+            <div class="type-name">Body M</div>
+            <div class="type-specs">Inter / 15 / 24 / 400</div>
+            <div class="type-sample-body-m">Select from over 40 premium voices across 12 languages. Preview each voice before committing to a full conversion.</div>
+          </div>
+
+          <div class="type-row">
+            <div class="type-name">Body S</div>
+            <div class="type-specs">Inter / 13 / 20 / 400</div>
+            <div class="type-sample-body-s">Estimated processing time: 2 minutes. You will receive a notification when your audio is ready.</div>
+          </div>
+
+          <div class="type-row">
+            <div class="type-name">Label</div>
+            <div class="type-specs">Inter / 12 / 16 / 500 / UC</div>
+            <div class="type-sample-label">Character limit remaining</div>
+          </div>
+
+          <div class="type-row">
+            <div class="type-name">Mono</div>
+            <div class="type-specs">Geist Mono / 13 / 18 / 400</div>
+            <div class="type-sample-mono">const audioBlob = await processDocument(file, voiceId);</div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== COLOR SYSTEM ========== -->
+    <section class="spec-section" id="colors">
+      <h2 class="spec-section-title">Color System</h2>
+      <p class="spec-section-desc">Neutral, accent, and semantic color tokens for consistent visual language across the product.</p>
+
+      <!-- Neutrals -->
+      <h3 class="sub-heading">Neutrals</h3>
+      <div class="spec-frame">
+        <div class="spec-frame-label">Neutral Palette</div>
+        <div class="spec-frame-body">
+          <div class="swatch-row">
+            <div class="swatch">
+              <div class="swatch-color" style="background: #F2F2F2;"></div>
+              <div class="swatch-hex">#F2F2F2</div>
+              <div class="swatch-token">neutral-50</div>
+            </div>
+            <div class="swatch">
+              <div class="swatch-color" style="background: #E5E5E5;"></div>
+              <div class="swatch-hex">#E5E5E5</div>
+              <div class="swatch-token">neutral-100</div>
+            </div>
+            <div class="swatch">
+              <div class="swatch-color" style="background: #BDBDBD;"></div>
+              <div class="swatch-hex">#BDBDBD</div>
+              <div class="swatch-token">neutral-300</div>
+            </div>
+            <div class="swatch">
+              <div class="swatch-color" style="background: #767676;"></div>
+              <div class="swatch-hex">#767676</div>
+              <div class="swatch-token">neutral-500</div>
+            </div>
+            <div class="swatch">
+              <div class="swatch-color" style="background: #525252;"></div>
+              <div class="swatch-hex">#525252</div>
+              <div class="swatch-token">neutral-600</div>
+            </div>
+            <div class="swatch">
+              <div class="swatch-color" style="background: #3D3D3D;"></div>
+              <div class="swatch-hex">#3D3D3D</div>
+              <div class="swatch-token">neutral-700</div>
+            </div>
+            <div class="swatch">
+              <div class="swatch-color" style="background: #292929;"></div>
+              <div class="swatch-hex">#292929</div>
+              <div class="swatch-token">neutral-900</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Accents -->
+      <h3 class="sub-heading">Accents</h3>
+      <div class="spec-frame">
+        <div class="spec-frame-label">Accent Palette</div>
+        <div class="spec-frame-body">
+
+          <!-- Primary Indigo -->
+          <div class="accent-group">
+            <div class="accent-group-title">Primary Indigo</div>
+            <div class="swatch-row">
+              <div class="swatch">
+                <div class="accent-swatch-color" style="background: #8DA0F0;"></div>
+                <div class="swatch-hex">#8DA0F0</div>
+                <div class="accent-variant-label">Light</div>
+              </div>
+              <div class="swatch">
+                <div class="accent-swatch-color" style="background: #5D79DF;"></div>
+                <div class="swatch-hex">#5D79DF</div>
+                <div class="accent-variant-label">Base</div>
+              </div>
+              <div class="swatch">
+                <div class="accent-swatch-color" style="background: #4A63BF;"></div>
+                <div class="swatch-hex">#4A63BF</div>
+                <div class="accent-variant-label">Dark</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Teal -->
+          <div class="accent-group">
+            <div class="accent-group-title">Teal</div>
+            <div class="swatch-row">
+              <div class="swatch">
+                <div class="accent-swatch-color" style="background: #6EDECF;"></div>
+                <div class="swatch-hex">#6EDECF</div>
+                <div class="accent-variant-label">Light</div>
+              </div>
+              <div class="swatch">
+                <div class="accent-swatch-color" style="background: #37C8B5;"></div>
+                <div class="swatch-hex">#37C8B5</div>
+                <div class="accent-variant-label">Base</div>
+              </div>
+              <div class="swatch">
+                <div class="accent-swatch-color" style="background: #2AA89A;"></div>
+                <div class="swatch-hex">#2AA89A</div>
+                <div class="accent-variant-label">Dark</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sky -->
+          <div class="accent-group">
+            <div class="accent-group-title">Sky</div>
+            <div class="swatch-row">
+              <div class="swatch">
+                <div class="accent-swatch-color" style="background: #7FDAED;"></div>
+                <div class="swatch-hex">#7FDAED</div>
+                <div class="accent-variant-label">Light</div>
+              </div>
+              <div class="swatch">
+                <div class="accent-swatch-color" style="background: #4EC7E0;"></div>
+                <div class="swatch-hex">#4EC7E0</div>
+                <div class="accent-variant-label">Base</div>
+              </div>
+              <div class="swatch">
+                <div class="accent-swatch-color" style="background: #3AACCA;"></div>
+                <div class="swatch-hex">#3AACCA</div>
+                <div class="accent-variant-label">Dark</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Success -->
+          <div class="accent-group">
+            <div class="accent-group-title">Success</div>
+            <div class="swatch-row">
+              <div class="swatch">
+                <div class="accent-swatch-color" style="background: #6AE5B2;"></div>
+                <div class="swatch-hex">#6AE5B2</div>
+                <div class="accent-variant-label">Light</div>
+              </div>
+              <div class="swatch">
+                <div class="accent-swatch-color" style="background: #2DD28D;"></div>
+                <div class="swatch-hex">#2DD28D</div>
+                <div class="accent-variant-label">Base</div>
+              </div>
+              <div class="swatch">
+                <div class="accent-swatch-color" style="background: #22B074;"></div>
+                <div class="swatch-hex">#22B074</div>
+                <div class="accent-variant-label">Dark</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Warning -->
+          <div class="accent-group">
+            <div class="accent-group-title">Warning</div>
+            <div class="swatch-row">
+              <div class="swatch">
+                <div class="accent-swatch-color" style="background: #ECC97E;"></div>
+                <div class="swatch-hex">#ECC97E</div>
+                <div class="accent-variant-label">Light</div>
+              </div>
+              <div class="swatch">
+                <div class="accent-swatch-color" style="background: #E3B256;"></div>
+                <div class="swatch-hex">#E3B256</div>
+                <div class="accent-variant-label">Base</div>
+              </div>
+              <div class="swatch">
+                <div class="accent-swatch-color" style="background: #C99A3A;"></div>
+                <div class="swatch-hex">#C99A3A</div>
+                <div class="accent-variant-label">Dark</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Error -->
+          <div class="accent-group">
+            <div class="accent-group-title">Error</div>
+            <div class="swatch-row">
+              <div class="swatch">
+                <div class="accent-swatch-color" style="background: #E57A7A;"></div>
+                <div class="swatch-hex">#E57A7A</div>
+                <div class="accent-variant-label">Light</div>
+              </div>
+              <div class="swatch">
+                <div class="accent-swatch-color" style="background: #D84E4E;"></div>
+                <div class="swatch-hex">#D84E4E</div>
+                <div class="accent-variant-label">Base</div>
+              </div>
+              <div class="swatch">
+                <div class="accent-swatch-color" style="background: #B83A3A;"></div>
+                <div class="swatch-hex">#B83A3A</div>
+                <div class="accent-variant-label">Dark</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Semantic Aliases -->
+      <h3 class="sub-heading">Semantic Aliases</h3>
+
+      <!-- Backgrounds -->
+      <div class="spec-frame" style="margin-bottom: var(--space-6);">
+        <div class="spec-frame-label">Backgrounds</div>
+        <div class="spec-frame-body">
+          <div class="semantic-grid">
+            <div class="semantic-card">
+              <div class="semantic-preview" style="background: var(--bg-base);"></div>
+              <div class="semantic-info">
+                <div class="semantic-token">bg/base</div>
+                <div class="semantic-value">#FFFFFF</div>
+              </div>
+            </div>
+            <div class="semantic-card">
+              <div class="semantic-preview" style="background: var(--bg-surface);"></div>
+              <div class="semantic-info">
+                <div class="semantic-token">bg/surface</div>
+                <div class="semantic-value">#F9F9F9</div>
+              </div>
+            </div>
+            <div class="semantic-card">
+              <div class="semantic-preview" style="background: var(--bg-elevated);"></div>
+              <div class="semantic-info">
+                <div class="semantic-token">bg/elevated</div>
+                <div class="semantic-value">#FFFFFF</div>
+              </div>
+            </div>
+            <div class="semantic-card">
+              <div class="semantic-preview" style="background: var(--bg-sunken);"></div>
+              <div class="semantic-info">
+                <div class="semantic-token">bg/sunken</div>
+                <div class="semantic-value">#F2F2F2</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Text colors -->
+      <div class="spec-frame" style="margin-bottom: var(--space-6);">
+        <div class="spec-frame-label">Text Colors</div>
+        <div class="spec-frame-body">
+          <div class="semantic-grid">
+            <div class="semantic-card">
+              <div class="semantic-text-preview" style="color: var(--text-primary);">Aa</div>
+              <div class="semantic-info">
+                <div class="semantic-token">text/primary</div>
+                <div class="semantic-value">#292929</div>
+              </div>
+            </div>
+            <div class="semantic-card">
+              <div class="semantic-text-preview" style="color: var(--text-secondary);">Aa</div>
+              <div class="semantic-info">
+                <div class="semantic-token">text/secondary</div>
+                <div class="semantic-value">#525252</div>
+              </div>
+            </div>
+            <div class="semantic-card">
+              <div class="semantic-text-preview" style="color: var(--text-muted);">Aa</div>
+              <div class="semantic-info">
+                <div class="semantic-token">text/muted</div>
+                <div class="semantic-value">#767676</div>
+              </div>
+            </div>
+            <div class="semantic-card">
+              <div class="semantic-text-preview" style="color: var(--text-inverse); background: var(--neutral-900);">Aa</div>
+              <div class="semantic-info">
+                <div class="semantic-token">text/inverse</div>
+                <div class="semantic-value">#FFFFFF</div>
+              </div>
+            </div>
+            <div class="semantic-card">
+              <div class="semantic-text-preview" style="color: var(--text-link);">Aa</div>
+              <div class="semantic-info">
+                <div class="semantic-token">text/link</div>
+                <div class="semantic-value">#5D79DF</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Borders -->
+      <div class="spec-frame" style="margin-bottom: var(--space-6);">
+        <div class="spec-frame-label">Borders</div>
+        <div class="spec-frame-body">
+          <div class="semantic-grid">
+            <div class="semantic-card">
+              <div class="semantic-border-preview" style="border: 2px solid var(--border-subtle);"></div>
+              <div class="semantic-info">
+                <div class="semantic-token">border/subtle</div>
+                <div class="semantic-value">#E5E5E5</div>
+              </div>
+            </div>
+            <div class="semantic-card">
+              <div class="semantic-border-preview" style="border: 2px solid var(--border-strong);"></div>
+              <div class="semantic-info">
+                <div class="semantic-token">border/strong</div>
+                <div class="semantic-value">#BDBDBD</div>
+              </div>
+            </div>
+            <div class="semantic-card">
+              <div class="semantic-border-preview" style="border: 2px solid var(--border-focus);"></div>
+              <div class="semantic-info">
+                <div class="semantic-token">border/focus</div>
+                <div class="semantic-value">#5D79DF</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- States -->
+      <div class="spec-frame">
+        <div class="spec-frame-label">States</div>
+        <div class="spec-frame-body">
+          <div class="state-row" style="background: var(--state-success-bg);">
+            <div class="state-label" style="color: var(--state-success-text);">Success</div>
+            <div class="state-chip" style="background: var(--state-success-bg); color: var(--state-success-text); border-color: var(--state-success-border);">bg + text + border</div>
+            <div class="semantic-value">bg: rgba(45,210,141,0.08) &middot; text: #22B074 &middot; border: rgba(45,210,141,0.25)</div>
+          </div>
+          <div class="state-row" style="background: var(--state-warning-bg);">
+            <div class="state-label" style="color: var(--state-warning-text);">Warning</div>
+            <div class="state-chip" style="background: var(--state-warning-bg); color: var(--state-warning-text); border-color: var(--state-warning-border);">bg + text + border</div>
+            <div class="semantic-value">bg: rgba(227,178,86,0.08) &middot; text: #C99A3A &middot; border: rgba(227,178,86,0.25)</div>
+          </div>
+          <div class="state-row" style="background: var(--state-error-bg);">
+            <div class="state-label" style="color: var(--state-error-text);">Error</div>
+            <div class="state-chip" style="background: var(--state-error-bg); color: var(--state-error-text); border-color: var(--state-error-border);">bg + text + border</div>
+            <div class="semantic-value">bg: rgba(216,78,78,0.08) &middot; text: #B83A3A &middot; border: rgba(216,78,78,0.25)</div>
+          </div>
+          <div class="state-row" style="background: var(--state-info-bg);">
+            <div class="state-label" style="color: var(--state-info-text);">Info</div>
+            <div class="state-chip" style="background: var(--state-info-bg); color: var(--state-info-text); border-color: var(--state-info-border);">bg + text + border</div>
+            <div class="semantic-value">bg: rgba(78,199,224,0.08) &middot; text: #3AACCA &middot; border: rgba(78,199,224,0.25)</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== SPACING SCALE ========== -->
+    <section class="spec-section" id="spacing">
+      <h2 class="spec-section-title">Spacing Scale</h2>
+      <p class="spec-section-desc">Consistent spacing tokens based on a 4px base unit.</p>
+
+      <div class="spec-frame">
+        <div class="spec-frame-label">Spacing Tokens</div>
+        <div class="spec-frame-body">
+
+          <div class="spacing-row">
+            <div class="spacing-label">space-1</div>
+            <div class="spacing-bar" style="width: 4px;"></div>
+            <div class="spacing-px">4px</div>
+          </div>
+
+          <div class="spacing-row">
+            <div class="spacing-label">space-2</div>
+            <div class="spacing-bar" style="width: 8px;"></div>
+            <div class="spacing-px">8px</div>
+          </div>
+
+          <div class="spacing-row">
+            <div class="spacing-label">space-3</div>
+            <div class="spacing-bar" style="width: 12px;"></div>
+            <div class="spacing-px">12px</div>
+          </div>
+
+          <div class="spacing-row">
+            <div class="spacing-label">space-4</div>
+            <div class="spacing-bar" style="width: 16px;"></div>
+            <div class="spacing-px">16px</div>
+          </div>
+
+          <div class="spacing-row">
+            <div class="spacing-label">space-5</div>
+            <div class="spacing-bar" style="width: 20px;"></div>
+            <div class="spacing-px">20px</div>
+          </div>
+
+          <div class="spacing-row">
+            <div class="spacing-label">space-6</div>
+            <div class="spacing-bar" style="width: 24px;"></div>
+            <div class="spacing-px">24px</div>
+          </div>
+
+          <div class="spacing-row">
+            <div class="spacing-label">space-8</div>
+            <div class="spacing-bar" style="width: 32px;"></div>
+            <div class="spacing-px">32px</div>
+          </div>
+
+          <div class="spacing-row">
+            <div class="spacing-label">space-10</div>
+            <div class="spacing-bar" style="width: 40px;"></div>
+            <div class="spacing-px">40px</div>
+          </div>
+
+          <div class="spacing-row">
+            <div class="spacing-label">space-12</div>
+            <div class="spacing-bar" style="width: 48px;"></div>
+            <div class="spacing-px">48px</div>
+          </div>
+
+          <div class="spacing-row">
+            <div class="spacing-label">space-16</div>
+            <div class="spacing-bar" style="width: 64px;"></div>
+            <div class="spacing-px">64px</div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== RADIUS TOKENS ========== -->
+    <section class="spec-section" id="radius">
+      <h2 class="spec-section-title">Radius Tokens</h2>
+      <p class="spec-section-desc">Border radius values for consistent rounding across components.</p>
+
+      <div class="spec-frame">
+        <div class="spec-frame-label">Border Radius</div>
+        <div class="spec-frame-body">
+          <div class="radius-row">
+
+            <div class="radius-item">
+              <div class="radius-demo" style="border-radius: var(--radius-xs);"></div>
+              <div class="radius-token">radius-xs</div>
+              <div class="radius-value">4px</div>
+            </div>
+
+            <div class="radius-item">
+              <div class="radius-demo" style="border-radius: var(--radius-sm);"></div>
+              <div class="radius-token">radius-sm</div>
+              <div class="radius-value">8px</div>
+            </div>
+
+            <div class="radius-item">
+              <div class="radius-demo" style="border-radius: var(--radius-md);"></div>
+              <div class="radius-token">radius-md</div>
+              <div class="radius-value">12px</div>
+            </div>
+
+            <div class="radius-item">
+              <div class="radius-demo" style="border-radius: var(--radius-lg);"></div>
+              <div class="radius-token">radius-lg</div>
+              <div class="radius-value">20px</div>
+            </div>
+
+            <div class="radius-item">
+              <div class="radius-demo" style="border-radius: var(--radius-xl);"></div>
+              <div class="radius-token">radius-xl</div>
+              <div class="radius-value">28px</div>
+            </div>
+
+            <div class="radius-item">
+              <div class="radius-demo" style="border-radius: var(--radius-full);"></div>
+              <div class="radius-token">radius-full</div>
+              <div class="radius-value">999px</div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== SHADOWS ========== -->
+    <section class="spec-section" id="shadows">
+      <h2 class="spec-section-title">Shadows</h2>
+      <p class="spec-section-desc">Elevation layers for depth and focus indication.</p>
+
+      <div class="spec-frame">
+        <div class="spec-frame-label">Shadow Tokens</div>
+        <div class="spec-frame-body" style="background: var(--bg-sunken);">
+          <div class="shadow-row">
+
+            <div class="shadow-card shadow-soft-1">
+              <div class="shadow-token">soft-1</div>
+            </div>
+
+            <div class="shadow-card shadow-soft-2">
+              <div class="shadow-token">soft-2</div>
+            </div>
+
+            <div class="shadow-card shadow-soft-3">
+              <div class="shadow-token">soft-3</div>
+            </div>
+
+            <div class="shadow-card shadow-focus">
+              <div class="shadow-token">focus</div>
+            </div>
+
+            <div class="shadow-card shadow-elevated">
+              <div class="shadow-token">elevated</div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== GRID SYSTEM ========== -->
+    <section class="spec-section" id="grid">
+      <h2 class="spec-section-title">Grid System</h2>
+      <p class="spec-section-desc">Responsive grid definitions for desktop, tablet, and mobile breakpoints.</p>
+
+      <!-- Desktop -->
+      <div class="grid-demo-wrap">
+        <div class="grid-demo-label">Desktop</div>
+        <div class="grid-demo-specs">1440px &middot; 12 columns &middot; 80px margins &middot; 24px gutters</div>
+        <div class="spec-frame">
+          <div class="spec-frame-label">Desktop Grid <span class="dims">1440 &times; 900</span></div>
+          <div class="spec-frame-body" style="padding: 0; overflow-x: auto;">
+            <div class="grid-demo" style="width: 1440px; min-width: 1440px;">
+              <div class="grid-margin" style="width: 80px;"></div>
+              <div class="grid-columns" style="gap: 0;">
+                <div class="grid-col"></div><div class="grid-gutter" style="width: 24px;"></div>
+                <div class="grid-col"></div><div class="grid-gutter" style="width: 24px;"></div>
+                <div class="grid-col"></div><div class="grid-gutter" style="width: 24px;"></div>
+                <div class="grid-col"></div><div class="grid-gutter" style="width: 24px;"></div>
+                <div class="grid-col"></div><div class="grid-gutter" style="width: 24px;"></div>
+                <div class="grid-col"></div><div class="grid-gutter" style="width: 24px;"></div>
+                <div class="grid-col"></div><div class="grid-gutter" style="width: 24px;"></div>
+                <div class="grid-col"></div><div class="grid-gutter" style="width: 24px;"></div>
+                <div class="grid-col"></div><div class="grid-gutter" style="width: 24px;"></div>
+                <div class="grid-col"></div><div class="grid-gutter" style="width: 24px;"></div>
+                <div class="grid-col"></div><div class="grid-gutter" style="width: 24px;"></div>
+                <div class="grid-col"></div>
+              </div>
+              <div class="grid-margin" style="width: 80px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tablet -->
+      <div class="grid-demo-wrap">
+        <div class="grid-demo-label">Tablet</div>
+        <div class="grid-demo-specs">1024px &middot; 8 columns &middot; 48px margins &middot; 20px gutters</div>
+        <div class="spec-frame">
+          <div class="spec-frame-label">Tablet Grid <span class="dims">1024 &times; 768</span></div>
+          <div class="spec-frame-body" style="padding: 0; overflow-x: auto;">
+            <div class="grid-demo" style="width: 1024px; min-width: 1024px;">
+              <div class="grid-margin" style="width: 48px;"></div>
+              <div class="grid-columns" style="gap: 0;">
+                <div class="grid-col"></div><div class="grid-gutter" style="width: 20px;"></div>
+                <div class="grid-col"></div><div class="grid-gutter" style="width: 20px;"></div>
+                <div class="grid-col"></div><div class="grid-gutter" style="width: 20px;"></div>
+                <div class="grid-col"></div><div class="grid-gutter" style="width: 20px;"></div>
+                <div class="grid-col"></div><div class="grid-gutter" style="width: 20px;"></div>
+                <div class="grid-col"></div><div class="grid-gutter" style="width: 20px;"></div>
+                <div class="grid-col"></div><div class="grid-gutter" style="width: 20px;"></div>
+                <div class="grid-col"></div>
+              </div>
+              <div class="grid-margin" style="width: 48px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile -->
+      <div class="grid-demo-wrap">
+        <div class="grid-demo-label">Mobile</div>
+        <div class="grid-demo-specs">390px &middot; 4 columns &middot; 20px margins &middot; 16px gutters</div>
+        <div class="spec-frame">
+          <div class="spec-frame-label">Mobile Grid <span class="dims">390 &times; 844</span></div>
+          <div class="spec-frame-body" style="padding: 0;">
+            <div class="grid-demo" style="width: 390px;">
+              <div class="grid-margin" style="width: 20px;"></div>
+              <div class="grid-columns" style="gap: 0;">
+                <div class="grid-col"></div><div class="grid-gutter" style="width: 16px;"></div>
+                <div class="grid-col"></div><div class="grid-gutter" style="width: 16px;"></div>
+                <div class="grid-col"></div><div class="grid-gutter" style="width: 16px;"></div>
+                <div class="grid-col"></div>
+              </div>
+              <div class="grid-margin" style="width: 20px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+</body>
+</html>

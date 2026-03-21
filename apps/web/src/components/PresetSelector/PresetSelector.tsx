@@ -143,17 +143,17 @@ export function PresetSelector({
             className={cn(
               "flex flex-col items-start gap-1 rounded-lg p-3 text-left transition-all",
               selectedPreset === option.value
-                ? "bg-blue-50 dark:bg-blue-950 ring-2 ring-blue-500"
-                : "bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 ring-1 ring-gray-200 dark:ring-gray-700"
+                ? "bg-indigo-subtle ring-2 ring-indigo"
+                : "bg-bg-sunken hover:bg-bg-surface ring-1 ring-border-subtle"
             )}
           >
             <div className="flex items-center gap-2">
               <span className="text-lg">{option.icon}</span>
-              <span className="font-medium text-sm text-gray-900 dark:text-white">
+              <span className="font-medium text-sm text-text-primary">
                 {option.label}
               </span>
             </div>
-            <span className="text-xs text-gray-500 dark:text-gray-400">
+            <span className="text-xs text-text-muted">
               {option.description}
             </span>
           </button>
@@ -167,11 +167,11 @@ export function PresetSelector({
             <div className="flex items-center justify-between">
               <label
                 htmlFor={`slider-${slider.key}`}
-                className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="text-sm font-medium text-text-secondary"
               >
                 {slider.label}
               </label>
-              <span className="text-sm font-mono text-gray-500 dark:text-gray-400">
+              <span className="text-sm font-mono text-text-muted">
                 {params[slider.key].toFixed(2)}
               </span>
             </div>
@@ -184,7 +184,7 @@ export function PresetSelector({
               value={params[slider.key]}
               onChange={(e) => handleSliderChange(slider.key, parseFloat(e.target.value))}
               aria-label={slider.label}
-              className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-200 dark:bg-gray-700 accent-blue-600"
+              className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-bg-sunken accent-indigo"
             />
           </div>
         ))}

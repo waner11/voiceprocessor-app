@@ -71,15 +71,15 @@ export function ChapterNavigation({
             className={cn(
               "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm transition-colors",
               isActive
-                ? "bg-blue-50 dark:bg-blue-900/20 text-blue-900 dark:text-blue-100 font-medium"
-                : "hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+                ? "bg-indigo-subtle text-indigo font-medium"
+                : "hover:bg-bg-sunken text-text-secondary"
             )}
           >
-            <span className="flex-shrink-0 text-xs text-gray-400 dark:text-gray-500 tabular-nums w-10">
+            <span className="flex-shrink-0 text-xs text-text-muted tabular-nums w-10">
               {formatTime(chapter.startTimeMs)}
             </span>
             <span className="flex-1 truncate">{chapter.title}</span>
-            <span className="flex-shrink-0 text-xs text-gray-400 dark:text-gray-500 tabular-nums">
+            <span className="flex-shrink-0 text-xs text-text-muted tabular-nums">
               {formatDuration(chapter.startTimeMs, chapter.endTimeMs)}
             </span>
           </button>
@@ -93,10 +93,10 @@ export function ChapterNavigation({
           aria-valuemin={0}
           aria-valuemax={100}
           aria-label={`Chapter progress: ${currentChapterProgress}%`}
-          className="mt-2 h-1 w-full rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden"
+          className="mt-2 h-1 w-full rounded-full bg-bg-sunken overflow-hidden"
         >
           <div
-            className="h-full rounded-full bg-blue-500 transition-all duration-300"
+            className="h-full rounded-full bg-indigo transition-all duration-300"
             style={{ width: `${currentChapterProgress}%` }}
           />
         </div>

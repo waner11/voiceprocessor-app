@@ -118,9 +118,9 @@ export function ChapterPreview({ text }: ChapterPreviewProps) {
   if (chapters.length === 0) return null;
 
   return (
-    <div data-testid="chapter-preview" className="mt-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-4">
+    <div data-testid="chapter-preview" className="mt-4 rounded-lg border border-border-subtle bg-bg-sunken p-4">
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+        <h3 className="text-sm font-semibold text-text-secondary">
           📖 {chapters.length} {chapters.length === 1 ? "chapter" : "chapters"} detected
         </h3>
       </div>
@@ -128,12 +128,12 @@ export function ChapterPreview({ text }: ChapterPreviewProps) {
         {chapters.map((chapter, index) => (
           <li
             key={index}
-            className="flex items-center justify-between rounded-md bg-white dark:bg-gray-800 px-3 py-2 text-sm ring-1 ring-gray-100 dark:ring-gray-700"
+            className="flex items-center justify-between rounded-md bg-bg-elevated px-3 py-2 text-sm ring-1 ring-border-subtle"
           >
-            <span className="font-medium text-gray-800 dark:text-gray-200 truncate mr-3">
+            <span className="font-medium text-text-primary truncate mr-3">
               {chapter.title}
             </span>
-            <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+            <span className="text-xs text-text-muted whitespace-nowrap">
               {formatNumber(chapter.characterCount)} chars
             </span>
           </li>

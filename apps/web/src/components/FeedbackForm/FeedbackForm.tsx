@@ -74,9 +74,9 @@ export function FeedbackForm({
   if (isSubmitted) {
     return (
       <div className={cn("rounded-lg border p-6 text-center", className)}>
-        <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
+        <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-success-subtle">
           <svg
-            className="h-5 w-5 text-green-600"
+            className="h-5 w-5 text-success"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -90,7 +90,7 @@ export function FeedbackForm({
           </svg>
         </div>
         <p className="font-medium">Thanks for your feedback!</p>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-text-muted">
           Your input helps us improve our voices.
         </p>
       </div>
@@ -116,8 +116,8 @@ export function FeedbackForm({
               className={cn(
                 "h-8 w-8 transition-colors",
                 (hoveredRating || rating) >= star
-                  ? "fill-yellow-400 text-yellow-400"
-                  : "fill-gray-200 text-gray-200"
+                  ? "fill-warning text-warning"
+                  : "fill-bg-sunken text-bg-sunken"
               )}
               viewBox="0 0 24 24"
             >
@@ -126,13 +126,13 @@ export function FeedbackForm({
           </button>
         ))}
         {rating > 0 && (
-          <span className="ml-2 text-sm text-gray-500">{rating}/5</span>
+          <span className="ml-2 text-sm text-text-muted">{rating}/5</span>
         )}
       </div>
 
       {/* Quick tags */}
       <div>
-        <p className="mb-2 text-sm text-gray-500">Quick feedback (optional)</p>
+        <p className="mb-2 text-sm text-text-muted">Quick feedback (optional)</p>
         <div className="flex flex-wrap gap-2">
           {QUICK_TAGS.map((tag) => (
             <button
@@ -142,8 +142,8 @@ export function FeedbackForm({
               className={cn(
                 "rounded-full px-3 py-1 text-sm transition-colors",
                 selectedTags.includes(tag.id)
-                  ? "bg-blue-100 text-blue-700"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  ? "bg-indigo-subtle text-indigo"
+                  : "bg-bg-sunken text-text-secondary hover:bg-bg-surface"
               )}
             >
               {tag.label}
@@ -154,7 +154,7 @@ export function FeedbackForm({
 
       {/* Comment */}
       <div>
-        <label htmlFor="comment" className="mb-1 block text-sm text-gray-500">
+        <label htmlFor="comment" className="mb-1 block text-sm text-text-muted">
           Additional comments (optional)
         </label>
         <textarea
@@ -162,7 +162,7 @@ export function FeedbackForm({
           value={comment}
           onChange={(e) => setComment(e.target.value)}
           placeholder="Tell us more about your experience..."
-          className="w-full rounded-lg border p-3 text-sm resize-none focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="w-full rounded-lg border p-3 text-sm resize-none focus:border-border-focus focus:outline-none focus:ring-1 focus:ring-border-focus"
           rows={3}
         />
       </div>
@@ -172,7 +172,7 @@ export function FeedbackForm({
         type="button"
         onClick={handleSubmit}
         disabled={rating === 0 || isSubmitting}
-        className="w-full rounded-lg bg-black py-2 text-white hover:bg-gray-800 disabled:opacity-50"
+        className="w-full rounded-lg bg-indigo py-2 text-white hover:bg-indigo-dark disabled:opacity-50"
       >
         {isSubmitting ? "Submitting..." : "Submit Feedback"}
       </button>

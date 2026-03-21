@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings &amp; Billing — VP Design System</title>
+  <link rel="stylesheet" href="tokens.css">
+  <style>
+    /* ========== PAGE-LEVEL ========== */
+    .spec-page { padding-top: var(--space-6); }
+
+    /* ========== APP HEADER (56px) ========== */
+    .app-header {
+      height: 56px;
+      background: var(--bg-base);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      padding: 0 var(--space-6);
+      gap: var(--space-8);
+    }
+    .app-header-logo {
+      font: 600 18px/1 var(--font-heading);
+      color: var(--indigo);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .app-header-logo svg { flex-shrink: 0; }
+    .app-header-nav {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+      margin-left: auto;
+    }
+    .app-header-nav a {
+      font: 500 14px/1 var(--font-body);
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-sm);
+      transition: all var(--duration-fast) var(--ease-default);
+    }
+    .app-header-nav a:hover { color: var(--text-primary); background: var(--bg-sunken); }
+    .app-header-nav a.active { color: var(--indigo); background: var(--indigo-subtle); }
+    .app-header-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-full);
+      background: var(--indigo-muted);
+      color: var(--indigo-dark);
+      font: 600 13px/32px var(--font-heading);
+      text-align: center;
+      margin-left: var(--space-3);
+    }
+
+    /* ========== SETTINGS SUB-NAV ========== */
+    .settings-subnav {
+      background: var(--bg-base);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 0 var(--space-6);
+      display: flex;
+      gap: var(--space-1);
+    }
+    .settings-subnav a {
+      font: 500 14px/1 var(--font-body);
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: var(--space-3) var(--space-4);
+      border-bottom: 2px solid transparent;
+      transition: all var(--duration-fast) var(--ease-default);
+      margin-bottom: -1px;
+    }
+    .settings-subnav a:hover { color: var(--text-primary); }
+    .settings-subnav a.active {
+      color: var(--indigo);
+      border-bottom-color: var(--indigo);
+    }
+
+    /* ========== SETTINGS CONTENT AREA ========== */
+    .settings-content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: var(--space-10) var(--space-6);
+    }
+    .settings-content.wide {
+      max-width: 900px;
+    }
+    .settings-title {
+      font: var(--text-h2);
+      color: var(--text-primary);
+      margin-bottom: var(--space-8);
+    }
+    .settings-desc {
+      font: var(--text-body-m);
+      color: var(--text-muted);
+      margin-top: calc(-1 * var(--space-5));
+      margin-bottom: var(--space-8);
+    }
+
+    /* ========== FORM ELEMENTS ========== */
+    .form-section {
+      margin-bottom: var(--space-8);
+    }
+    .form-section-title {
+      font: var(--text-h3);
+      color: var(--text-primary);
+      margin-bottom: var(--space-5);
+    }
+    .form-group {
+      margin-bottom: var(--space-5);
+    }
+    .form-label {
+      display: block;
+      font: 500 14px/1 var(--font-body);
+      color: var(--text-secondary);
+      margin-bottom: var(--space-2);
+    }
+    .form-input {
+      width: 100%;
+      height: 44px;
+      padding: 0 var(--space-4);
+      font: var(--text-body-m);
+      color: var(--text-primary);
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      outline: none;
+      transition: border-color var(--duration-fast) var(--ease-default),
+                  box-shadow var(--duration-fast) var(--ease-default);
+    }
+    .form-input:focus {
+      border-color: var(--border-focus);
+      box-shadow: var(--shadow-focus);
+    }
+    .form-input-wrap {
+      position: relative;
+    }
+    .form-input-wrap .form-input {
+      padding-right: 44px;
+    }
+    .form-input-wrap .input-icon {
+      position: absolute;
+      right: var(--space-3);
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+    }
+    .form-input.disabled {
+      background: var(--bg-sunken);
+      color: var(--text-muted);
+      cursor: not-allowed;
+      border-color: var(--border-subtle);
+    }
+
+    /* Password strength */
+    .strength-bar {
+      display: flex;
+      gap: var(--space-1);
+      margin-top: var(--space-2);
+    }
+    .strength-segment {
+      flex: 1;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--border-subtle);
+    }
+    .strength-segment.filled { background: var(--success); }
+    .strength-segment.filled.medium { background: var(--warning); }
+    .strength-label {
+      font: var(--text-body-s);
+      color: var(--success-dark);
+      margin-top: var(--space-1);
+    }
+
+    /* ========== BUTTONS ========== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      height: 40px;
+      padding: 0 var(--space-5);
+      font: 500 14px/1 var(--font-body);
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-default);
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: var(--indigo);
+      color: var(--text-inverse);
+      border-color: var(--indigo);
+    }
+    .btn-primary:hover { background: var(--indigo-dark); border-color: var(--indigo-dark); }
+    .btn-destructive {
+      background: transparent;
+      color: var(--error);
+      border-color: var(--error);
+    }
+    .btn-destructive:hover { background: var(--error-subtle); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+      border-color: var(--border-subtle);
+    }
+    .btn-ghost:hover { background: var(--bg-sunken); }
+
+    .text-link {
+      font: 500 14px/1 var(--font-body);
+      color: var(--text-link);
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .text-link:hover { text-decoration: underline; }
+
+    /* ========== DIVIDER ========== */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border-subtle);
+      margin: var(--space-8) 0;
+    }
+
+    /* ========== DANGER ZONE ========== */
+    .danger-zone {
+      background: var(--state-error-bg);
+      border: 1px solid var(--state-error-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-6);
+    }
+    .danger-zone-title {
+      font: var(--text-h4);
+      color: var(--error-dark);
+      margin-bottom: var(--space-2);
+    }
+    .danger-zone-desc {
+      font: var(--text-body-m);
+      color: var(--text-secondary);
+      margin-bottom: var(--space-5);
+    }
+
+    /* ========== API KEYS TABLE ========== */
+    .api-keys-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-6);
+    }
+    .api-keys-header .settings-title { margin-bottom: 0; }
+
+    .keys-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .keys-table th {
+      font: var(--text-label);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      text-align: left;
+      padding: var(--space-3) var(--space-4);
+      border-bottom: 1px solid var(--border-subtle);
+      background: var(--bg-sunken);
+    }
+    .keys-table th:first-child { border-radius: var(--radius-sm) 0 0 0; }
+    .keys-table th:last-child { border-radius: 0 var(--radius-sm) 0 0; }
+    .keys-table td {
+      font: var(--text-body-m);
+      color: var(--text-primary);
+      padding: var(--space-4);
+      border-bottom: 1px solid var(--border-subtle);
+      vertical-align: middle;
+    }
+    .key-mono {
+      font: var(--text-mono);
+      color: var(--text-secondary);
+      background: var(--bg-sunken);
+      padding: var(--space-1) var(--space-2);
+      border-radius: var(--radius-xs);
+    }
+    .key-actions {
+      display: flex;
+      gap: var(--space-3);
+      align-items: center;
+    }
+    .key-action-copy {
+      font: 500 13px/1 var(--font-body);
+      color: var(--text-link);
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+    .key-action-copy:hover { text-decoration: underline; }
+    .key-action-revoke {
+      font: 500 13px/1 var(--font-body);
+      color: var(--error);
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+    .key-action-revoke:hover { text-decoration: underline; }
+    .key-date {
+      font: var(--text-body-s);
+      color: var(--text-muted);
+    }
+
+    /* ========== CONNECTION CARDS ========== */
+    .connection-card {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: var(--space-5);
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      margin-bottom: var(--space-4);
+    }
+    .connection-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-sunken);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .connection-icon svg { width: 22px; height: 22px; }
+    .connection-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .connection-name {
+      font: 500 15px/1.2 var(--font-body);
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-1);
+    }
+    .connection-detail {
+      font: var(--text-body-s);
+      color: var(--text-muted);
+    }
+    .badge-connected {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font: 500 11px/1 var(--font-body);
+      color: var(--success-dark);
+      background: var(--state-success-bg);
+      border: 1px solid var(--state-success-border);
+      border-radius: var(--radius-full);
+      padding: 3px 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .badge-connected::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--success);
+    }
+
+    /* ========== BILLING — CREDIT HERO ========== */
+    .credit-hero {
+      background: linear-gradient(135deg, var(--indigo-subtle), rgba(93, 121, 223, 0.05));
+      border: 1px solid var(--indigo-muted);
+      border-radius: var(--radius-lg);
+      padding: var(--space-10) var(--space-6);
+      text-align: center;
+      margin-bottom: var(--space-10);
+    }
+    .credit-hero-number {
+      font: 700 72px/1 var(--font-heading);
+      color: var(--indigo);
+      margin-bottom: var(--space-2);
+    }
+    .credit-hero-label {
+      font: var(--text-body-l);
+      color: var(--text-muted);
+    }
+
+    /* ========== BILLING — CREDIT PACKS ========== */
+    .billing-section-title {
+      font: var(--text-h3);
+      color: var(--text-primary);
+      margin-bottom: var(--space-5);
+    }
+    .credit-packs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-5);
+      margin-bottom: var(--space-10);
+    }
+    .credit-pack {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: var(--space-6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+    }
+    .credit-pack.highlighted {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 1px var(--teal);
+    }
+    .pack-badge {
+      position: absolute;
+      top: calc(-1 * var(--space-3));
+      font: 600 11px/1 var(--font-body);
+      color: var(--text-inverse);
+      background: var(--teal);
+      border-radius: var(--radius-full);
+      padding: 5px 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .pack-name {
+      font: var(--text-h4);
+      color: var(--text-primary);
+      margin-bottom: var(--space-2);
+    }
+    .pack-credits {
+      font: var(--text-body-m);
+      color: var(--text-secondary);
+      margin-bottom: var(--space-4);
+    }
+    .pack-price {
+      font: 700 32px/1 var(--font-heading);
+      color: var(--text-primary);
+      margin-bottom: var(--space-1);
+    }
+    .pack-unit {
+      font: var(--text-body-s);
+      color: var(--text-muted);
+      margin-bottom: var(--space-5);
+    }
+
+    /* ========== BILLING — USAGE ========== */
+    .usage-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-5);
+      margin-bottom: var(--space-10);
+    }
+    .usage-card {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: var(--space-5);
+    }
+    .usage-card-label {
+      font: var(--text-label);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-3);
+    }
+    .usage-card-value {
+      font: 600 18px/1.2 var(--font-heading);
+      color: var(--text-primary);
+      margin-bottom: var(--space-3);
+    }
+    .progress-bar-track {
+      width: 100%;
+      height: 6px;
+      background: var(--bg-sunken);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--indigo);
+      border-radius: 3px;
+    }
+
+    /* ========== BILLING — PAYMENT METHOD ========== */
+    .payment-method {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-5);
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-10);
+    }
+    .payment-icon {
+      width: 48px;
+      height: 32px;
+      background: var(--bg-sunken);
+      border-radius: var(--radius-xs);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font: 700 11px/1 var(--font-body);
+      color: var(--indigo-dark);
+      letter-spacing: 0.02em;
+    }
+    .payment-info {
+      flex: 1;
+    }
+    .payment-card-name {
+      font: 500 15px/1.2 var(--font-body);
+      color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+    .payment-card-expiry {
+      font: var(--text-body-s);
+      color: var(--text-muted);
+    }
+
+    /* ========== BILLING HISTORY TABLE ========== */
+    .billing-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .billing-table th {
+      font: var(--text-label);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      text-align: left;
+      padding: var(--space-3) var(--space-4);
+      border-bottom: 1px solid var(--border-subtle);
+      background: var(--bg-sunken);
+    }
+    .billing-table th:first-child { border-radius: var(--radius-sm) 0 0 0; }
+    .billing-table th:last-child { border-radius: 0 var(--radius-sm) 0 0; }
+    .billing-table td {
+      font: var(--text-body-m);
+      color: var(--text-primary);
+      padding: var(--space-4);
+      border-bottom: 1px solid var(--border-subtle);
+      vertical-align: middle;
+    }
+    .badge-completed {
+      display: inline-flex;
+      align-items: center;
+      font: 500 12px/1 var(--font-body);
+      color: var(--success-dark);
+      background: var(--state-success-bg);
+      border-radius: var(--radius-full);
+      padding: 4px 10px;
+    }
+    .badge-refunded {
+      display: inline-flex;
+      align-items: center;
+      font: 500 12px/1 var(--font-body);
+      color: var(--text-muted);
+      background: var(--bg-sunken);
+      border-radius: var(--radius-full);
+      padding: 4px 10px;
+    }
+
+    /* ========== PAYMENT RESULT PAGES ========== */
+    .payment-result {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 56px);
+      padding: var(--space-10) var(--space-6);
+      text-align: center;
+    }
+    .result-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: var(--space-6);
+    }
+    .result-icon.success {
+      background: var(--state-success-bg);
+      color: var(--success);
+    }
+    .result-icon.warning {
+      background: var(--state-warning-bg);
+      color: var(--warning-dark);
+    }
+    .result-icon svg { width: 32px; height: 32px; }
+    .result-title {
+      font: var(--text-h2);
+      color: var(--text-primary);
+      margin-bottom: var(--space-3);
+    }
+    .result-desc {
+      font: var(--text-body-l);
+      color: var(--text-muted);
+      margin-bottom: var(--space-2);
+    }
+    .result-balance {
+      font: var(--text-body-l);
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: var(--space-8);
+    }
+    .result-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-4);
+    }
+
+    /* ========== SCREEN CONTAINER ========== */
+    .screen-container {
+      width: 1440px;
+      min-height: 900px;
+      background: var(--bg-surface);
+    }
+
+    /* ========== FRAME OVERRIDES ========== */
+    .spec-frame-body { overflow-x: auto; }
+  </style>
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+</head>
+<body>
+
+  <!-- ========== NAVIGATION ========== -->
+  <nav class="spec-nav">
+    <span class="logo">VP Design System</span>
+    <a href="index.html">Index</a>
+    <a href="00-foundations.html">Foundations</a>
+    <a href="01-marketing.html">Marketing</a>
+    <a href="02-auth.html">Auth</a>
+    <a href="03-app-shell.html">App Shell</a>
+    <a href="04-core-flows.html">Core Flows</a>
+    <a href="05-settings.html" class="active">Settings</a>
+    <a href="06-components.html">Components</a>
+    <a href="07-interactions.html">Interactions</a>
+  </nav>
+
+  <main class="spec-page">
+
+    <!-- ============================================================
+         FRAME 1 — Profile Settings (Desktop 1440px)
+         ============================================================ -->
+    <section class="spec-section" id="profile">
+      <h2 class="spec-section-title">Profile Settings</h2>
+      <p class="spec-section-desc">User profile management with personal information, password change, and account deletion.</p>
+
+      <div class="spec-frame">
+        <div class="spec-frame-label">Profile Settings <span class="dims">1440 &times; 900</span></div>
+        <div class="spec-frame-body" style="padding: 0;">
+          <div class="screen-container">
+
+            <!-- App Header -->
+            <div class="app-header">
+              <div class="app-header-logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="6" fill="#5D79DF"/><path d="M8 15V9l4 3-4 3zm5-3l4 3V9l-4 3z" fill="#fff"/></svg>
+                VoiceProcessor
+              </div>
+              <nav class="app-header-nav">
+                <a href="#">Dashboard</a>
+                <a href="#">Library</a>
+                <a href="#" class="active">Settings</a>
+              </nav>
+              <div class="app-header-avatar">WP</div>
+            </div>
+
+            <!-- Settings Sub-Nav -->
+            <div class="settings-subnav">
+              <a href="#" class="active">Profile</a>
+              <a href="#">API Keys</a>
+              <a href="#">Connections</a>
+              <a href="#">Billing</a>
+            </div>
+
+            <!-- Content -->
+            <div class="settings-content">
+              <h2 class="settings-title">Profile</h2>
+
+              <!-- Personal Information -->
+              <div class="form-section">
+                <h3 class="form-section-title">Personal Information</h3>
+                <div class="form-group">
+                  <label class="form-label">Display Name</label>
+                  <input type="text" class="form-input" value="Waner Pena" readonly>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Email</label>
+                  <div class="form-input-wrap">
+                    <input type="email" class="form-input disabled" value="waner@example.com" readonly>
+                    <span class="input-icon">
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="4.5" y="7" width="7" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M6 7V5a2 2 0 114 0v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                    </span>
+                  </div>
+                </div>
+                <button class="btn btn-primary">Save Changes</button>
+              </div>
+
+              <hr class="divider">
+
+              <!-- Change Password -->
+              <div class="form-section">
+                <h3 class="form-section-title">Change Password</h3>
+                <div class="form-group">
+                  <label class="form-label">Current Password</label>
+                  <input type="password" class="form-input" placeholder="Enter current password">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">New Password</label>
+                  <input type="password" class="form-input" placeholder="Enter new password">
+                  <div class="strength-bar">
+                    <div class="strength-segment filled"></div>
+                    <div class="strength-segment filled"></div>
+                    <div class="strength-segment filled"></div>
+                    <div class="strength-segment"></div>
+                  </div>
+                  <div class="strength-label">Strong</div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Confirm New Password</label>
+                  <input type="password" class="form-input" placeholder="Confirm new password">
+                </div>
+                <button class="btn btn-primary">Update Password</button>
+              </div>
+
+              <hr class="divider">
+
+              <!-- Danger Zone -->
+              <div class="danger-zone">
+                <h3 class="danger-zone-title">Delete Account</h3>
+                <p class="danger-zone-desc">Once you delete your account, all of your data will be permanently removed. This action cannot be undone.</p>
+                <button class="btn btn-destructive">Delete Account</button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         FRAME 2 — API Keys (Desktop 1440px)
+         ============================================================ -->
+    <section class="spec-section" id="api-keys">
+      <h2 class="spec-section-title">API Keys</h2>
+      <p class="spec-section-desc">API key management interface with masked keys, creation, and revocation controls.</p>
+
+      <div class="spec-frame">
+        <div class="spec-frame-label">API Keys <span class="dims">1440 &times; 900</span></div>
+        <div class="spec-frame-body" style="padding: 0;">
+          <div class="screen-container">
+
+            <!-- App Header -->
+            <div class="app-header">
+              <div class="app-header-logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="6" fill="#5D79DF"/><path d="M8 15V9l4 3-4 3zm5-3l4 3V9l-4 3z" fill="#fff"/></svg>
+                VoiceProcessor
+              </div>
+              <nav class="app-header-nav">
+                <a href="#">Dashboard</a>
+                <a href="#">Library</a>
+                <a href="#" class="active">Settings</a>
+              </nav>
+              <div class="app-header-avatar">WP</div>
+            </div>
+
+            <!-- Settings Sub-Nav -->
+            <div class="settings-subnav">
+              <a href="#">Profile</a>
+              <a href="#" class="active">API Keys</a>
+              <a href="#">Connections</a>
+              <a href="#">Billing</a>
+            </div>
+
+            <!-- Content -->
+            <div class="settings-content">
+              <div class="api-keys-header">
+                <div>
+                  <h2 class="settings-title">API Keys</h2>
+                  <p style="font: var(--text-body-m); color: var(--text-muted); margin-top: calc(-1 * var(--space-5));">Manage your API keys for programmatic access to VoiceProcessor.</p>
+                </div>
+                <button class="btn btn-primary">Create New Key</button>
+              </div>
+
+              <table class="keys-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Key</th>
+                    <th>Created</th>
+                    <th>Last Used</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="font-weight: 500;">Production</td>
+                    <td><span class="key-mono">sk-...a3f7</span></td>
+                    <td class="key-date">Jan 12</td>
+                    <td class="key-date">Mar 15</td>
+                    <td>
+                      <div class="key-actions">
+                        <button class="key-action-copy">Copy</button>
+                        <button class="key-action-revoke">Revoke</button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 500;">Development</td>
+                    <td><span class="key-mono">sk-...b2e1</span></td>
+                    <td class="key-date">Feb 8</td>
+                    <td class="key-date">Mar 14</td>
+                    <td>
+                      <div class="key-actions">
+                        <button class="key-action-copy">Copy</button>
+                        <button class="key-action-revoke">Revoke</button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 500;">CI/CD Pipeline</td>
+                    <td><span class="key-mono">sk-...c9d4</span></td>
+                    <td class="key-date">Mar 1</td>
+                    <td class="key-date" style="color: var(--text-muted); font-style: italic;">Never</td>
+                    <td>
+                      <div class="key-actions">
+                        <button class="key-action-copy">Copy</button>
+                        <button class="key-action-revoke">Revoke</button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         FRAME 3 — Connections (Desktop 1440px)
+         ============================================================ -->
+    <section class="spec-section" id="connections">
+      <h2 class="spec-section-title">Connections</h2>
+      <p class="spec-section-desc">Connected accounts and third-party integration management.</p>
+
+      <div class="spec-frame">
+        <div class="spec-frame-label">Connections <span class="dims">1440 &times; 900</span></div>
+        <div class="spec-frame-body" style="padding: 0;">
+          <div class="screen-container">
+
+            <!-- App Header -->
+            <div class="app-header">
+              <div class="app-header-logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="6" fill="#5D79DF"/><path d="M8 15V9l4 3-4 3zm5-3l4 3V9l-4 3z" fill="#fff"/></svg>
+                VoiceProcessor
+              </div>
+              <nav class="app-header-nav">
+                <a href="#">Dashboard</a>
+                <a href="#">Library</a>
+                <a href="#" class="active">Settings</a>
+              </nav>
+              <div class="app-header-avatar">WP</div>
+            </div>
+
+            <!-- Settings Sub-Nav -->
+            <div class="settings-subnav">
+              <a href="#">Profile</a>
+              <a href="#">API Keys</a>
+              <a href="#" class="active">Connections</a>
+              <a href="#">Billing</a>
+            </div>
+
+            <!-- Content -->
+            <div class="settings-content">
+              <h2 class="settings-title">Connections</h2>
+              <p class="settings-desc">Manage your connected accounts and integrations.</p>
+
+              <!-- Google -->
+              <div class="connection-card">
+                <div class="connection-icon">
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09A6.6 6.6 0 015.5 12c0-.72.12-1.42.35-2.09V7.07H2.18A10.96 10.96 0 001 12c0 1.77.42 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                </div>
+                <div class="connection-info">
+                  <div class="connection-name">
+                    Google
+                    <span class="badge-connected">Connected</span>
+                  </div>
+                  <div class="connection-detail">waner@gmail.com</div>
+                </div>
+                <button class="btn btn-ghost">Disconnect</button>
+              </div>
+
+              <!-- GitHub -->
+              <div class="connection-card">
+                <div class="connection-icon">
+                  <svg viewBox="0 0 24 24" fill="var(--text-primary)"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.167 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836a9.59 9.59 0 012.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+                </div>
+                <div class="connection-info">
+                  <div class="connection-name">
+                    GitHub
+                    <span class="badge-connected">Connected</span>
+                  </div>
+                  <div class="connection-detail">@wanerpena</div>
+                </div>
+                <button class="btn btn-ghost">Disconnect</button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         FRAME 4 — Billing (Desktop 1440px)
+         ============================================================ -->
+    <section class="spec-section" id="billing">
+      <h2 class="spec-section-title">Billing</h2>
+      <p class="spec-section-desc">Credit balance, purchasing, usage metrics, payment method, and billing history.</p>
+
+      <div class="spec-frame">
+        <div class="spec-frame-label">Billing <span class="dims">1440 &times; 1200</span></div>
+        <div class="spec-frame-body" style="padding: 0;">
+          <div class="screen-container" style="min-height: 1200px;">
+
+            <!-- App Header -->
+            <div class="app-header">
+              <div class="app-header-logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="6" fill="#5D79DF"/><path d="M8 15V9l4 3-4 3zm5-3l4 3V9l-4 3z" fill="#fff"/></svg>
+                VoiceProcessor
+              </div>
+              <nav class="app-header-nav">
+                <a href="#">Dashboard</a>
+                <a href="#">Library</a>
+                <a href="#" class="active">Settings</a>
+              </nav>
+              <div class="app-header-avatar">WP</div>
+            </div>
+
+            <!-- Settings Sub-Nav -->
+            <div class="settings-subnav">
+              <a href="#">Profile</a>
+              <a href="#">API Keys</a>
+              <a href="#">Connections</a>
+              <a href="#" class="active">Billing</a>
+            </div>
+
+            <!-- Content -->
+            <div class="settings-content wide">
+              <h2 class="settings-title">Billing</h2>
+
+              <!-- Credit Balance Hero -->
+              <div class="credit-hero">
+                <div class="credit-hero-number">247</div>
+                <div class="credit-hero-label">credits remaining</div>
+              </div>
+
+              <!-- Buy Credits -->
+              <h3 class="billing-section-title">Buy Credits</h3>
+              <div class="credit-packs">
+                <!-- Starter -->
+                <div class="credit-pack">
+                  <div class="pack-name">Starter</div>
+                  <div class="pack-credits">100 credits</div>
+                  <div class="pack-price">$9</div>
+                  <div class="pack-unit">$0.09/credit</div>
+                  <button class="btn btn-primary" style="width: 100%;">Buy</button>
+                </div>
+                <!-- Pro -->
+                <div class="credit-pack highlighted">
+                  <span class="pack-badge">Best Value</span>
+                  <div class="pack-name">Pro</div>
+                  <div class="pack-credits">500 credits</div>
+                  <div class="pack-price">$39</div>
+                  <div class="pack-unit">$0.078/credit</div>
+                  <button class="btn btn-primary" style="width: 100%;">Buy</button>
+                </div>
+                <!-- Studio -->
+                <div class="credit-pack">
+                  <div class="pack-name">Studio</div>
+                  <div class="pack-credits">2,000 credits</div>
+                  <div class="pack-price">$129</div>
+                  <div class="pack-unit">$0.065/credit</div>
+                  <button class="btn btn-primary" style="width: 100%;">Buy</button>
+                </div>
+              </div>
+
+              <!-- Usage -->
+              <h3 class="billing-section-title">Usage</h3>
+              <div class="usage-grid">
+                <div class="usage-card">
+                  <div class="usage-card-label">Characters Used</div>
+                  <div class="usage-card-value">142,800 / 500,000</div>
+                  <div class="progress-bar-track">
+                    <div class="progress-bar-fill" style="width: 28%;"></div>
+                  </div>
+                </div>
+                <div class="usage-card">
+                  <div class="usage-card-label">Generations</div>
+                  <div class="usage-card-value">38 this month</div>
+                </div>
+                <div class="usage-card">
+                  <div class="usage-card-label">Audio Minutes</div>
+                  <div class="usage-card-value">47 min</div>
+                </div>
+              </div>
+
+              <!-- Payment Method -->
+              <h3 class="billing-section-title">Payment Method</h3>
+              <div class="payment-method">
+                <div class="payment-icon">VISA</div>
+                <div class="payment-info">
+                  <div class="payment-card-name">Visa ending in 4242</div>
+                  <div class="payment-card-expiry">Expires 12/27</div>
+                </div>
+                <a href="#" class="text-link">Update</a>
+              </div>
+
+              <!-- Billing History -->
+              <h3 class="billing-section-title">Billing History</h3>
+              <table class="billing-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Credits</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Mar 10</td>
+                    <td>Pro Pack</td>
+                    <td>+500</td>
+                    <td>$39.00</td>
+                    <td><span class="badge-completed">Completed</span></td>
+                  </tr>
+                  <tr>
+                    <td>Feb 15</td>
+                    <td>Starter Pack</td>
+                    <td>+100</td>
+                    <td>$9.00</td>
+                    <td><span class="badge-completed">Completed</span></td>
+                  </tr>
+                  <tr>
+                    <td>Jan 20</td>
+                    <td>Pro Pack</td>
+                    <td>+500</td>
+                    <td>$39.00</td>
+                    <td><span class="badge-completed">Completed</span></td>
+                  </tr>
+                  <tr>
+                    <td>Dec 5</td>
+                    <td>Starter Pack</td>
+                    <td>+100</td>
+                    <td>$9.00</td>
+                    <td><span class="badge-refunded">Refunded</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         FRAME 5 — Payment Success (Desktop 1440px)
+         ============================================================ -->
+    <section class="spec-section" id="payment-success">
+      <h2 class="spec-section-title">Payment Success</h2>
+      <p class="spec-section-desc">Confirmation screen shown after a successful credit purchase.</p>
+
+      <div class="spec-frame">
+        <div class="spec-frame-label">Payment Success <span class="dims">1440 &times; 900</span></div>
+        <div class="spec-frame-body" style="padding: 0;">
+          <div class="screen-container">
+
+            <!-- App Header -->
+            <div class="app-header">
+              <div class="app-header-logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="6" fill="#5D79DF"/><path d="M8 15V9l4 3-4 3zm5-3l4 3V9l-4 3z" fill="#fff"/></svg>
+                VoiceProcessor
+              </div>
+              <nav class="app-header-nav">
+                <a href="#">Dashboard</a>
+                <a href="#">Library</a>
+                <a href="#">Settings</a>
+              </nav>
+              <div class="app-header-avatar">WP</div>
+            </div>
+
+            <!-- Centered Content -->
+            <div class="payment-result">
+              <div class="result-icon success">
+                <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="15" stroke="currentColor" stroke-width="2"/><path d="M10 16.5l4 4 8-8" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <h2 class="result-title">Payment Successful!</h2>
+              <p class="result-desc">500 credits have been added to your account.</p>
+              <p class="result-balance">Your new balance: 747 credits</p>
+              <div class="result-actions">
+                <a href="#" class="btn btn-primary">Go to Dashboard</a>
+                <a href="#" class="text-link">View Billing</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         FRAME 6 — Payment Cancel (Desktop 1440px)
+         ============================================================ -->
+    <section class="spec-section" id="payment-cancel">
+      <h2 class="spec-section-title">Payment Cancelled</h2>
+      <p class="spec-section-desc">Shown when user cancels a payment before completion.</p>
+
+      <div class="spec-frame">
+        <div class="spec-frame-label">Payment Cancelled <span class="dims">1440 &times; 900</span></div>
+        <div class="spec-frame-body" style="padding: 0;">
+          <div class="screen-container">
+
+            <!-- App Header -->
+            <div class="app-header">
+              <div class="app-header-logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="6" fill="#5D79DF"/><path d="M8 15V9l4 3-4 3zm5-3l4 3V9l-4 3z" fill="#fff"/></svg>
+                VoiceProcessor
+              </div>
+              <nav class="app-header-nav">
+                <a href="#">Dashboard</a>
+                <a href="#">Library</a>
+                <a href="#">Settings</a>
+              </nav>
+              <div class="app-header-avatar">WP</div>
+            </div>
+
+            <!-- Centered Content -->
+            <div class="payment-result">
+              <div class="result-icon warning">
+                <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="15" stroke="currentColor" stroke-width="2"/><path d="M16 10v8" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><circle cx="16" cy="22" r="1.5" fill="currentColor"/></svg>
+              </div>
+              <h2 class="result-title">Payment Cancelled</h2>
+              <p class="result-desc">Your payment was not processed. No charges were made.</p>
+              <div class="result-actions" style="margin-top: var(--space-6);">
+                <a href="#" class="btn btn-primary">Try Again</a>
+                <a href="#" class="text-link">Go to Dashboard</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+</body>
+</html>

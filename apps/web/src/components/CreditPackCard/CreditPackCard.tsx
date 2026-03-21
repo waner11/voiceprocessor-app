@@ -17,36 +17,36 @@ export function CreditPackCard({
   error,
 }: CreditPackCardProps) {
   return (
-    <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6 space-y-4">
-      <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+    <div className="rounded-lg border border-border-subtle bg-bg-elevated p-6 space-y-4 transition-shadow hover:shadow-soft-2">
+      <h3 className="text-xl font-semibold text-text-primary">
         {pack.name}
       </h3>
 
        <div>
-         <p className="text-3xl font-bold text-gray-900 dark:text-white">
+         <p className="text-3xl font-bold text-text-primary">
            {formatNumber(pack.credits)}
          </p>
-         <p className="text-sm text-gray-500 dark:text-gray-400">credits</p>
+         <p className="text-sm text-text-muted">credits</p>
        </div>
 
       <div>
-        <p className="text-2xl font-bold text-gray-900 dark:text-white">
+        <p className="text-2xl font-bold text-text-primary">
           ${pack.price.toFixed(2)}
         </p>
       </div>
 
-      <p className="text-sm text-gray-600 dark:text-gray-400">
+      <p className="text-sm text-text-secondary">
         {pack.description}
       </p>
 
       {error && (
-        <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+        <p className="text-sm text-error">{error}</p>
       )}
 
       <button
         onClick={() => onBuy(pack.priceId)}
         disabled={isLoading}
-        className="w-full rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="w-full rounded-lg bg-indigo px-4 py-2 text-white hover:bg-indigo-dark active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition"
       >
         {isLoading ? "Processing..." : "Buy Now"}
       </button>
