@@ -59,7 +59,7 @@ export default function DashboardPage() {
 
       {/* Stats Cards */}
       <div className="grid gap-6 md:grid-cols-3">
-        <div className="rounded-lg border border-border-subtle bg-bg-elevated p-6">
+        <div className="rounded-lg border border-border-subtle bg-bg-elevated p-6 transition-shadow hover:shadow-soft-2">
           <h2 className="mb-2 text-lg font-semibold text-text-primary">Credits</h2>
           {usageLoading ? (
             <div className="animate-pulse">
@@ -76,7 +76,7 @@ export default function DashboardPage() {
            )}
         </div>
 
-        <div className="rounded-lg border border-border-subtle bg-bg-elevated p-6">
+        <div className="rounded-lg border border-border-subtle bg-bg-elevated p-6 transition-shadow hover:shadow-soft-2">
           <h2 className="mb-2 text-lg font-semibold text-text-primary">Generations</h2>
           {generationsLoading ? (
             <div className="animate-pulse">
@@ -93,7 +93,7 @@ export default function DashboardPage() {
           )}
         </div>
 
-        <div className="rounded-lg border border-border-subtle bg-bg-elevated p-6">
+        <div className="rounded-lg border border-border-subtle bg-bg-elevated p-6 transition-shadow hover:shadow-soft-2">
           <h2 className="mb-2 text-lg font-semibold text-text-primary">Audio Duration</h2>
           {generationsLoading ? (
             <div className="animate-pulse">
@@ -139,7 +139,7 @@ export default function DashboardPage() {
               <Link
                 key={generation.id}
                 href={`/generations/${generation.id}`}
-                className="flex items-center gap-4 p-4 hover:bg-bg-sunken transition-colors"
+                className="flex items-center gap-4 p-4 hover:bg-bg-sunken hover:shadow-soft-2 transition"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-bg-sunken">
                   {generation.status === "Completed" ? <Headphones className="w-5 h-5 text-success" /> :
@@ -163,7 +163,7 @@ export default function DashboardPage() {
                     {generation.audioDurationMs && ` · ${formatDuration(generation.audioDurationMs)}`}
                   </p>
                 </div>
-                <span className={`rounded-full px-3 py-1 text-xs font-medium ${statusColors[generation.status]}`}>
+                <span className={`rounded-full px-3 py-1 text-xs font-medium transition-colors duration-300 ${statusColors[generation.status]}`}>
                   {generation.status}
                 </span>
               </Link>
@@ -180,7 +180,7 @@ export default function DashboardPage() {
       <div className="mt-8 flex justify-center">
         <Link
           href="/generate"
-          className="rounded-lg bg-indigo px-6 py-3 text-white hover:bg-indigo-dark transition-colors"
+          className="rounded-lg bg-indigo px-6 py-3 text-white hover:bg-indigo-dark active:scale-[0.98] transition"
         >
           Create New Generation
         </Link>

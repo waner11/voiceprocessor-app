@@ -55,7 +55,7 @@ export function GenerationStatus({
         <h3 className="font-semibold">Status</h3>
         <span
           className={cn(
-            "rounded-full px-3 py-1 text-sm font-medium",
+            "rounded-full px-3 py-1 text-sm font-medium transition-colors duration-300",
             statusColors[status]
           )}
         >

@@ -213,6 +213,13 @@
   --font-sans: var(--font-inter);
   --font-heading: var(--font-dm-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Shadows → shadow-soft-1, shadow-soft-2, etc. */
+  --shadow-soft-1: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-soft-2: 0 4px 12px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04);
+  --shadow-soft-3: 0 8px 24px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-elevated: 0 12px 40px rgba(0,0,0,0.1), 0 4px 12px rgba(0,0,0,0.05);
+  --shadow-focus: 0 0 0 2px rgba(93, 121, 223, 0.3);
 }
 
 /* ========== BASE STYLES ========== */
@@ -230,7 +237,29 @@ button {
   transition: background-color var(--duration-fast) var(--ease-default),
               color var(--duration-fast) var(--ease-default),
               border-color var(--duration-fast) var(--ease-default),
-              opacity var(--duration-fast) var(--ease-default);
+              opacity var(--duration-fast) var(--ease-default),
+              box-shadow var(--duration-fast) var(--ease-default),
+              transform var(--duration-fast) var(--ease-default);
+}
+
+/* Card hover elevation */
+.card-hover {
+  transition: box-shadow var(--duration-fast) var(--ease-default),
+              transform var(--duration-fast) var(--ease-default);
+}
+.card-hover:hover {
+  box-shadow: var(--shadow-soft-2);
+}
+
+/* Button press feedback */
+.btn-press:active {
+  transform: scale(0.98);
+}
+
+/* Smooth fade for status changes */
+.status-transition {
+  transition: background-color var(--duration-normal) var(--ease-default),
+              color var(--duration-normal) var(--ease-default);
 }
 
 /* Smooth page transitions */

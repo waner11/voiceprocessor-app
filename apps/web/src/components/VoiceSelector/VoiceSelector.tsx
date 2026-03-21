@@ -223,7 +223,7 @@ export function VoiceSelector({
                 key={voice.id}
                 onClick={() => onSelect(voice.id)}
                 className={cn(
-                  "flex items-start gap-3 rounded-lg border p-4 text-left transition-colors",
+                  "flex items-start gap-3 rounded-lg border p-4 text-left transition hover:shadow-soft-2",
                   selectedVoiceId === voice.id
                     ? "border-indigo bg-indigo-subtle"
                     : "hover:border-border-subtle hover:bg-bg-sunken"
