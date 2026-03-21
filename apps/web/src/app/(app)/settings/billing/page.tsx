@@ -73,6 +73,7 @@ export default function BillingSettingsPage() {
            };
            localStorage.setItem("voiceprocessor_checkout_pack", JSON.stringify(packInfo));
          } catch {
+           // localStorage may be unavailable in private browsing — non-critical, ignore
          }
        }
        

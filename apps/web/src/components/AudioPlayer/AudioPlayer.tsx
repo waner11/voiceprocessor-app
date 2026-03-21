@@ -51,11 +51,13 @@ export function AudioPlayer({
   useEffect(() => {
     if (!containerRef.current) return;
 
+    const root = document.documentElement;
+    const style = getComputedStyle(root);
     const wavesurfer = WaveSurfer.create({
       container: containerRef.current,
-      waveColor: "#d1d5db",
-      progressColor: "#3b82f6",
-      cursorColor: "#1d4ed8",
+      waveColor: style.getPropertyValue("--border-subtle").trim() || "#3D3D3D",
+      progressColor: style.getPropertyValue("--indigo").trim() || "#5D79DF",
+      cursorColor: style.getPropertyValue("--indigo-dark").trim() || "#4A63BF",
       barWidth: 2,
       barGap: 1,
       barRadius: 2,
@@ -144,7 +146,7 @@ export function AudioPlayer({
             onClick={() => handleSkip(-10)}
             disabled={!isReady}
             className="rounded-full p-2 hover:bg-bg-sunken disabled:opacity-50"
-            title="Back 10s"
+            aria-label="Skip back 10 seconds"
           >
             ⏪
           </button>
@@ -153,6 +155,7 @@ export function AudioPlayer({
             onClick={togglePlayPause}
             disabled={!isReady}
             className="rounded-full bg-indigo p-3 text-white hover:bg-indigo-dark disabled:opacity-50"
+            aria-label={isPlaying ? "Pause" : "Play"}
           >
             {isPlaying ? "⏸" : "▶"}
           </button>
@@ -161,7 +164,7 @@ export function AudioPlayer({
             onClick={() => handleSkip(10)}
             disabled={!isReady}
             className="rounded-full p-2 hover:bg-bg-sunken disabled:opacity-50"
-            title="Forward 10s"
+            aria-label="Skip forward 10 seconds"
           >
             ⏩
           </button>
@@ -176,7 +179,8 @@ export function AudioPlayer({
           <select
             value={playbackRate}
             onChange={(e) => handleRateChange(Number(e.target.value))}
-            className="rounded border px-2 py-1 text-sm"
+            className="rounded border border-border-subtle bg-bg-elevated px-2 py-1 text-sm text-text-primary"
+            aria-label="Playback speed"
           >
             {PLAYBACK_RATES.map((rate) => (
               <option key={rate} value={rate}>
@@ -190,13 +194,15 @@ export function AudioPlayer({
             <div className="flex gap-1">
               <button
                 onClick={() => onDownload("mp3")}
-                className="rounded border px-3 py-1 text-sm hover:bg-bg-sunken"
+                className="rounded border border-border-subtle px-3 py-1 text-sm text-text-secondary hover:bg-bg-sunken"
+                aria-label="Download MP3"
               >
                 MP3
               </button>
               <button
                 onClick={() => onDownload("wav")}
-                className="rounded border px-3 py-1 text-sm hover:bg-bg-sunken"
+                className="rounded border border-border-subtle px-3 py-1 text-sm text-text-secondary hover:bg-bg-sunken"
+                aria-label="Download WAV"
               >
                 WAV
               </button>

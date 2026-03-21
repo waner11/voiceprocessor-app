@@ -262,9 +262,11 @@ button {
               color var(--duration-normal) var(--ease-default);
 }
 
-/* Smooth page transitions */
-main {
-  animation: fadeIn 0.2s ease-out;
+/* Smooth page transitions — respects reduced motion preference */
+@media (prefers-reduced-motion: no-preference) {
+  main {
+    animation: fadeIn 0.2s ease-out;
+  }
 }
 
 @keyframes fadeIn {
@@ -276,7 +278,9 @@ main {
   }
 }
 
-/* Improve scrolling performance */
-* {
-  scroll-behavior: smooth;
+/* Smooth scrolling — scoped to html, respects motion preferences */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }

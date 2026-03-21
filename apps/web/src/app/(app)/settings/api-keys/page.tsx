@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import FocusTrap from "focus-trap-react";
 import { useApiAccess } from "@/lib/posthog/use-api-access";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -31,6 +32,7 @@ export default function ApiKeysSettingsPage() {
   const [newKeyValue, setNewKeyValue] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [revokeKeyId, setRevokeKeyId] = useState<string | null>(null);
 
    useEffect(() => {
      if (!hasApiAccess) return;
@@ -45,9 +47,9 @@ export default function ApiKeysSettingsPage() {
            const data = await response.json();
            setKeys(data);
          }
-       } catch (err) {
-         console.error("Failed to fetch API keys:", err);
-       } finally {
+        } catch {
+          // Error is handled by the isLoading/empty state UI
+        } finally {
          setIsLoading(false);
        }
      };
@@ -100,10 +102,12 @@ export default function ApiKeysSettingsPage() {
     }
   };
 
-  const handleRevokeKey = async (id: string) => {
-    if (!confirm("Are you sure you want to revoke this API key? This action cannot be undone.")) {
-      return;
-    }
+  const handleRevokeKey = (id: string) => setRevokeKeyId(id);
+
+  const confirmRevoke = async () => {
+    if (!revokeKeyId) return;
+    const id = revokeKeyId;
+    setRevokeKeyId(null);
 
     try {
       const response = await fetch(`${API_URL}/api/v1/auth/api-keys/${id}`, {
@@ -291,6 +295,47 @@ export default function ApiKeysSettingsPage() {
   -d '{"text": "Hello world", "voiceId": "..."}'`}
         </pre>
       </section>
+
+      {revokeKeyId && (
+        <FocusTrap focusTrapOptions={{ initialFocus: false }}>
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+            tabIndex={-1}
+            onKeyDown={(e) => { if (e.key === "Escape") setRevokeKeyId(null); }}
+          >
+            <div
+              className="w-full max-w-md rounded-lg bg-bg-elevated p-6 shadow-xl"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="revoke-dialog-title"
+            >
+              <h3 id="revoke-dialog-title" className="text-lg font-semibold text-text-primary mb-2">
+                Revoke API Key
+              </h3>
+              <p className="text-sm text-text-secondary mb-6">
+                Are you sure you want to revoke this API key? This action cannot be undone.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  autoFocus
+                  onClick={confirmRevoke}
+                  className="rounded-lg bg-error px-4 py-2 text-sm text-white hover:bg-error/80"
+                >
+                  Revoke Key
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRevokeKeyId(null)}
+                  className="rounded-lg border border-border-subtle px-4 py-2 text-sm text-text-secondary hover:bg-bg-sunken"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </FocusTrap>
+      )}
     </div>
   );
 }

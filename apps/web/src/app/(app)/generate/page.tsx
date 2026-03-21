@@ -400,6 +400,7 @@ export default function GeneratePage() {
                         <button
                           className="rounded-full bg-bg-elevated p-2 shadow-sm ring-1 ring-border-subtle hover:bg-bg-sunken"
                           onClick={(e) => e.stopPropagation()}
+                          aria-label="Preview voice sample"
                         >
                           ▶
                         </button>
@@ -499,11 +500,7 @@ export default function GeneratePage() {
               </button>
             </div>
 
-            {/* Info */}
-            <div className="rounded-lg bg-indigo-subtle p-4 text-sm text-indigo">
-              <p className="font-medium">Your remaining quota</p>
-              <p className="mt-1 text-text-link">10,000 characters this month</p>
-            </div>
+
           </div>
         </div>
       </div>

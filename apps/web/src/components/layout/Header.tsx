@@ -7,13 +7,7 @@ import { cn } from "@/lib/utils";
 import { useUsage } from "@/hooks";
 import { useAuthStore } from "@/stores";
 import { formatNumber } from "@/utils/formatNumber";
-
-const navItems = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/generate", label: "Generate" },
-  { href: "/generations", label: "Generations" },
-  { href: "/voices", label: "Voices" },
-];
+import { navItems } from "@/lib/navigation";
 
 export function Header() {
   const pathname = usePathname();
@@ -103,6 +97,7 @@ export function Header() {
               onClick={() => setIsMenuOpen(!isMenuOpen)}
                className="flex items-center justify-center h-9 w-9 rounded-full bg-indigo text-white text-sm font-medium hover:bg-indigo-dark transition-colors focus:outline-none focus:shadow-[var(--shadow-focus)]"
               title={isMounted ? (user?.name || "Profile") : "Profile"}
+              aria-label={isMounted ? (user?.name || "Open profile menu") : "Open profile menu"}
             >
               {isMounted ? getInitials(user?.name) : "U"}
             </button>

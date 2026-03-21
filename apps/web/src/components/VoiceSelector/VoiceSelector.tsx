@@ -129,14 +129,14 @@ export function VoiceSelector({
           placeholder="Search voices..."
           value={filter.search}
           onChange={(e) => setFilter((f) => ({ ...f, search: e.target.value }))}
-          className="flex-1 min-w-[150px] rounded-lg border px-3 py-2 text-sm"
+          className="flex-1 min-w-[150px] rounded-lg border border-border-subtle bg-bg-elevated px-3 py-2 text-sm text-text-primary placeholder-text-muted"
         />
         <select
           value={filter.language}
           onChange={(e) =>
             setFilter((f) => ({ ...f, language: e.target.value }))
           }
-          className="rounded-lg border px-3 py-2 text-sm"
+          className="rounded-lg border border-border-subtle bg-bg-elevated px-3 py-2 text-sm text-text-primary"
         >
           <option value="">All Languages</option>
           {languages.map((lang) => (
@@ -150,7 +150,7 @@ export function VoiceSelector({
           onChange={(e) =>
             setFilter((f) => ({ ...f, provider: e.target.value }))
           }
-          className="rounded-lg border px-3 py-2 text-sm"
+          className="rounded-lg border border-border-subtle bg-bg-elevated px-3 py-2 text-sm text-text-primary"
         >
           <option value="">All Providers</option>
           {providers.map((provider) => (
@@ -162,7 +162,7 @@ export function VoiceSelector({
         <select
           value={filter.style}
           onChange={(e) => setFilter((f) => ({ ...f, style: e.target.value }))}
-          className="rounded-lg border px-3 py-2 text-sm"
+          className="rounded-lg border border-border-subtle bg-bg-elevated px-3 py-2 text-sm text-text-primary"
         >
           <option value="">All Styles</option>
           {styles.map((style) => (
@@ -291,6 +291,7 @@ export function VoiceSelector({
                           ? "bg-indigo text-white"
                           : "bg-bg-sunken hover:bg-bg-surface"
                       )}
+                      aria-label={playingId === voice.id ? "Stop preview" : "Play voice preview"}
                     >
                       {playingId === voice.id ? "⏹" : "▶"}
                     </button>

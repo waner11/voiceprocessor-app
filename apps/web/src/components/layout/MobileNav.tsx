@@ -3,14 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Mic, Library, AudioLines } from "lucide-react";
-
-const navItems = [
-  { href: "/dashboard", label: "Home", icon: LayoutDashboard },
-  { href: "/generate", label: "Generate", icon: Mic },
-  { href: "/generations", label: "Library", icon: Library },
-  { href: "/voices", label: "Voices", icon: AudioLines },
-];
+import { navItems } from "@/lib/navigation";
 
 export function MobileNav() {
   const pathname = usePathname();
@@ -32,7 +25,7 @@ export function MobileNav() {
               )}
             >
               <Icon className="w-5 h-5" />
-              <span>{item.label}</span>
+              <span>{item.mobileLabel}</span>
             </Link>
           );
         })}

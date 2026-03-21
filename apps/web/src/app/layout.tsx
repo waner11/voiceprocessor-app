@@ -43,13 +43,13 @@ export default function RootLayout({
           toastOptions={{
             duration: 4000,
             style: {
-              background: "#292929",
-              color: "#F2F2F2",
+              background: "var(--bg-elevated)",
+              color: "var(--text-primary)",
             },
             success: {
               iconTheme: {
-                primary: "#2DD28D",
-                secondary: "#F2F2F2",
+                primary: "var(--success)",
+                secondary: "var(--text-inverse)",
               },
             },
           }}

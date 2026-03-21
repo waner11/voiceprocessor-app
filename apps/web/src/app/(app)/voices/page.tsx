@@ -168,7 +168,7 @@ export default function VoicesPage() {
               {filteredVoices.map((voice) => (
                 <div
                   key={voice.id}
-                  className="rounded-lg border border-border-subtle bg-bg-elevated p-6 hover:shadow-md transition-shadow"
+                  className="rounded-lg border border-border-subtle bg-bg-elevated p-6 hover:shadow-soft-2 transition-shadow"
                 >
                   <div className="flex items-start gap-4 mb-4">
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-indigo text-white text-lg font-medium">
