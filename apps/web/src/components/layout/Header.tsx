@@ -62,10 +62,10 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 bg-white/95 dark:bg-gray-950/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-gray-950/60">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+    <header className="sticky top-0 z-50 border-b border-border-subtle bg-bg-base/95 backdrop-blur supports-[backdrop-filter]:bg-bg-base/60">
+      <div className="container mx-auto flex h-14 items-center justify-between px-4">
         <div className="flex items-center gap-8">
-          <Link href="/dashboard" className="text-xl font-bold text-gray-900 dark:text-white">
+          <Link href="/dashboard" className="text-xl font-bold text-indigo font-heading">
             VoiceProcessor
           </Link>
 
@@ -77,8 +77,8 @@ export function Header() {
                 className={cn(
                   "rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                   pathname === item.href
-                    ? "bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-white"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+                    ? "bg-indigo-subtle text-indigo"
+                    : "text-text-secondary hover:bg-bg-sunken hover:text-text-primary"
                 )}
               >
                 {item.label}
@@ -90,8 +90,8 @@ export function Header() {
         <div className="flex items-center gap-4">
            {usage && (
              <div className="hidden sm:flex items-center gap-2 text-sm">
-               <span className="text-gray-500 dark:text-gray-400">Credits:</span>
-               <span className="font-semibold tabular-nums text-gray-900 dark:text-white">
+                <span className="text-text-secondary">Credits:</span>
+                <span className="font-semibold tabular-nums text-indigo">
                  {formatNumber(usage.creditsRemaining || 0)}
                </span>
              </div>
@@ -101,20 +101,20 @@ export function Header() {
           <div className="relative" ref={menuRef}>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="flex items-center justify-center h-9 w-9 rounded-full bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-950"
+               className="flex items-center justify-center h-9 w-9 rounded-full bg-indigo text-white text-sm font-medium hover:bg-indigo-dark transition-colors focus:outline-none focus:shadow-[var(--shadow-focus)]"
               title={isMounted ? (user?.name || "Profile") : "Profile"}
             >
               {isMounted ? getInitials(user?.name) : "U"}
             </button>
 
             {isMenuOpen && (
-              <div className="absolute right-0 mt-2 w-56 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-lg py-1 z-50">
+              <div className="absolute right-0 mt-2 w-56 rounded-lg border border-border-subtle bg-bg-base shadow-elevated py-1 z-50">
                 {/* User Info */}
-                <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                <div className="px-4 py-3 border-b border-border-subtle">
+                  <p className="text-sm font-medium text-text-primary truncate">
                     {isMounted ? (user?.name || "User") : "User"}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                  <p className="text-xs text-text-muted truncate">
                     {isMounted ? (user?.email || "user@example.com") : "user@example.com"}
                   </p>
                 </div>
@@ -124,7 +124,7 @@ export function Header() {
                   <Link
                     href="/settings"
                     onClick={() => setIsMenuOpen(false)}
-                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                    className="flex items-center gap-3 px-4 py-2 text-sm text-text-secondary hover:bg-bg-sunken hover:text-text-primary"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -145,10 +145,10 @@ export function Header() {
                 </div>
 
                 {/* Sign Out */}
-                <div className="border-t border-gray-200 dark:border-gray-700 py-1">
+                <div className="border-t border-border-subtle py-1">
                   <button
                     onClick={handleSignOut}
-                    className="flex w-full items-center gap-3 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                    className="flex w-full items-center gap-3 px-4 py-2 text-sm text-error hover:bg-bg-sunken"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
