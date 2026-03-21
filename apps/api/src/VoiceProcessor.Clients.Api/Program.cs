@@ -178,6 +178,20 @@ builder.Services.AddSwaggerGen(options =>
     }
 });
 
+builder.WebHost.UseSentry(options =>
+{
+    options.SendDefaultPii = true;
+    options.AttachStacktrace = true;
+    options.TracesSampleRate = 1.0;
+    options.AutoSessionTracking = false;
+    options.Debug = false;
+    options.SetBeforeSend((sentryEvent, _) =>
+    {
+        sentryEvent.ServerName = null;
+        return sentryEvent;
+    });
+});
+
 var app = builder.Build();
 
 // Auto-apply pending EF Core migrations on startup
