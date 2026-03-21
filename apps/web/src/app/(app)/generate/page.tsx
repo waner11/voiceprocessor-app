@@ -239,11 +239,11 @@ export default function GeneratePage() {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900">
+    <div className="min-h-screen bg-bg-surface">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Generate Audio</h1>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">
+          <h1 className="text-3xl font-bold text-text-primary">Generate Audio</h1>
+          <p className="mt-2 text-text-secondary">
             Convert your text to professional audio using AI voices
           </p>
         </div>
@@ -252,9 +252,9 @@ export default function GeneratePage() {
           {/* Main content area */}
           <div className="lg:col-span-2 space-y-6">
             {/* Text Input */}
-            <div className="rounded-xl bg-white dark:bg-gray-900 p-6 shadow-sm ring-1 ring-gray-200 dark:ring-gray-800">
+            <div className="rounded-xl bg-bg-elevated p-6 shadow-sm ring-1 ring-border-subtle">
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Text Input</h2>
+                <h2 className="text-lg font-semibold text-text-primary">Text Input</h2>
                 <div className="flex gap-2">
                   {/* Hidden file input */}
                   <input
@@ -268,13 +268,13 @@ export default function GeneratePage() {
                   <button
                     onClick={handleUploadClick}
                     disabled={isExtracting}
-                    className="rounded-lg bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="rounded-lg bg-bg-sunken px-3 py-1.5 text-sm font-medium text-text-secondary hover:bg-bg-surface disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     {isExtracting ? "Extracting..." : "Upload File"}
                   </button>
                   <button
                     onClick={() => navigator.clipboard.readText().then(setText)}
-                    className="rounded-lg bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                    className="rounded-lg bg-bg-sunken px-3 py-1.5 text-sm font-medium text-text-secondary hover:bg-bg-surface transition-colors"
                   >
                     Paste
                   </button>
@@ -283,71 +283,71 @@ export default function GeneratePage() {
               <textarea
                 value={text}
                 onChange={handleTextChange}
-                className="w-full h-64 rounded-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-4 resize-none text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                className="w-full h-64 rounded-lg border-border-subtle bg-bg-sunken p-4 resize-none text-text-primary placeholder-text-muted focus:border-border-focus focus:ring-2 focus:ring-border-focus/20 transition-all"
                 placeholder="Paste your text here or upload a file. Supports books, articles, scripts, and more..."
                 onPaste={handlePaste}
               />
               {pasteNotification && (
-                <div className="mt-2 rounded-lg bg-amber-50 dark:bg-amber-950 px-3 py-2 text-sm text-amber-700 dark:text-amber-300">
+                <div className="mt-2 rounded-lg bg-warning-subtle px-3 py-2 text-sm text-state-warning-text">
                   {pasteNotification}
                 </div>
               )}
               {uploadWarning && (
-                <div className="mt-2 rounded-lg bg-amber-50 dark:bg-amber-950 px-3 py-2 text-sm text-amber-700 dark:text-amber-300">
+                <div className="mt-2 rounded-lg bg-warning-subtle px-3 py-2 text-sm text-state-warning-text">
                   {uploadWarning}
                 </div>
               )}
               {uploadError && (
-                <div className="mt-2 rounded-lg bg-red-50 dark:bg-red-950 px-3 py-2 text-sm text-red-700 dark:text-red-300">
+                <div className="mt-2 rounded-lg bg-error-subtle px-3 py-2 text-sm text-state-error-text">
                   {uploadError}
                 </div>
               )}
               <div className="mt-3 flex items-center justify-between text-sm">
-                <div className="flex items-center gap-4 text-gray-500 dark:text-gray-400">
+                <div className="flex items-center gap-4 text-text-muted">
                   <span className="flex items-center gap-1.5">
-                    <span className="h-2 w-2 rounded-full bg-green-500"></span>
+                    <span className="h-2 w-2 rounded-full bg-success"></span>
                     Auto-detected: English
                   </span>
                   {isNearLimit && (
-                    <span className="text-amber-600 dark:text-amber-400 font-medium">
+                    <span className="text-warning font-medium">
                       Approaching limit
                     </span>
                   )}
                   {isOverLimit && (
-                    <span className="text-red-600 dark:text-red-400 font-medium">
+                    <span className="text-error font-medium">
                       Limit reached
                     </span>
                   )}
                 </div>
                 <div className="flex gap-4">
-                   <span className="text-gray-600 dark:text-gray-400">{formatNumber(wordCount)} words</span>
-                   <span className="text-gray-300 dark:text-gray-600">|</span>
+                   <span className="text-text-secondary">{formatNumber(wordCount)} words</span>
+                   <span className="text-text-muted">|</span>
                    <span
                      className={cn(
                        "tabular-nums",
                        isOverLimit
-                         ? "text-red-500 font-semibold"
+                         ? "text-error font-semibold"
                          : isNearLimit
-                           ? "text-amber-500 font-medium"
-                           : "text-gray-600 dark:text-gray-400"
+                           ? "text-warning font-medium"
+                           : "text-text-secondary"
                      )}
                    >
                      {formatNumber(characterCount)} / {formatNumber(MAX_CHAR_LENGTH)}
                    </span>
                  </div>
               </div>
-              <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">
-                Tip: Use <code className="rounded bg-gray-200 dark:bg-gray-700 px-1 py-0.5 font-mono text-xs">---</code> on its own line to mark chapter breaks
+              <p className="mt-3 text-xs text-text-muted">
+                Tip: Use <code className="rounded bg-bg-sunken px-1 py-0.5 font-mono text-xs">---</code> on its own line to mark chapter breaks
               </p>
               <ChapterPreview text={debouncedText} />
             </div>
             {/* Voice Selection */}
-            <div className="rounded-xl bg-white dark:bg-gray-900 p-6 shadow-sm ring-1 ring-gray-200 dark:ring-gray-800">
+            <div className="rounded-xl bg-bg-elevated p-6 shadow-sm ring-1 ring-border-subtle">
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Voice Selection</h2>
+                <h2 className="text-lg font-semibold text-text-primary">Voice Selection</h2>
                 <button
                   onClick={() => router.push("/voices")}
-                  className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+                  className="text-sm font-medium text-text-link hover:underline"
                 >
                   Browse All Voices →
                 </button>
@@ -356,12 +356,12 @@ export default function GeneratePage() {
               {voicesLoading ? (
                 <div className="grid gap-3 sm:grid-cols-2">
                   {[...Array(4)].map((_, i) => (
-                    <div key={i} className="rounded-lg bg-gray-50 dark:bg-gray-800 p-4 animate-pulse">
+                    <div key={i} className="rounded-lg bg-bg-sunken p-4 animate-pulse">
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700" />
+                        <div className="h-10 w-10 rounded-full bg-bg-sunken" />
                         <div className="flex-1">
-                          <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
-                          <div className="h-3 w-16 bg-gray-200 dark:bg-gray-700 rounded" />
+                          <div className="h-4 w-20 bg-bg-sunken rounded mb-2" />
+                          <div className="h-3 w-16 bg-bg-sunken rounded" />
                         </div>
                       </div>
                     </div>
@@ -376,29 +376,29 @@ export default function GeneratePage() {
                       className={cn(
                         "flex items-center gap-3 rounded-lg p-4 text-left transition-all",
                         selectedVoice === voice.id
-                          ? "bg-blue-50 dark:bg-blue-950 ring-2 ring-blue-500"
-                          : "bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 ring-1 ring-gray-200 dark:ring-gray-700"
+                          ? "bg-indigo-subtle ring-2 ring-indigo"
+                          : "bg-bg-sunken hover:bg-bg-surface ring-1 ring-border-subtle"
                       )}
                     >
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 text-lg">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-bg-sunken text-text-muted text-lg">
                         🎙️
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="font-medium text-gray-900 dark:text-white truncate">
+                          <span className="font-medium text-text-primary truncate">
                             {voice.name}
                           </span>
-                          <span className="rounded-full bg-purple-100 dark:bg-purple-900 px-2 py-0.5 text-xs font-medium text-purple-700 dark:text-purple-300">
+                          <span className="rounded-full bg-indigo-subtle px-2 py-0.5 text-xs font-medium text-indigo">
                             {voice.provider}
                           </span>
                         </div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                        <div className="text-sm text-text-muted">
                           {voice.language} {voice.gender && `· ${voice.gender}`}
                         </div>
                       </div>
                       {voice.previewUrl && (
                         <button
-                          className="rounded-full bg-white dark:bg-gray-700 p-2 shadow-sm ring-1 ring-gray-200 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
+                          className="rounded-full bg-bg-elevated p-2 shadow-sm ring-1 ring-border-subtle hover:bg-bg-sunken"
                           onClick={(e) => e.stopPropagation()}
                         >
                           ▶
@@ -414,8 +414,8 @@ export default function GeneratePage() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Routing Strategy */}
-            <div className="rounded-xl bg-white dark:bg-gray-900 p-6 shadow-sm ring-1 ring-gray-200 dark:ring-gray-800">
-              <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Routing Strategy</h2>
+            <div className="rounded-xl bg-bg-elevated p-6 shadow-sm ring-1 ring-border-subtle">
+              <h2 className="mb-4 text-lg font-semibold text-text-primary">Routing Strategy</h2>
               <div className="space-y-2">
                 {routingOptions.map((option) => (
                   <button
@@ -424,17 +424,17 @@ export default function GeneratePage() {
                     className={cn(
                       "w-full flex items-center gap-3 rounded-lg p-3 text-left transition-all",
                       routing === option.value
-                        ? "bg-blue-50 dark:bg-blue-950 ring-2 ring-blue-500"
-                        : "bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        ? "bg-indigo-subtle ring-2 ring-indigo"
+                        : "bg-bg-sunken hover:bg-bg-surface"
                     )}
                   >
                     <span className="text-xl">{option.icon}</span>
                     <div className="flex-1">
-                      <div className="font-medium text-gray-900 dark:text-white">{option.label}</div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">{option.description}</div>
+                      <div className="font-medium text-text-primary">{option.label}</div>
+                      <div className="text-xs text-text-muted">{option.description}</div>
                     </div>
                     {option.value === "Balanced" && (
-                      <span className="rounded-full bg-green-100 dark:bg-green-900 px-2 py-0.5 text-xs font-medium text-green-700 dark:text-green-300">
+                      <span className="rounded-full bg-success-subtle px-2 py-0.5 text-xs font-medium text-state-success-text">
                         Recommended
                       </span>
                     )}
@@ -444,8 +444,8 @@ export default function GeneratePage() {
             </div>
 
             {/* Voice Preset */}
-            <div className="rounded-xl bg-white dark:bg-gray-900 p-6 shadow-sm ring-1 ring-gray-200 dark:ring-gray-800">
-              <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Voice Preset</h2>
+            <div className="rounded-xl bg-bg-elevated p-6 shadow-sm ring-1 ring-border-subtle">
+              <h2 className="mb-4 text-lg font-semibold text-text-primary">Voice Preset</h2>
               <PresetSelector
                 provider={selectedProvider}
                 selectedPreset={selectedPreset}
@@ -456,14 +456,14 @@ export default function GeneratePage() {
             </div>
 
             {/* Output Format Selection */}
-            <div className="rounded-xl bg-white dark:bg-gray-900 p-6 shadow-sm ring-1 ring-gray-200 dark:ring-gray-800">
-              <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Output Format</h2>
+            <div className="rounded-xl bg-bg-elevated p-6 shadow-sm ring-1 ring-border-subtle">
+              <h2 className="mb-4 text-lg font-semibold text-text-primary">Output Format</h2>
               <div className="space-y-3">
                 <select
                   name="audioFormat"
                   value={audioFormat}
                   onChange={(e) => setAudioFormat(e.target.value)}
-                  className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-gray-900 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                  className="w-full rounded-lg border border-border-subtle bg-bg-elevated px-4 py-2 text-text-primary focus:border-border-focus focus:ring-2 focus:ring-border-focus/20 transition-all"
                 >
                   <option value="mp3">MP3 (Recommended) - Best compatibility, smaller file size</option>
                   <option value="wav">WAV - Lossless, larger file size</option>
@@ -487,22 +487,22 @@ export default function GeneratePage() {
               <button
                 onClick={handleGenerate}
                 disabled={!text || !selectedVoice || isGenerating || isOverLimit}
-                className="w-full rounded-xl bg-blue-600 px-6 py-4 text-lg font-semibold text-white shadow-lg shadow-blue-600/25 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none transition-all"
+                className="w-full rounded-xl bg-indigo px-6 py-4 text-lg font-semibold text-white shadow-lg shadow-indigo/25 hover:bg-indigo-dark disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none transition-all"
               >
                 {isGenerating ? "Starting Generation..." : "Generate Audio"}
               </button>
               <button
                 disabled={!text || !selectedVoice || isOverLimit}
-                className="w-full rounded-xl bg-white dark:bg-gray-800 px-6 py-3 font-medium text-gray-700 dark:text-gray-300 ring-1 ring-gray-200 dark:ring-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                className="w-full rounded-xl bg-bg-elevated px-6 py-3 font-medium text-text-secondary ring-1 ring-border-subtle hover:bg-bg-sunken disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 Preview First 500 Characters (Free)
               </button>
             </div>
 
             {/* Info */}
-            <div className="rounded-lg bg-blue-50 dark:bg-blue-950 p-4 text-sm text-blue-800 dark:text-blue-200">
+            <div className="rounded-lg bg-indigo-subtle p-4 text-sm text-indigo">
               <p className="font-medium">Your remaining quota</p>
-              <p className="mt-1 text-blue-600 dark:text-blue-400">10,000 characters this month</p>
+              <p className="mt-1 text-text-link">10,000 characters this month</p>
             </div>
           </div>
         </div>

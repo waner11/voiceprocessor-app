@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Headphones, Clock, XCircle, FileText } from "lucide-react";
 import { useGenerations, useUsage } from "@/hooks";
 import type { components } from "@/lib/api/types";
 import { formatNumber } from "@/utils/formatNumber";
@@ -8,14 +9,14 @@ import { formatNumber } from "@/utils/formatNumber";
 type GenerationStatus = components["schemas"]["GenerationStatus"];
 
 const statusColors: Record<GenerationStatus, string> = {
-  Pending: "bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300",
-  Analyzing: "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300",
-  Chunking: "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300",
-  Processing: "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300",
-  Merging: "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300",
-  Completed: "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300",
-  Failed: "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300",
-  Cancelled: "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300",
+  Pending: "bg-warning-subtle text-state-warning-text",
+  Analyzing: "bg-indigo-subtle text-indigo",
+  Chunking: "bg-indigo-subtle text-indigo",
+  Processing: "bg-indigo-subtle text-indigo",
+  Merging: "bg-indigo-subtle text-indigo",
+  Completed: "bg-success-subtle text-state-success-text",
+  Failed: "bg-error-subtle text-state-error-text",
+  Cancelled: "bg-bg-sunken text-text-muted",
 };
 
 export default function DashboardPage() {
@@ -54,57 +55,57 @@ export default function DashboardPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="mb-8 text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+      <h1 className="mb-8 text-3xl font-bold text-text-primary">Dashboard</h1>
 
       {/* Stats Cards */}
       <div className="grid gap-6 md:grid-cols-3">
-        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
-          <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Credits</h2>
+        <div className="rounded-lg border border-border-subtle bg-bg-elevated p-6">
+          <h2 className="mb-2 text-lg font-semibold text-text-primary">Credits</h2>
           {usageLoading ? (
             <div className="animate-pulse">
-              <div className="h-9 w-24 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
-              <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded" />
+              <div className="h-9 w-24 bg-bg-sunken rounded mb-2" />
+              <div className="h-4 w-32 bg-bg-sunken rounded" />
             </div>
            ) : (
              <>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                <p className="text-3xl font-bold text-text-primary">
                   {formatNumber(usageData?.creditsRemaining || 0)}
                 </p>
-               <p className="text-sm text-gray-500 dark:text-gray-400">credits remaining</p>
+               <p className="text-sm text-text-muted">credits remaining</p>
              </>
            )}
         </div>
 
-        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
-          <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Generations</h2>
+        <div className="rounded-lg border border-border-subtle bg-bg-elevated p-6">
+          <h2 className="mb-2 text-lg font-semibold text-text-primary">Generations</h2>
           {generationsLoading ? (
             <div className="animate-pulse">
-              <div className="h-9 w-16 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
-              <div className="h-4 w-28 bg-gray-200 dark:bg-gray-700 rounded" />
+              <div className="h-9 w-16 bg-bg-sunken rounded mb-2" />
+              <div className="h-4 w-28 bg-bg-sunken rounded" />
             </div>
           ) : (
             <>
-               <p className="text-3xl font-bold text-gray-900 dark:text-white">
+               <p className="text-3xl font-bold text-text-primary">
                  {formatNumber(totalGenerations)}
                </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">total generations</p>
+              <p className="text-sm text-text-muted">total generations</p>
             </>
           )}
         </div>
 
-        <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
-          <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Audio Duration</h2>
+        <div className="rounded-lg border border-border-subtle bg-bg-elevated p-6">
+          <h2 className="mb-2 text-lg font-semibold text-text-primary">Audio Duration</h2>
           {generationsLoading ? (
             <div className="animate-pulse">
-              <div className="h-9 w-20 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
-              <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded" />
+              <div className="h-9 w-20 bg-bg-sunken rounded mb-2" />
+              <div className="h-4 w-24 bg-bg-sunken rounded" />
             </div>
           ) : (
             <>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">
+              <p className="text-3xl font-bold text-text-primary">
                 {totalAudioHours}
               </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">total hours</p>
+              <p className="text-sm text-text-muted">total hours</p>
             </>
           )}
         </div>
@@ -113,50 +114,51 @@ export default function DashboardPage() {
       {/* Recent Generations */}
       <div className="mt-8">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Recent Generations</h2>
-          <Link href="/generations" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
+          <h2 className="text-xl font-semibold text-text-primary">Recent Generations</h2>
+          <Link href="/generations" className="text-sm text-text-link hover:underline">
             View all
           </Link>
         </div>
 
         {generationsLoading ? (
-          <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
+          <div className="rounded-lg border border-border-subtle bg-bg-elevated divide-y divide-border-subtle">
             {[...Array(3)].map((_, i) => (
               <div key={i} className="animate-pulse flex items-center gap-4 p-4">
-                <div className="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded" />
+                <div className="h-10 w-10 bg-bg-sunken rounded" />
                 <div className="flex-1">
-                  <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
-                  <div className="h-3 w-24 bg-gray-200 dark:bg-gray-700 rounded" />
+                  <div className="h-4 w-32 bg-bg-sunken rounded mb-2" />
+                  <div className="h-3 w-24 bg-bg-sunken rounded" />
                 </div>
-                <div className="h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
+                <div className="h-6 w-20 bg-bg-sunken rounded" />
               </div>
             ))}
           </div>
         ) : generations.length > 0 ? (
-          <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
+          <div className="rounded-lg border border-border-subtle bg-bg-elevated divide-y divide-border-subtle">
             {generations.map((generation) => (
               <Link
                 key={generation.id}
                 href={`/generations/${generation.id}`}
-                className="flex items-center gap-4 p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                className="flex items-center gap-4 p-4 hover:bg-bg-sunken transition-colors"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 text-xl">
-                  {generation.status === "Completed" ? "🎧" :
-                   generation.status === "Processing" ? "⏳" :
-                   generation.status === "Failed" ? "❌" : "📝"}
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-bg-sunken">
+                  {generation.status === "Completed" ? <Headphones className="w-5 h-5 text-success" /> :
+                   generation.status === "Processing" ? <Clock className="w-5 h-5 text-indigo" /> :
+                   generation.status === "Failed" ? <XCircle className="w-5 h-5 text-error" /> :
+                   <FileText className="w-5 h-5 text-text-muted" />}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="font-medium text-gray-900 dark:text-white truncate">
+                    <p className="font-medium text-text-primary truncate">
                        {formatNumber(generation.characterCount)} characters
                      </p>
                     {generation.provider && (
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                      <span className="text-xs text-text-muted">
                         via {generation.provider}
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-sm text-text-muted">
                     {formatDate(generation.createdAt)}
                     {generation.audioDurationMs && ` · ${formatDuration(generation.audioDurationMs)}`}
                   </p>
@@ -168,7 +170,7 @@ export default function DashboardPage() {
             ))}
           </div>
         ) : (
-          <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-8 text-center text-gray-500 dark:text-gray-400">
+          <div className="rounded-lg border border-border-subtle bg-bg-elevated p-8 text-center text-text-muted">
             No generations yet. Start by creating your first audiobook.
           </div>
         )}
@@ -178,7 +180,7 @@ export default function DashboardPage() {
       <div className="mt-8 flex justify-center">
         <Link
           href="/generate"
-          className="rounded-lg bg-blue-600 px-6 py-3 text-white hover:bg-blue-700 transition-colors"
+          className="rounded-lg bg-indigo px-6 py-3 text-white hover:bg-indigo-dark transition-colors"
         >
           Create New Generation
         </Link>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { Headphones, Clock, XCircle, FileText } from "lucide-react";
 import { useGenerations } from "@/hooks";
 import { useGenerationHub } from "@/hooks/useGenerationHub";
 import type { components } from "@/lib/api/types";
@@ -28,14 +29,14 @@ const providerOptions: { value: string; label: string }[] = [
 ];
 
 const statusColors: Record<GenerationStatus, string> = {
-  Pending: "bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300",
-  Analyzing: "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300",
-  Chunking: "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300",
-  Processing: "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300",
-  Merging: "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300",
-  Completed: "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300",
-  Failed: "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300",
-  Cancelled: "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300",
+  Pending: "bg-warning-subtle text-state-warning-text",
+  Analyzing: "bg-indigo-subtle text-indigo",
+  Chunking: "bg-indigo-subtle text-indigo",
+  Processing: "bg-indigo-subtle text-indigo",
+  Merging: "bg-indigo-subtle text-indigo",
+  Completed: "bg-success-subtle text-state-success-text",
+  Failed: "bg-error-subtle text-state-error-text",
+  Cancelled: "bg-bg-sunken text-text-muted",
 };
 
 export default function GenerationsPage() {
@@ -99,18 +100,18 @@ export default function GenerationsPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8 flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Generations</h1>
+        <h1 className="text-3xl font-bold text-text-primary">Generations</h1>
         <Link
           href="/generate"
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
+          className="rounded-lg bg-indigo px-4 py-2 text-sm text-white hover:bg-indigo-dark"
         >
           New Generation
         </Link>
       </div>
 
-      <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+      <div className="rounded-lg border border-border-subtle bg-bg-elevated">
         {/* Filters */}
-        <div className="border-b border-gray-200 dark:border-gray-800 p-4">
+        <div className="border-b border-border-subtle p-4">
           <div className="flex gap-4">
             <div className="relative flex-1">
               <input
@@ -118,14 +119,14 @@ export default function GenerationsPage() {
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 placeholder="Search generations..."
-                className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 pr-10 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+                className="w-full rounded-lg border border-border-subtle bg-bg-elevated px-4 py-2 pr-10 text-text-primary placeholder-text-muted"
               />
               {searchInput && (
                 <button
                   type="button"
                   aria-label="Clear search"
                   onClick={handleClearSearch}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-text-muted hover:text-text-primary"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -136,7 +137,7 @@ export default function GenerationsPage() {
             <select
               value={provider}
               onChange={(e) => handleProviderChange(e.target.value)}
-              className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-gray-900 dark:text-white"
+              className="rounded-lg border border-border-subtle bg-bg-elevated px-4 py-2 text-text-primary"
             >
               {providerOptions.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -150,7 +151,7 @@ export default function GenerationsPage() {
                 setStatus(e.target.value as GenerationStatus | "");
                 setPage(1);
               }}
-              className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-gray-900 dark:text-white"
+              className="rounded-lg border border-border-subtle bg-bg-elevated px-4 py-2 text-text-primary"
             >
               {statusOptions.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -166,13 +167,13 @@ export default function GenerationsPage() {
           <div className="p-8">
             <div className="space-y-4">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="animate-pulse flex items-center gap-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-                  <div className="h-12 w-12 bg-gray-200 dark:bg-gray-700 rounded" />
+                <div key={i} className="animate-pulse flex items-center gap-4 p-4 border border-border-subtle rounded-lg">
+                  <div className="h-12 w-12 bg-bg-sunken rounded" />
                   <div className="flex-1">
-                    <div className="h-4 w-48 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
-                    <div className="h-3 w-32 bg-gray-200 dark:bg-gray-700 rounded" />
+                    <div className="h-4 w-48 bg-bg-sunken rounded mb-2" />
+                    <div className="h-3 w-32 bg-bg-sunken rounded" />
                   </div>
-                  <div className="h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
+                  <div className="h-6 w-20 bg-bg-sunken rounded" />
                 </div>
               ))}
             </div>
@@ -182,7 +183,7 @@ export default function GenerationsPage() {
         {/* Error State */}
         {error && (
           <div className="p-8 text-center">
-            <p className="text-red-600 dark:text-red-400">Failed to load generations. Please try again.</p>
+            <p className="text-error">Failed to load generations. Please try again.</p>
           </div>
         )}
 
@@ -190,33 +191,34 @@ export default function GenerationsPage() {
         {!isLoading && !error && (
           <>
             {generations.length > 0 ? (
-              <div className="divide-y divide-gray-200 dark:divide-gray-800">
+              <div className="divide-y divide-border-subtle">
                 {generations.map((generation) => (
                   <Link
                     key={generation.id}
                     href={`/generations/${generation.id}`}
-                    className="flex items-center gap-4 p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                    className="flex items-center gap-4 p-4 hover:bg-bg-sunken transition-colors"
                   >
                     {/* Status Icon */}
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 text-2xl">
-                      {generation.status === "Completed" ? "🎧" :
-                       generation.status === "Processing" ? "⏳" :
-                       generation.status === "Failed" ? "❌" : "📝"}
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-bg-sunken">
+                      {generation.status === "Completed" ? <Headphones className="w-5 h-5 text-success" /> :
+                       generation.status === "Processing" ? <Clock className="w-5 h-5 text-indigo" /> :
+                       generation.status === "Failed" ? <XCircle className="w-5 h-5 text-error" /> :
+                       <FileText className="w-5 h-5 text-text-muted" />}
                     </div>
 
                     {/* Info */}
                     <div className="flex-1 min-w-0">
                        <div className="flex items-center gap-2">
-                         <p className="font-medium text-gray-900 dark:text-white truncate">
+                         <p className="font-medium text-text-primary truncate">
                            {formatNumber(generation.characterCount)} characters
                          </p>
                         {generation.provider && (
-                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                          <span className="text-xs text-text-muted">
                             via {generation.provider}
                           </span>
                         )}
                       </div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                      <p className="text-sm text-text-muted">
                         {formatDate(generation.createdAt)}
                         {generation.audioDurationMs && ` · ${formatDuration(generation.audioDurationMs)}`}
                       </p>
@@ -225,12 +227,12 @@ export default function GenerationsPage() {
                     {/* Progress (for in-progress generations) */}
                     {generation.status !== "Completed" && generation.status !== "Failed" && generation.status !== "Cancelled" && (
                       <div className="text-right">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        <p className="text-sm font-medium text-text-primary">
                           {generation.progress}%
                         </p>
-                        <div className="mt-1 h-1.5 w-24 rounded-full bg-gray-200 dark:bg-gray-700">
+                        <div className="mt-1 h-1.5 w-24 rounded-full bg-bg-sunken">
                           <div
-                            className="h-full rounded-full bg-blue-500"
+                            className="h-full rounded-full bg-indigo"
                             style={{ width: `${generation.progress}%` }}
                           />
                         </div>
@@ -244,7 +246,7 @@ export default function GenerationsPage() {
 
                     {/* Credits */}
                     {generation.creditsUsed != null && (
-                      <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+                      <span className="text-sm text-text-secondary font-medium">
                         {formatCredits(generation.creditsUsed)}
                       </span>
                     )}
@@ -252,7 +254,7 @@ export default function GenerationsPage() {
                 ))}
               </div>
             ) : (
-              <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+              <div className="p-8 text-center text-text-muted">
                 {hasActiveFilters
                   ? "No generations found matching your filters. Try adjusting your search or filters."
                   : "No generations yet. Create your first audiobook to get started."}
@@ -261,21 +263,21 @@ export default function GenerationsPage() {
 
             {/* Pagination */}
             {data && data.totalPages && data.totalPages > 1 && (
-              <div className="border-t border-gray-200 dark:border-gray-800 p-4 flex items-center justify-center gap-2">
+              <div className="border-t border-border-subtle p-4 flex items-center justify-center gap-2">
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={!data.hasPreviousPage}
-                  className="rounded-lg border border-gray-200 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="rounded-lg border border-border-subtle px-4 py-2 text-sm text-text-secondary hover:bg-bg-sunken disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Previous
                 </button>
-                <span className="text-sm text-gray-600 dark:text-gray-400">
+                <span className="text-sm text-text-secondary">
                   Page {data.page} of {data.totalPages}
                 </span>
                 <button
                   onClick={() => setPage((p) => p + 1)}
                   disabled={!data.hasNextPage}
-                  className="rounded-lg border border-gray-200 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="rounded-lg border border-border-subtle px-4 py-2 text-sm text-text-secondary hover:bg-bg-sunken disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Next
                 </button>

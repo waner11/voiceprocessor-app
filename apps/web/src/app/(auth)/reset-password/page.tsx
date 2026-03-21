@@ -47,146 +47,146 @@ function ResetPasswordContent() {
     );
   };
 
-  if (!token) {
-    return (
-      <div className="space-y-6 text-center">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-900/50">
-          <svg
-            className="h-6 w-6 text-red-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </div>
-        <h1 className="text-2xl font-bold text-white">Invalid reset link</h1>
-        <p className="text-gray-400">
-          Invalid or missing reset link. Please request a new password reset.
-        </p>
-        <Link
-          href="/forgot-password"
-          className="inline-block text-blue-400 hover:underline"
-        >
-          Request new reset link
-        </Link>
-      </div>
-    );
-  }
+   if (!token) {
+     return (
+       <div className="space-y-6 text-center">
+         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-900/50">
+           <svg
+             className="h-6 w-6 text-red-400"
+             fill="none"
+             viewBox="0 0 24 24"
+             stroke="currentColor"
+           >
+             <path
+               strokeLinecap="round"
+               strokeLinejoin="round"
+               strokeWidth={2}
+               d="M6 18L18 6M6 6l12 12"
+             />
+           </svg>
+         </div>
+         <h1 className="text-2xl font-bold text-text-primary">Invalid reset link</h1>
+         <p className="text-text-secondary">
+           Invalid or missing reset link. Please request a new password reset.
+         </p>
+         <Link
+           href="/forgot-password"
+           className="inline-block text-text-link hover:underline"
+         >
+           Request new reset link
+         </Link>
+       </div>
+     );
+   }
 
-  if (isSuccess) {
-    return (
-      <div className="space-y-6 text-center">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-900/50">
-          <svg
-            className="h-6 w-6 text-green-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5 13l4 4L19 7"
-            />
-          </svg>
-        </div>
-        <h1 className="text-2xl font-bold text-white">
-          Password reset successfully
-        </h1>
-        <p className="text-gray-400">
-          Your password has been updated. You can now sign in with your new
-          password.
-        </p>
-        <Link
-          href="/login"
-          className="inline-block text-blue-400 hover:underline"
-        >
-          Sign in
-        </Link>
-      </div>
-    );
-  }
+   if (isSuccess) {
+     return (
+       <div className="space-y-6 text-center">
+         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-900/50">
+           <svg
+             className="h-6 w-6 text-green-400"
+             fill="none"
+             viewBox="0 0 24 24"
+             stroke="currentColor"
+           >
+             <path
+               strokeLinecap="round"
+               strokeLinejoin="round"
+               strokeWidth={2}
+               d="M5 13l4 4L19 7"
+             />
+           </svg>
+         </div>
+         <h1 className="text-2xl font-bold text-text-primary">
+           Password reset successfully
+         </h1>
+         <p className="text-text-secondary">
+           Your password has been updated. You can now sign in with your new
+           password.
+         </p>
+         <Link
+           href="/login"
+           className="inline-block text-text-link hover:underline"
+         >
+           Sign in
+         </Link>
+       </div>
+     );
+   }
 
-  return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-white">Reset your password</h1>
-        <p className="mt-2 text-gray-400">
-          Enter your new password below
-        </p>
-      </div>
+   return (
+     <div className="space-y-6">
+       <div className="text-center">
+         <h1 className="text-2xl font-bold text-text-primary">Reset your password</h1>
+         <p className="mt-2 text-text-secondary">
+           Enter your new password below
+         </p>
+       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {error && (
-          <div className="rounded-lg bg-red-900/50 border border-red-800 p-3 text-sm text-red-400">
-            {error}
-          </div>
-        )}
+       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+         {error && (
+           <div className="rounded-lg bg-state-error-bg border border-state-error-border p-3 text-sm text-state-error-text">
+             {error}
+           </div>
+         )}
 
-        <div>
-          <label
-            htmlFor="newPassword"
-            className="block text-sm font-medium text-gray-300 mb-1"
-          >
-            New Password
-          </label>
-          <input
-            {...register("newPassword")}
-            type="password"
-            id="newPassword"
-            className="w-full rounded-lg border border-gray-700 bg-gray-900 px-4 py-2 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            placeholder="••••••••"
-          />
-          {errors.newPassword && (
-            <p className="mt-1 text-sm text-red-400">
-              {errors.newPassword.message}
-            </p>
-          )}
-        </div>
+         <div>
+           <label
+             htmlFor="newPassword"
+             className="block text-sm font-medium text-text-secondary mb-1"
+           >
+             New Password
+           </label>
+           <input
+             {...register("newPassword")}
+             type="password"
+             id="newPassword"
+             className="w-full rounded-lg border border-border-subtle bg-bg-elevated px-4 py-2 text-text-primary placeholder-text-muted focus:border-border-focus focus:outline-none focus:ring-1 focus:ring-border-focus"
+             placeholder="••••••••"
+           />
+           {errors.newPassword && (
+             <p className="mt-1 text-sm text-state-error-text">
+               {errors.newPassword.message}
+             </p>
+           )}
+         </div>
 
-        <div>
-          <label
-            htmlFor="confirmPassword"
-            className="block text-sm font-medium text-gray-300 mb-1"
-          >
-            Confirm Password
-          </label>
-          <input
-            {...register("confirmPassword")}
-            type="password"
-            id="confirmPassword"
-            className="w-full rounded-lg border border-gray-700 bg-gray-900 px-4 py-2 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            placeholder="••••••••"
-          />
-          {errors.confirmPassword && (
-            <p className="mt-1 text-sm text-red-400">
-              {errors.confirmPassword.message}
-            </p>
-          )}
-        </div>
+         <div>
+           <label
+             htmlFor="confirmPassword"
+             className="block text-sm font-medium text-text-secondary mb-1"
+           >
+             Confirm Password
+           </label>
+           <input
+             {...register("confirmPassword")}
+             type="password"
+             id="confirmPassword"
+             className="w-full rounded-lg border border-border-subtle bg-bg-elevated px-4 py-2 text-text-primary placeholder-text-muted focus:border-border-focus focus:outline-none focus:ring-1 focus:ring-border-focus"
+             placeholder="••••••••"
+           />
+           {errors.confirmPassword && (
+             <p className="mt-1 text-sm text-state-error-text">
+               {errors.confirmPassword.message}
+             </p>
+           )}
+         </div>
 
-        <button
-          type="submit"
-          disabled={isPending}
-          className="w-full rounded-lg bg-blue-600 py-2.5 text-white hover:bg-blue-700 disabled:opacity-50"
-        >
-          {isPending ? "Resetting..." : "Reset password"}
-        </button>
+         <button
+           type="submit"
+           disabled={isPending}
+           className="w-full rounded-lg bg-indigo py-2.5 text-white hover:bg-indigo-dark disabled:opacity-50"
+         >
+           {isPending ? "Resetting..." : "Reset password"}
+         </button>
       </form>
 
-      <p className="text-center text-sm text-gray-400">
-        Remember your password?{" "}
-        <Link href="/login" className="text-blue-400 hover:underline">
-          Sign in
-        </Link>
-      </p>
+       <p className="text-center text-sm text-text-secondary">
+         Remember your password?{" "}
+         <Link href="/login" className="text-text-link hover:underline">
+           Sign in
+         </Link>
+       </p>
     </div>
   );
 }

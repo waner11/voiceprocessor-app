@@ -76,7 +76,7 @@ export default function VoicesPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="mb-8 text-3xl font-bold text-gray-900 dark:text-white">Voice Catalog</h1>
+      <h1 className="mb-8 text-3xl font-bold text-text-primary">Voice Catalog</h1>
 
       {/* Filters */}
       <div className="mb-6 flex flex-wrap gap-4">
@@ -85,7 +85,7 @@ export default function VoicesPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search voices..."
-          className="flex-1 min-w-[200px] rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+          className="flex-1 min-w-[200px] rounded-lg border border-border-subtle bg-bg-elevated px-4 py-2 text-text-primary placeholder-text-muted"
         />
         <select
           value={language}
@@ -93,7 +93,7 @@ export default function VoicesPage() {
             setLanguage(e.target.value);
             setPage(1);
           }}
-          className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-gray-900 dark:text-white"
+          className="rounded-lg border border-border-subtle bg-bg-elevated px-4 py-2 text-text-primary"
         >
           {languages.map((lang) => (
             <option key={lang.value} value={lang.value}>
@@ -107,7 +107,7 @@ export default function VoicesPage() {
             setProvider(e.target.value as Provider | "");
             setPage(1);
           }}
-          className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-gray-900 dark:text-white"
+          className="rounded-lg border border-border-subtle bg-bg-elevated px-4 py-2 text-text-primary"
         >
           {providers.map((p) => (
             <option key={p.value} value={p.value}>
@@ -121,7 +121,7 @@ export default function VoicesPage() {
             setGender(e.target.value);
             setPage(1);
           }}
-          className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-gray-900 dark:text-white"
+          className="rounded-lg border border-border-subtle bg-bg-elevated px-4 py-2 text-text-primary"
         >
           {genders.map((g) => (
             <option key={g.value} value={g.value}>
@@ -137,17 +137,17 @@ export default function VoicesPage() {
           {[...Array(6)].map((_, i) => (
             <div
               key={i}
-              className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 animate-pulse"
+              className="rounded-lg border border-border-subtle bg-bg-elevated p-6 animate-pulse"
             >
               <div className="flex items-center gap-4 mb-4">
-                <div className="h-12 w-12 rounded-full bg-gray-200 dark:bg-gray-700" />
+                <div className="h-12 w-12 rounded-full bg-bg-sunken" />
                 <div className="flex-1">
-                  <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
-                  <div className="h-3 w-16 bg-gray-200 dark:bg-gray-700 rounded" />
+                  <div className="h-4 w-24 bg-bg-sunken rounded mb-2" />
+                  <div className="h-3 w-16 bg-bg-sunken rounded" />
                 </div>
               </div>
-              <div className="h-3 w-full bg-gray-200 dark:bg-gray-700 rounded mb-2" />
-              <div className="h-3 w-2/3 bg-gray-200 dark:bg-gray-700 rounded" />
+              <div className="h-3 w-full bg-bg-sunken rounded mb-2" />
+              <div className="h-3 w-2/3 bg-bg-sunken rounded" />
             </div>
           ))}
         </div>
@@ -155,8 +155,8 @@ export default function VoicesPage() {
 
       {/* Error State */}
       {error && (
-        <div className="rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/30 p-6 text-center">
-          <p className="text-red-600 dark:text-red-400">Failed to load voices. Please try again.</p>
+        <div className="rounded-lg border border-error bg-error-subtle p-6 text-center">
+          <p className="text-state-error-text">Failed to load voices. Please try again.</p>
         </div>
       )}
 
@@ -168,22 +168,22 @@ export default function VoicesPage() {
               {filteredVoices.map((voice) => (
                 <div
                   key={voice.id}
-                  className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 hover:shadow-md transition-shadow"
+                  className="rounded-lg border border-border-subtle bg-bg-elevated p-6 hover:shadow-md transition-shadow"
                 >
                   <div className="flex items-start gap-4 mb-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-white text-lg font-medium">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-indigo text-white text-lg font-medium">
                       {voice.name?.[0]?.toUpperCase() || "V"}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-gray-900 dark:text-white truncate">
+                      <h3 className="font-semibold text-text-primary truncate">
                         {voice.name}
                       </h3>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="rounded-full bg-blue-100 dark:bg-blue-900 px-2 py-0.5 text-xs font-medium text-blue-700 dark:text-blue-300">
+                        <span className="rounded-full bg-indigo-subtle px-2 py-0.5 text-xs font-medium text-indigo">
                           {voice.provider}
                         </span>
                         {voice.gender && (
-                          <span className="text-xs text-gray-500 dark:text-gray-400 capitalize">
+                          <span className="text-xs text-text-muted capitalize">
                             {voice.gender}
                           </span>
                         )}
@@ -197,17 +197,17 @@ export default function VoicesPage() {
                   </div>
 
                   {voice.description && (
-                    <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-3">
+                    <p className="text-sm text-text-secondary line-clamp-2 mb-3">
                       {voice.description}
                     </p>
                   )}
 
                   <div className="flex items-center justify-between text-sm">
-                    <div className="text-gray-500 dark:text-gray-400">
+                    <div className="text-text-muted">
                       {voice.language && <span>{voice.language}</span>}
                       {voice.accent && <span> · {voice.accent}</span>}
                     </div>
-                    <div className="text-gray-700 dark:text-gray-300 font-medium">
+                    <div className="text-text-secondary font-medium">
                       ${voice.costPerThousandChars?.toFixed(4)}/1k
                     </div>
                   </div>
@@ -215,8 +215,8 @@ export default function VoicesPage() {
               ))}
             </div>
           ) : (
-            <div className="rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-12 text-center">
-              <p className="text-gray-500 dark:text-gray-400">No voices found matching your filters.</p>
+            <div className="rounded-lg border border-border-subtle bg-bg-elevated p-12 text-center">
+              <p className="text-text-muted">No voices found matching your filters.</p>
             </div>
           )}
 
@@ -226,17 +226,17 @@ export default function VoicesPage() {
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={!data.hasPreviousPage}
-                className="rounded-lg border border-gray-200 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="rounded-lg border border-border-subtle px-4 py-2 text-sm text-text-secondary hover:bg-bg-sunken disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Previous
               </button>
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+              <span className="text-sm text-text-secondary">
                 Page {data.page} of {data.totalPages}
               </span>
               <button
                 onClick={() => setPage((p) => p + 1)}
                 disabled={!data.hasNextPage}
-                className="rounded-lg border border-gray-200 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="rounded-lg border border-border-subtle px-4 py-2 text-sm text-text-secondary hover:bg-bg-sunken disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Next
               </button>
@@ -245,7 +245,7 @@ export default function VoicesPage() {
 
           {/* Total Count */}
           {data?.totalCount !== undefined && (
-            <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
+            <p className="mt-4 text-center text-sm text-text-muted">
               {data.totalCount} voice{data.totalCount !== 1 ? "s" : ""} available
             </p>
           )}
