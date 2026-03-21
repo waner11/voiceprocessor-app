@@ -11,6 +11,7 @@ using VoiceProcessor.Accessors.Data.DbContext;
 using VoiceProcessor.Accessors.DependencyInjection;
 using VoiceProcessor.Clients.Api.Authentication;
 using VoiceProcessor.Clients.Api.Hubs;
+using VoiceProcessor.Clients.Api.Middleware;
 using VoiceProcessor.Clients.Api.Notifications;
 using VoiceProcessor.Clients.Api.Services;
 using VoiceProcessor.Domain.Contracts.Accessors;
@@ -223,6 +224,8 @@ app.UseCors("Frontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<SentryUserContextMiddleware>();
 
 app.MapControllers();
 app.MapHub<GenerationHub>("/hubs/generation");
