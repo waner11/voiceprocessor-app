@@ -31,10 +31,6 @@ public class SentryUserContextMiddleware
                     }
                 };
             }
-            else
-            {
-                scope.User = null;
-            }
         });
 
         await _next(context);
