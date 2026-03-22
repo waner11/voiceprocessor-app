@@ -11,6 +11,7 @@ using VoiceProcessor.Accessors.Data.DbContext;
 using VoiceProcessor.Accessors.DependencyInjection;
 using VoiceProcessor.Clients.Api.Authentication;
 using VoiceProcessor.Clients.Api.Hubs;
+using VoiceProcessor.Clients.Api.Middleware;
 using VoiceProcessor.Clients.Api.Notifications;
 using VoiceProcessor.Clients.Api.Services;
 using VoiceProcessor.Domain.Contracts.Accessors;
@@ -178,6 +179,20 @@ builder.Services.AddSwaggerGen(options =>
     }
 });
 
+builder.WebHost.UseSentry(options =>
+{
+    options.SendDefaultPii = true;
+    options.AttachStacktrace = true;
+    options.TracesSampleRate = 1.0;
+    options.AutoSessionTracking = false;
+    options.Debug = false;
+    options.SetBeforeSend((sentryEvent, _) =>
+    {
+        sentryEvent.ServerName = null;
+        return sentryEvent;
+    });
+});
+
 var app = builder.Build();
 
 // Auto-apply pending EF Core migrations on startup
@@ -209,6 +224,8 @@ app.UseCors("Frontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<SentryUserContextMiddleware>();
 
 app.MapControllers();
 app.MapHub<GenerationHub>("/hubs/generation");
