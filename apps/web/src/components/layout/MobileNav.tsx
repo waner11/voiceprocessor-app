@@ -21,7 +21,7 @@ export function MobileNav() {
                 "flex flex-1 flex-col items-center gap-1 py-3 text-xs transition-colors",
                 pathname === item.href
                   ? "text-indigo"
-                  : "text-text-muted"
+                  : "text-text-secondary"
               )}
             >
               <Icon className="w-5 h-5" />

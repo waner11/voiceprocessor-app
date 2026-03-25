@@ -56,7 +56,7 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border-subtle bg-bg-base/95 backdrop-blur supports-[backdrop-filter]:bg-bg-base/60">
+    <header className="sticky top-0 z-50 border-b border-border-subtle bg-bg-base">
       <div className="container mx-auto flex h-14 items-center justify-between px-4">
         <div className="flex items-center gap-8">
           <Link href="/dashboard" className="text-xl font-bold text-indigo font-heading">
@@ -95,7 +95,7 @@ export function Header() {
           <div className="relative" ref={menuRef}>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-               className="flex items-center justify-center h-9 w-9 rounded-full bg-indigo text-white text-sm font-medium hover:bg-indigo-dark transition-colors focus:outline-none focus:shadow-[var(--shadow-focus)]"
+               className="flex items-center justify-center h-9 w-9 rounded-full bg-indigo text-text-inverse text-sm font-medium hover:bg-indigo-dark transition-colors focus:outline-none focus:shadow-[var(--shadow-focus)]"
               title={isMounted ? (user?.name || "Profile") : "Profile"}
               aria-label={isMounted ? (user?.name || "Open profile menu") : "Open profile menu"}
             >
