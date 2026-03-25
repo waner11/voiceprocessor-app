@@ -93,7 +93,7 @@ export default function LandingPage() {
   return (
     <div className="flex min-h-screen flex-col bg-bg-base">
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-border-subtle bg-bg-base/95 backdrop-blur supports-[backdrop-filter]:bg-bg-base/60">
+      <header className="sticky top-0 z-50 border-b border-border-subtle bg-bg-base">
         <div className="container mx-auto flex h-14 items-center justify-between px-4">
           <Link href="/" className="text-xl font-bold text-indigo font-heading">
             VoiceProcessor
@@ -111,7 +111,7 @@ export default function LandingPage() {
              </Link>
             <Link
               href="/signup"
-              className="rounded-lg bg-indigo px-4 py-2 text-sm text-white hover:bg-indigo-dark"
+              className="rounded-lg bg-indigo px-4 py-2 text-sm text-text-inverse hover:bg-indigo-dark"
             >
               Get Started
             </Link>
@@ -136,7 +136,7 @@ export default function LandingPage() {
                <div className="flex flex-col sm:flex-row justify-center gap-4">
                  <Link
                    href="/signup"
-                   className="rounded-lg bg-indigo px-8 py-3 text-lg text-white hover:bg-indigo-dark"
+                   className="rounded-lg bg-indigo px-8 py-3 text-lg text-text-inverse hover:bg-indigo-dark"
                  >
                    Start Free Trial
                  </Link>
@@ -174,7 +174,7 @@ export default function LandingPage() {
                       <option>James - Professional (OpenAI)</option>
                       <option>Sofia - Warm (Google)</option>
                     </select>
-                    <button className="rounded-full bg-indigo p-3 text-white hover:bg-indigo-dark">
+                    <button className="rounded-full bg-indigo p-3 text-text-inverse hover:bg-indigo-dark">
                       ▶
                     </button>
                   </div>
@@ -277,7 +277,7 @@ export default function LandingPage() {
                     href={plan.href}
                     className={`block w-full rounded-lg py-3 text-center ${
                       plan.highlighted
-                        ? "bg-indigo text-white hover:bg-indigo-dark"
+                        ? "bg-indigo text-text-inverse hover:bg-indigo-dark"
                         : "border border-border-subtle text-text-primary hover:bg-bg-sunken"
                     }`}
                   >
@@ -300,7 +300,7 @@ export default function LandingPage() {
             </p>
             <Link
               href="/signup"
-              className="inline-block rounded-lg bg-indigo px-8 py-3 text-lg font-medium text-white hover:bg-indigo-dark"
+              className="inline-block rounded-lg bg-indigo px-8 py-3 text-lg font-medium text-text-inverse hover:bg-indigo-dark"
             >
               Get Started Free
             </Link>
