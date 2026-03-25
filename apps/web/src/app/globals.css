@@ -92,11 +92,31 @@
   --state-error-text: #B83A3A;
   --state-error-border: rgba(216, 78, 78, 0.25);
 
-  --state-info-bg: rgba(78, 199, 224, 0.08);
-  --state-info-text: #3AACCA;
-  --state-info-border: rgba(78, 199, 224, 0.25);
+   --state-info-bg: rgba(78, 199, 224, 0.08);
+   --state-info-text: #3AACCA;
+   --state-info-border: rgba(78, 199, 224, 0.25);
 
-  /* ===== SPACING ===== */
+   /* ===== SHADCN COMPATIBILITY ALIASES ===== */
+   /* These aliases auto-inherit dark values via the semantic tokens they reference */
+   --background: var(--bg-base);
+   --foreground: var(--text-primary);
+   --card: var(--bg-elevated);
+   --card-foreground: var(--text-primary);
+   --border: var(--border-subtle);
+   --ring: var(--border-focus);
+   --muted: var(--bg-sunken);
+   --muted-foreground: var(--text-muted);
+   --primary: var(--indigo);
+   --primary-foreground: var(--text-inverse);
+   --destructive: var(--error);
+   --destructive-foreground: var(--text-inverse);
+   --accent: var(--indigo-subtle);
+   --accent-foreground: var(--text-primary);
+   --input: var(--border-subtle);
+   --popover: var(--bg-elevated);
+   --popover-foreground: var(--text-primary);
+
+   /* ===== SPACING ===== */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -246,16 +266,35 @@
   --color-border-strong: var(--border-strong);
   --color-border-focus: var(--border-focus);
 
-  /* Accent colors → bg-indigo, text-indigo, etc. */
-  --color-indigo: var(--indigo);
-  --color-indigo-light: var(--indigo-light);
-  --color-indigo-dark: var(--indigo-dark);
-  --color-indigo-subtle: var(--indigo-subtle);
-  --color-indigo-muted: var(--indigo-muted);
-  --color-teal: var(--teal);
-  --color-success: var(--success);
-  --color-warning: var(--warning);
-  --color-error: var(--error);
+   /* shadcn compatibility aliases */
+   --color-background: var(--background);
+   --color-foreground: var(--foreground);
+   --color-card: var(--card);
+   --color-card-foreground: var(--card-foreground);
+   --color-border: var(--border);
+   --color-ring: var(--ring);
+   --color-muted: var(--muted);
+   --color-muted-foreground: var(--muted-foreground);
+   --color-primary: var(--primary);
+   --color-primary-foreground: var(--primary-foreground);
+   --color-destructive: var(--destructive);
+   --color-destructive-foreground: var(--destructive-foreground);
+   --color-accent: var(--accent);
+   --color-accent-foreground: var(--accent-foreground);
+   --color-input: var(--input);
+   --color-popover: var(--popover);
+   --color-popover-foreground: var(--popover-foreground);
+
+   /* Accent colors → bg-indigo, text-indigo, etc. */
+   --color-indigo: var(--indigo);
+   --color-indigo-light: var(--indigo-light);
+   --color-indigo-dark: var(--indigo-dark);
+   --color-indigo-subtle: var(--indigo-subtle);
+   --color-indigo-muted: var(--indigo-muted);
+   --color-teal: var(--teal);
+   --color-success: var(--success);
+   --color-warning: var(--warning);
+   --color-error: var(--error);
 
   /* Neutral scale → bg-neutral-50, text-neutral-500, etc. */
   --color-neutral-50: var(--neutral-50);
