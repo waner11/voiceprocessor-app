@@ -144,7 +144,7 @@ export default function BillingSettingsPage() {
                     setIsLoadingPacks(false);
                   });
               }}
-              className="rounded-lg bg-indigo px-4 py-2 text-white hover:bg-indigo-dark transition-colors"
+              className="rounded-lg bg-indigo px-4 py-2 text-text-inverse hover:bg-indigo-dark transition-colors"
             >
               Try Again
             </button>
@@ -183,7 +183,7 @@ export default function BillingSettingsPage() {
             <p className="text-state-error-text mb-4">Failed to load usage data</p>
             <button
               onClick={() => refetchUsage()}
-              className="rounded-lg bg-indigo px-4 py-2 text-white hover:bg-indigo-dark transition-colors"
+              className="rounded-lg bg-indigo px-4 py-2 text-text-inverse hover:bg-indigo-dark transition-colors"
             >
               Try Again
             </button>
@@ -211,7 +211,7 @@ export default function BillingSettingsPage() {
 
         <div className="flex items-center justify-between p-4 rounded-lg border border-border-subtle bg-bg-sunken">
           <div className="flex items-center gap-4">
-            <div className="h-10 w-16 rounded bg-gradient-to-r from-indigo to-indigo-dark flex items-center justify-center text-white text-xs font-bold">
+            <div className="h-10 w-16 rounded bg-gradient-to-r from-indigo to-indigo-dark flex items-center justify-center text-text-inverse text-xs font-bold">
               VISA
             </div>
             <div>
@@ -239,7 +239,7 @@ export default function BillingSettingsPage() {
             <p className="text-state-error-text mb-4">{paymentsError}</p>
             <button
               onClick={() => fetchPaymentHistory()}
-              className="rounded-lg bg-indigo px-4 py-2 text-white hover:bg-indigo-dark transition-colors"
+              className="rounded-lg bg-indigo px-4 py-2 text-text-inverse hover:bg-indigo-dark transition-colors"
             >
               Try Again
             </button>
