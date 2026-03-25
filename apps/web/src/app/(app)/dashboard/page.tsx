@@ -180,7 +180,7 @@ export default function DashboardPage() {
       <div className="mt-8 flex justify-center">
         <Link
           href="/generate"
-          className="rounded-lg bg-indigo px-6 py-3 text-white hover:bg-indigo-dark active:scale-[0.98] transition"
+          className="rounded-lg bg-indigo px-6 py-3 text-text-inverse hover:bg-indigo-dark active:scale-[0.98] transition"
         >
           Create New Generation
         </Link>
