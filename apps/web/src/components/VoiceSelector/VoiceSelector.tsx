@@ -177,7 +177,7 @@ export function VoiceSelector({
             setFilter((f) => ({ ...f, showFavoritesOnly: !f.showFavoritesOnly }))
           }
           className={cn(
-            "flex items-center gap-1 rounded-lg border px-3 py-2 text-sm transition-colors",
+            "flex items-center gap-1 rounded-lg border border-border-subtle px-3 py-2 text-sm transition-colors",
             filter.showFavoritesOnly
               ? "bg-error-subtle border-state-error-border text-state-error-text"
               : "hover:bg-bg-sunken"
@@ -223,10 +223,10 @@ export function VoiceSelector({
                 key={voice.id}
                 onClick={() => onSelect(voice.id)}
                 className={cn(
-                  "flex items-start gap-3 rounded-lg border p-4 text-left transition hover:shadow-soft-2",
+                  "flex items-start gap-3 rounded-lg border border-border-subtle p-4 text-left transition hover:shadow-soft-2",
                   selectedVoiceId === voice.id
                     ? "border-indigo bg-indigo-subtle"
-                    : "hover:border-border-subtle hover:bg-bg-sunken"
+                    : "hover:bg-bg-sunken"
                 )}
               >
                 <div className="flex-1 min-w-0">
@@ -288,7 +288,7 @@ export function VoiceSelector({
                       className={cn(
                         "rounded-full p-2 transition-colors",
                         playingId === voice.id
-                          ? "bg-indigo text-white"
+                          ? "bg-indigo text-text-inverse"
                           : "bg-bg-sunken hover:bg-bg-surface"
                       )}
                       aria-label={playingId === voice.id ? "Stop preview" : "Play voice preview"}

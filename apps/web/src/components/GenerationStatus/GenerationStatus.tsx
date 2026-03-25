@@ -50,9 +50,9 @@ export function GenerationStatus({
   const isActive = status === "queued" || status === "processing";
 
   return (
-    <div className={cn("rounded-lg border p-6 space-y-4", className)}>
+    <div className={cn("rounded-lg border border-border-subtle bg-bg-elevated p-6 space-y-4", className)}>
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold">Status</h3>
+        <h3 className="font-semibold text-text-primary">Status</h3>
         <span
           className={cn(
             "rounded-full px-3 py-1 text-sm font-medium transition-colors duration-300",
