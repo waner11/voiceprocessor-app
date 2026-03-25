@@ -103,7 +103,7 @@ export default function GenerationsPage() {
         <h1 className="text-3xl font-bold text-text-primary">Generations</h1>
         <Link
           href="/generate"
-          className="rounded-lg bg-indigo px-4 py-2 text-sm text-white hover:bg-indigo-dark"
+          className="rounded-lg bg-indigo px-4 py-2 text-sm text-text-inverse hover:bg-indigo-dark"
         >
           New Generation
         </Link>
