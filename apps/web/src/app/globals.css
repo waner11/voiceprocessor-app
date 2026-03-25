@@ -6,7 +6,7 @@
 /* ========== DESIGN SYSTEM TOKENS ========== */
 :root {
   /* ===== TYPOGRAPHY ===== */
-  --font-heading: 'DM Sans', system-ui, sans-serif;
+  --font-heading: 'Manrope', system-ui, sans-serif;
   --font-body: 'Inter', system-ui, sans-serif;
   --font-mono: 'Geist Mono', ui-monospace, monospace;
 
@@ -268,7 +268,7 @@
 
   /* Font families → font-sans, font-heading, font-mono */
   --font-sans: var(--font-inter);
-  --font-heading: var(--font-dm-sans);
+  --font-heading: var(--font-manrope);
   --font-mono: var(--font-geist-mono);
 
   /* Shadows → shadow-soft-1, shadow-soft-2, etc. */
