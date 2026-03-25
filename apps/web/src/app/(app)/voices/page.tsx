@@ -79,7 +79,7 @@ export default function VoicesPage() {
       <h1 className="mb-8 text-3xl font-bold text-text-primary">Voice Catalog</h1>
 
       {/* Filters */}
-      <div className="mb-6 flex flex-wrap gap-4">
+      <div className="mb-6 flex flex-wrap gap-4 rounded-lg bg-bg-surface border border-border-subtle p-4">
         <input
           type="text"
           value={search}
@@ -171,7 +171,7 @@ export default function VoicesPage() {
                   className="rounded-lg border border-border-subtle bg-bg-elevated p-6 hover:shadow-soft-2 transition-shadow"
                 >
                   <div className="flex items-start gap-4 mb-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-indigo text-white text-lg font-medium">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-indigo text-text-inverse text-lg font-medium">
                       {voice.name?.[0]?.toUpperCase() || "V"}
                     </div>
                     <div className="flex-1 min-w-0">
