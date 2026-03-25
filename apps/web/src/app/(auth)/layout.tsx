@@ -7,7 +7,7 @@ export default function AuthLayout({
 }) {
   return (
     <div className="flex min-h-screen flex-col bg-bg-base">
-      <header className="sticky top-0 z-50 border-b border-border-subtle bg-bg-base/95 backdrop-blur supports-[backdrop-filter]:bg-bg-base/60">
+      <header className="sticky top-0 z-50 border-b border-border-subtle bg-bg-base">
         <div className="container mx-auto flex h-14 items-center px-4">
           <Link href="/" className="text-xl font-bold text-indigo font-heading">
             VoiceProcessor
