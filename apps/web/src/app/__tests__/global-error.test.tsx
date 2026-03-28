@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import GlobalError from "../global-error";
 
 vi.mock("@sentry/nextjs", () => ({
@@ -39,14 +40,15 @@ describe("GlobalError", () => {
     expect(button).toBeInTheDocument();
   });
 
-  it("calls reset function when try again button is clicked", () => {
+  it("calls reset function when try again button is clicked", async () => {
     const mockError = new Error("Test error");
     const mockReset = vi.fn();
 
     render(<GlobalError error={mockError} reset={mockReset} />);
 
     const button = screen.getByRole("button", { name: /try again/i });
-    fireEvent.click(button);
+    const user = userEvent.setup();
+    await user.click(button);
 
     expect(mockReset).toHaveBeenCalled();
   });
