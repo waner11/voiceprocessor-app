@@ -262,11 +262,13 @@
 
 /* ========== TAILWIND THEME REGISTRATION ========== */
 @theme inline {
-  /* Background colors → bg-base, bg-surface, bg-elevated, bg-sunken */
+  /* Background colors → bg-base, bg-surface, bg-elevated, bg-sunken, bg-prominent, bg-bright */
   --color-bg-base: var(--bg-base);
   --color-bg-surface: var(--bg-surface);
   --color-bg-elevated: var(--bg-elevated);
   --color-bg-sunken: var(--bg-sunken);
+  --color-bg-prominent: var(--bg-prominent);
+  --color-bg-bright: var(--bg-bright);
 
   /* Text colors → text-primary, text-secondary, text-muted, text-inverse, text-link */
   --color-text-primary: var(--text-primary);
@@ -309,6 +311,10 @@
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-error: var(--error);
+  --color-tertiary: var(--tertiary);
+  --color-tertiary-light: var(--tertiary-light);
+  --color-tertiary-dark: var(--tertiary-dark);
+  --color-tertiary-subtle: var(--tertiary-subtle);
 
   /* Neutral scale → bg-neutral-50, text-neutral-500, etc. */
   --color-neutral-50: var(--neutral-50);
@@ -330,6 +336,14 @@
   --shadow-soft-3: var(--shadow-soft-3);
   --shadow-elevated: var(--shadow-elevated);
   --shadow-focus: var(--shadow-focus);
+
+  /* Radius overrides — ROUND_FOUR scale */
+  --radius-sm: 2px;
+  --radius-default: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
 }
 
 /* ========== BASE STYLES ========== */
