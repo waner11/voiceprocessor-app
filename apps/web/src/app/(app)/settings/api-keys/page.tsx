@@ -145,7 +145,7 @@ export default function ApiKeysSettingsPage() {
           {!isCreating && !newKeyValue && (
             <button
               onClick={() => setIsCreating(true)}
-              className="rounded-lg bg-indigo px-4 py-2 text-sm text-white hover:bg-indigo-dark"
+              className="rounded-lg bg-indigo px-4 py-2 text-sm text-text-inverse hover:bg-indigo-dark"
             >
               Create New Key
             </button>
@@ -169,11 +169,11 @@ export default function ApiKeysSettingsPage() {
                 placeholder="Key name (e.g., Production, Development)"
                 className="flex-1 rounded-lg border border-border-subtle bg-bg-elevated px-4 py-2 text-sm text-text-primary placeholder-text-muted"
               />
-              <button
-                onClick={handleCreateKey}
-                disabled={!newKeyName.trim()}
-                className="rounded-lg bg-indigo px-4 py-2 text-sm text-white hover:bg-indigo-dark disabled:opacity-50"
-              >
+               <button
+                 onClick={handleCreateKey}
+                 disabled={!newKeyName.trim()}
+                 className="rounded-lg bg-indigo px-4 py-2 text-sm text-text-inverse hover:bg-indigo-dark disabled:opacity-50"
+               >
                 Create
               </button>
               <button
@@ -201,10 +201,10 @@ export default function ApiKeysSettingsPage() {
                   <code className="flex-1 rounded bg-bg-elevated px-3 py-2 text-sm font-mono text-text-primary border border-border-subtle break-all">
                     {newKeyValue}
                   </code>
-                  <button
-                    onClick={handleCopyKey}
-                    className="rounded-lg bg-success px-4 py-2 text-sm text-white hover:bg-success/80"
-                  >
+                   <button
+                     onClick={handleCopyKey}
+                     className="rounded-lg bg-success px-4 py-2 text-sm text-text-inverse hover:bg-success/80"
+                   >
                     {copied ? "Copied!" : "Copy"}
                   </button>
                 </div>
@@ -316,12 +316,12 @@ export default function ApiKeysSettingsPage() {
                 Are you sure you want to revoke this API key? This action cannot be undone.
               </p>
               <div className="flex gap-3">
-                <button
-                  type="button"
-                  autoFocus
-                  onClick={confirmRevoke}
-                  className="rounded-lg bg-error px-4 py-2 text-sm text-white hover:bg-error/80"
-                >
+                 <button
+                   type="button"
+                   autoFocus
+                   onClick={confirmRevoke}
+                   className="rounded-lg bg-error px-4 py-2 text-sm text-text-inverse hover:bg-error/80"
+                 >
                   Revoke Key
                 </button>
                 <button
