@@ -148,7 +148,7 @@ export default function PaymentSuccessPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/dashboard"
-              className="rounded-lg bg-indigo px-6 py-3 text-white font-medium hover:bg-indigo-dark transition-colors"
+              className="rounded-lg bg-indigo px-6 py-3 text-text-inverse font-medium hover:bg-indigo-dark transition-colors"
             >
               Go to Dashboard
             </Link>

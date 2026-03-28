@@ -175,7 +175,7 @@ function ResetPasswordContent() {
          <button
            type="submit"
            disabled={isPending}
-           className="w-full rounded-lg bg-indigo py-2.5 text-white hover:bg-indigo-dark disabled:opacity-50"
+           className="w-full rounded-lg bg-indigo py-2.5 text-text-inverse hover:bg-indigo-dark disabled:opacity-50"
          >
            {isPending ? "Resetting..." : "Reset password"}
          </button>

@@ -73,7 +73,7 @@ export function FeedbackForm({
 
   if (isSubmitted) {
     return (
-      <div className={cn("rounded-lg border p-6 text-center", className)}>
+      <div className={cn("rounded-lg border border-border-subtle bg-bg-elevated p-6 text-center", className)}>
         <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-success-subtle">
           <svg
             className="h-5 w-5 text-success"
@@ -89,7 +89,7 @@ export function FeedbackForm({
             />
           </svg>
         </div>
-        <p className="font-medium">Thanks for your feedback!</p>
+        <p className="font-medium text-text-primary">Thanks for your feedback!</p>
         <p className="mt-1 text-sm text-text-muted">
           Your input helps us improve our voices.
         </p>
@@ -98,8 +98,8 @@ export function FeedbackForm({
   }
 
   return (
-    <div className={cn("rounded-lg border p-6 space-y-4", className)}>
-      <h3 className="font-semibold">Rate this generation</h3>
+    <div className={cn("rounded-lg border border-border-subtle bg-bg-elevated p-6 space-y-4", className)}>
+      <h3 className="font-semibold text-text-primary">Rate this generation</h3>
 
       {/* Star rating */}
       <div className="flex items-center gap-1">
@@ -162,7 +162,7 @@ export function FeedbackForm({
           value={comment}
           onChange={(e) => setComment(e.target.value)}
           placeholder="Tell us more about your experience..."
-          className="w-full rounded-lg border p-3 text-sm resize-none focus:border-border-focus focus:outline-none focus:ring-1 focus:ring-border-focus"
+          className="w-full rounded-lg border border-border-subtle bg-bg-surface p-3 text-sm text-text-primary placeholder-text-muted resize-none focus:border-border-focus focus:outline-none focus:ring-1 focus:ring-border-focus"
           rows={3}
         />
       </div>
@@ -172,7 +172,7 @@ export function FeedbackForm({
         type="button"
         onClick={handleSubmit}
         disabled={rating === 0 || isSubmitting}
-        className="w-full rounded-lg bg-indigo py-2 text-white hover:bg-indigo-dark disabled:opacity-50"
+        className="w-full rounded-lg bg-indigo py-2 text-text-inverse hover:bg-indigo-dark disabled:opacity-50 disabled:cursor-not-allowed transition"
       >
         {isSubmitting ? "Submitting..." : "Submit Feedback"}
       </button>

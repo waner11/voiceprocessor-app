@@ -14,8 +14,10 @@ function initSentryClient(): void {
 
   Sentry.init({
     dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+    // GDPR: captures user IP, cookies, request headers for error context.
+    // If EU users: disclose in privacy policy or switch to explicit Sentry.setUser().
     sendDefaultPii: true,
-    tracesSampleRate: 1.0,
+    tracesSampleRate: process.env.NODE_ENV === "production" ? 0.2 : 1.0,
     enableLogs: true,
     tracePropagationTargets,
   });

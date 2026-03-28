@@ -84,7 +84,7 @@ export default function GenerationPage() {
           </p>
           <Link 
             href="/generations" 
-            className="inline-block rounded-lg bg-indigo px-4 py-2 text-white hover:bg-indigo-dark"
+            className="inline-block rounded-lg bg-indigo px-4 py-2 text-text-inverse hover:bg-indigo-dark"
           >
             Back to Generations
           </Link>
@@ -103,7 +103,7 @@ export default function GenerationPage() {
           </p>
           <Link 
             href="/generations" 
-            className="inline-block rounded-lg bg-indigo px-4 py-2 text-white hover:bg-indigo-dark"
+            className="inline-block rounded-lg bg-indigo px-4 py-2 text-text-inverse hover:bg-indigo-dark"
           >
             Back to Generations
           </Link>

@@ -154,7 +154,7 @@ export function AudioPlayer({
           <button
             onClick={togglePlayPause}
             disabled={!isReady}
-            className="rounded-full bg-indigo p-3 text-white hover:bg-indigo-dark disabled:opacity-50"
+            className="rounded-full bg-indigo p-3 text-text-inverse hover:bg-indigo-dark disabled:opacity-50"
             aria-label={isPlaying ? "Pause" : "Play"}
           >
             {isPlaying ? "⏸" : "▶"}

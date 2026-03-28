@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { DM_Sans, Inter, Geist_Mono } from "next/font/google";
+import { Manrope, Inter, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { Toaster } from "react-hot-toast";
 
-const dmSans = DM_Sans({
-  variable: "--font-dm-sans",
+const manrope = Manrope({
+  variable: "--font-manrope",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 });
@@ -34,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <body
-        className={`${dmSans.variable} ${inter.variable} ${geistMono.variable} antialiased`}
+        className={`${manrope.variable} ${inter.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
         <Providers>{children}</Providers>

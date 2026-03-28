@@ -7,8 +7,10 @@ function initSentryServer(): void {
 
   Sentry.init({
     dsn: process.env.SENTRY_DSN,
-    tracesSampleRate: 1.0,
+    tracesSampleRate: process.env.NODE_ENV === "production" ? 0.2 : 1.0,
     enableLogs: true,
+    // GDPR: captures user IP, cookies, request headers for error context.
+    // If EU users: disclose in privacy policy or switch to explicit Sentry.setUser().
     sendDefaultPii: true,
   });
 }

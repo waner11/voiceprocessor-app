@@ -182,13 +182,13 @@ export default function ProfileSettingsPage() {
             </div>
 
             <div className="flex gap-3 pt-2">
-              <button
-                type="submit"
-                disabled={isUpdatingProfile}
-                className="rounded-lg bg-indigo px-4 py-2 text-sm text-white hover:bg-indigo-dark disabled:opacity-50"
-              >
-                {isUpdatingProfile ? "Saving..." : "Save Changes"}
-              </button>
+               <button
+                 type="submit"
+                 disabled={isUpdatingProfile}
+                 className="rounded-lg bg-indigo px-4 py-2 text-sm text-text-inverse hover:bg-indigo-dark disabled:opacity-50"
+               >
+                 {isUpdatingProfile ? "Saving..." : "Save Changes"}
+               </button>
               <button
                 type="button"
                 onClick={() => {
@@ -272,13 +272,13 @@ export default function ProfileSettingsPage() {
               )}
             </div>
 
-            <button
-              type="submit"
-              disabled={isChangingPassword}
-              className="rounded-lg bg-indigo px-4 py-2 text-sm text-white hover:bg-indigo-dark disabled:opacity-50"
-            >
-              {isChangingPassword ? "Updating..." : "Update Password"}
-            </button>
+             <button
+               type="submit"
+               disabled={isChangingPassword}
+               className="rounded-lg bg-indigo px-4 py-2 text-sm text-text-inverse hover:bg-indigo-dark disabled:opacity-50"
+             >
+               {isChangingPassword ? "Updating..." : "Update Password"}
+             </button>
           </form>
         ) : (
           <form onSubmit={setPasswordForm.handleSubmit(onSetPasswordSubmit)} className="space-y-4">
@@ -318,13 +318,13 @@ export default function ProfileSettingsPage() {
               )}
             </div>
 
-            <button
-              type="submit"
-              disabled={isSettingPassword}
-              className="rounded-lg bg-indigo px-4 py-2 text-sm text-white hover:bg-indigo-dark disabled:opacity-50"
-            >
-              {isSettingPassword ? "Setting..." : "Set Password"}
-            </button>
+             <button
+               type="submit"
+               disabled={isSettingPassword}
+               className="rounded-lg bg-indigo px-4 py-2 text-sm text-text-inverse hover:bg-indigo-dark disabled:opacity-50"
+             >
+               {isSettingPassword ? "Setting..." : "Set Password"}
+             </button>
           </form>
         )}
       </section>
@@ -378,12 +378,12 @@ export default function ProfileSettingsPage() {
               )}
 
               <div className="flex gap-3 pt-2">
-                <button
-                  type="submit"
-                  disabled={isDeletingAccount}
-                  autoFocus={!user?.hasPassword}
-                  className="rounded-lg bg-error px-4 py-2 text-sm text-white hover:bg-error/80 disabled:opacity-50"
-                >
+                 <button
+                   type="submit"
+                   disabled={isDeletingAccount}
+                   autoFocus={!user?.hasPassword}
+                   className="rounded-lg bg-error px-4 py-2 text-sm text-text-inverse hover:bg-error/80 disabled:opacity-50"
+                 >
                   {isDeletingAccount ? "Deleting..." : "Confirm Delete"}
                 </button>
                 <button

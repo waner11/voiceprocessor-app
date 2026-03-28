@@ -6,7 +6,7 @@
 /* ========== DESIGN SYSTEM TOKENS ========== */
 :root {
   /* ===== TYPOGRAPHY ===== */
-  --font-heading: 'DM Sans', system-ui, sans-serif;
+  --font-heading: 'Manrope', system-ui, sans-serif;
   --font-body: 'Inter', system-ui, sans-serif;
   --font-mono: 'Geist Mono', ui-monospace, monospace;
 
@@ -96,6 +96,26 @@
   --state-info-text: #3AACCA;
   --state-info-border: rgba(78, 199, 224, 0.25);
 
+  /* ===== SHADCN COMPATIBILITY ALIASES ===== */
+  /* These aliases auto-inherit dark values via the semantic tokens they reference */
+  --background: var(--bg-base);
+  --foreground: var(--text-primary);
+  --card: var(--bg-elevated);
+  --card-foreground: var(--text-primary);
+  --border: var(--border-subtle);
+  --ring: var(--border-focus);
+  --muted: var(--bg-sunken);
+  --muted-foreground: var(--text-muted);
+  --primary: var(--indigo);
+  --primary-foreground: var(--text-inverse);
+  --destructive: var(--error);
+  --destructive-foreground: var(--text-inverse);
+  --accent: var(--indigo-subtle);
+  --accent-foreground: var(--text-primary);
+  --input: var(--border-subtle);
+  --popover: var(--bg-elevated);
+  --popover-foreground: var(--text-primary);
+
   /* ===== SPACING ===== */
   --space-1: 4px;
   --space-2: 8px;
@@ -148,6 +168,45 @@
 
 /* ========== DARK MODE OVERRIDES ========== */
 .dark {
+  --neutral-50: #111111;
+  --neutral-100: #1A1A1A;
+  --neutral-300: #3D3D3D;
+  --neutral-500: #8A8A8A;
+  --neutral-600: #BDBDBD;
+  --neutral-700: #E5E5E5;
+  --neutral-900: #F2F2F2;
+
+  --indigo: #5D79DF;
+  --indigo-light: #8DA0F0;
+  --indigo-dark: #4A63BF;
+  --indigo-subtle: rgba(93, 121, 223, 0.15);
+  --indigo-muted: rgba(93, 121, 223, 0.22);
+
+  --teal: #37C8B5;
+  --teal-light: #6EDECF;
+  --teal-dark: #2AA89A;
+  --teal-subtle: rgba(55, 200, 181, 0.15);
+
+  --sky: #4EC7E0;
+  --sky-light: #7FDAED;
+  --sky-dark: #3AACCA;
+  --sky-subtle: rgba(78, 199, 224, 0.15);
+
+  --success: #2DD28D;
+  --success-light: #6AE5B2;
+  --success-dark: #22B074;
+  --success-subtle: rgba(45, 210, 141, 0.15);
+
+  --warning: #E3B256;
+  --warning-light: #ECC97E;
+  --warning-dark: #C99A3A;
+  --warning-subtle: rgba(227, 178, 86, 0.15);
+
+  --error: #D84E4E;
+  --error-light: #E57A7A;
+  --error-dark: #B83A3A;
+  --error-subtle: rgba(216, 78, 78, 0.15);
+
   --bg-base: #0A0A0A;
   --bg-surface: #111111;
   --bg-elevated: #1A1A1A;
@@ -156,17 +215,35 @@
 
   --text-primary: #F2F2F2;
   --text-secondary: #BDBDBD;
-  --text-muted: #767676;
+  --text-muted: #8A8A8A;
   --text-inverse: #0A0A0A;
+  --text-link: #8DA0F0;
 
-  --border-subtle: #3D3D3D;
+  --border-subtle: #525252;
   --border-strong: #525252;
   --border-focus: #8DA0F0;
 
+  --state-success-bg: rgba(45, 210, 141, 0.12);
   --state-success-text: #2DD28D;
+  --state-success-border: rgba(45, 210, 141, 0.35);
+
+  --state-warning-bg: rgba(227, 178, 86, 0.12);
   --state-warning-text: #E3B256;
-  --state-error-text: #D84E4E;
+  --state-warning-border: rgba(227, 178, 86, 0.35);
+
+  --state-error-bg: rgba(216, 78, 78, 0.12);
+  --state-error-text: #E57A7A;
+  --state-error-border: rgba(216, 78, 78, 0.35);
+
+  --state-info-bg: rgba(78, 199, 224, 0.12);
   --state-info-text: #4EC7E0;
+  --state-info-border: rgba(78, 199, 224, 0.35);
+
+  --shadow-soft-1: 0 1px 3px rgba(255,255,255,0.03), 0 1px 2px rgba(255,255,255,0.04);
+  --shadow-soft-2: 0 4px 12px rgba(255,255,255,0.04), 0 1px 4px rgba(255,255,255,0.03);
+  --shadow-soft-3: 0 8px 24px rgba(255,255,255,0.05), 0 2px 8px rgba(255,255,255,0.03);
+  --shadow-elevated: 0 12px 40px rgba(255,255,255,0.06), 0 4px 12px rgba(255,255,255,0.04);
+  --shadow-focus: 0 0 0 2px rgba(93, 121, 223, 0.5);
 }
 
 /* ========== TAILWIND THEME REGISTRATION ========== */
@@ -188,6 +265,25 @@
   --color-border-subtle: var(--border-subtle);
   --color-border-strong: var(--border-strong);
   --color-border-focus: var(--border-focus);
+
+  /* shadcn compatibility aliases */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-input: var(--input);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
 
   /* Accent colors → bg-indigo, text-indigo, etc. */
   --color-indigo: var(--indigo);
@@ -211,15 +307,15 @@
 
   /* Font families → font-sans, font-heading, font-mono */
   --font-sans: var(--font-inter);
-  --font-heading: var(--font-dm-sans);
+  --font-heading: var(--font-manrope);
   --font-mono: var(--font-geist-mono);
 
   /* Shadows → shadow-soft-1, shadow-soft-2, etc. */
-  --shadow-soft-1: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
-  --shadow-soft-2: 0 4px 12px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04);
-  --shadow-soft-3: 0 8px 24px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
-  --shadow-elevated: 0 12px 40px rgba(0,0,0,0.1), 0 4px 12px rgba(0,0,0,0.05);
-  --shadow-focus: 0 0 0 2px rgba(93, 121, 223, 0.3);
+  --shadow-soft-1: var(--shadow-soft-1);
+  --shadow-soft-2: var(--shadow-soft-2);
+  --shadow-soft-3: var(--shadow-soft-3);
+  --shadow-elevated: var(--shadow-elevated);
+  --shadow-focus: var(--shadow-focus);
 }
 
 /* ========== BASE STYLES ========== */

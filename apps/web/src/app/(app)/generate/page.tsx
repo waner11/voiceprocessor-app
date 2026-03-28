@@ -283,7 +283,7 @@ export default function GeneratePage() {
               <textarea
                 value={text}
                 onChange={handleTextChange}
-                className="w-full h-64 rounded-lg border-border-subtle bg-bg-sunken p-4 resize-none text-text-primary placeholder-text-muted focus:border-border-focus focus:ring-2 focus:ring-border-focus/20 transition-all"
+                className="w-full h-64 rounded-lg border border-border-subtle bg-bg-elevated p-4 resize-none text-text-primary placeholder:text-text-muted focus:border-border-focus focus:ring-2 focus:ring-border-focus/20 transition-all"
                 placeholder="Paste your text here or upload a file. Supports books, articles, scripts, and more..."
                 onPaste={handlePaste}
               />
@@ -356,7 +356,7 @@ export default function GeneratePage() {
               {voicesLoading ? (
                 <div className="grid gap-3 sm:grid-cols-2">
                   {[...Array(4)].map((_, i) => (
-                    <div key={i} className="rounded-lg bg-bg-sunken p-4 animate-pulse">
+                    <div key={i} className="rounded-lg bg-bg-elevated p-4 animate-pulse ring-1 ring-border-subtle">
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-full bg-bg-sunken" />
                         <div className="flex-1">
@@ -377,7 +377,7 @@ export default function GeneratePage() {
                         "flex items-center gap-3 rounded-lg p-4 text-left transition-all",
                         selectedVoice === voice.id
                           ? "bg-indigo-subtle ring-2 ring-indigo"
-                          : "bg-bg-sunken hover:bg-bg-surface ring-1 ring-border-subtle"
+                          : "bg-bg-elevated hover:bg-bg-surface ring-1 ring-border-subtle"
                       )}
                     >
                       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-bg-sunken text-text-muted text-lg">
@@ -426,7 +426,7 @@ export default function GeneratePage() {
                       "w-full flex items-center gap-3 rounded-lg p-3 text-left transition-all",
                       routing === option.value
                         ? "bg-indigo-subtle ring-2 ring-indigo"
-                        : "bg-bg-sunken hover:bg-bg-surface"
+                        : "bg-bg-elevated hover:bg-bg-surface ring-1 ring-border-subtle"
                     )}
                   >
                     <span className="text-xl">{option.icon}</span>
@@ -488,7 +488,7 @@ export default function GeneratePage() {
               <button
                 onClick={handleGenerate}
                 disabled={!text || !selectedVoice || isGenerating || isOverLimit}
-                className="w-full rounded-xl bg-indigo px-6 py-4 text-lg font-semibold text-white shadow-lg shadow-indigo/25 hover:bg-indigo-dark disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none transition-all"
+                className="w-full rounded-xl bg-indigo px-6 py-4 text-lg font-semibold text-text-inverse shadow-lg shadow-indigo/25 hover:bg-indigo-dark disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none transition-all"
               >
                 {isGenerating ? "Starting Generation..." : "Generate Audio"}
               </button>

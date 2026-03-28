@@ -138,7 +138,7 @@ export default function ConnectionsSettingsPage() {
                   <button
                     onClick={() => handleLinkProvider(provider)}
                     disabled={isLinking === provider}
-                    className="rounded-lg bg-indigo px-4 py-2 text-sm text-white hover:bg-indigo-dark disabled:opacity-50"
+                    className="rounded-lg bg-indigo px-4 py-2 text-sm text-text-inverse hover:bg-indigo-dark disabled:opacity-50"
                   >
                     {isLinking === provider ? "Connecting..." : "Connect"}
                   </button>
