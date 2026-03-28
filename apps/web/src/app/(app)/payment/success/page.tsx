@@ -72,14 +72,14 @@ export default function PaymentSuccessPage() {
         angle: 60,
         spread: 55,
         origin: { x: 0 },
-        colors: ["#10b981", "#34d399", "#6ee7b7"],
+        colors: ["#2DD28D", "#2DD28D", "#2DD28D"],
       });
       confetti({
         particleCount: 2,
         angle: 120,
         spread: 55,
         origin: { x: 1 },
-        colors: ["#10b981", "#34d399", "#6ee7b7"],
+        colors: ["#2DD28D", "#2DD28D", "#2DD28D"],
       });
 
       if (Date.now() < end) {

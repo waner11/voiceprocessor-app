@@ -55,9 +55,9 @@ export function AudioPlayer({
     const style = getComputedStyle(root);
     const wavesurfer = WaveSurfer.create({
       container: containerRef.current,
-      waveColor: style.getPropertyValue("--border-subtle").trim() || "#3D3D3D",
-      progressColor: style.getPropertyValue("--indigo").trim() || "#5D79DF",
-      cursorColor: style.getPropertyValue("--indigo-dark").trim() || "#4A63BF",
+      waveColor: style.getPropertyValue("--border-subtle").trim() || "#2d3449",
+      progressColor: style.getPropertyValue("--indigo").trim() || "#b7c4ff",
+      cursorColor: style.getPropertyValue("--indigo-dark").trim() || "#6f8bf2",
       barWidth: 2,
       barGap: 1,
       barRadius: 2,
