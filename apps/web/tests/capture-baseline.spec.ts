@@ -13,7 +13,13 @@ const pages = [
 ];
 
 test.describe('Baseline Dark Mode Capture', () => {
+  test.describe.configure({ mode: 'serial' });
+
   const computedStyles: Record<string, unknown> = {};
+
+  test.beforeAll(async () => {
+    fs.mkdirSync(EVIDENCE_DIR, { recursive: true });
+  });
 
   for (const pageConfig of pages) {
     test(`capture ${pageConfig.url}`, async ({ page }) => {
@@ -21,7 +27,7 @@ test.describe('Baseline Dark Mode Capture', () => {
       console.log(`Capturing: ${fullUrl}`);
       
       await page.goto(fullUrl, { waitUntil: 'networkidle', timeout: 10000 });
-      await page.waitForTimeout(500);
+      await page.waitForLoadState('domcontentloaded');
       
       // Capture screenshot
       const screenshotPath = path.join(EVIDENCE_DIR, pageConfig.filename);
@@ -51,6 +57,10 @@ test.describe('Baseline Dark Mode Capture', () => {
       });
       
       computedStyles[pageConfig.url] = styles;
+      expect(styles.body.backgroundColor).toBeTruthy();
+      expect(styles.body.color).toBeTruthy();
+      expect(styles.roundedLg).toBeDefined();
+      expect(styles.boxShadow).toBeDefined();
       console.log(`✓ Styles extracted for ${pageConfig.url}`);
     });
   }
