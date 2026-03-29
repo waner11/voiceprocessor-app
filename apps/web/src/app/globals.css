@@ -330,7 +330,6 @@
   --shadow-focus: var(--shadow-focus);
 
   /* Radius overrides — ROUND_FOUR scale */
-  --radius-xs: 4px;
   --radius-sm: 2px;
   --radius-default: 4px;
   --radius-md: 6px;

@@ -27,7 +27,6 @@ test.describe('Baseline Dark Mode Capture', () => {
       console.log(`Capturing: ${fullUrl}`);
       
       await page.goto(fullUrl, { waitUntil: 'networkidle', timeout: 10000 });
-      await page.waitForLoadState('domcontentloaded');
       
       // Capture screenshot
       const screenshotPath = path.join(EVIDENCE_DIR, pageConfig.filename);
@@ -59,8 +58,8 @@ test.describe('Baseline Dark Mode Capture', () => {
       computedStyles[pageConfig.url] = styles;
       expect(styles.body.backgroundColor).toBeTruthy();
       expect(styles.body.color).toBeTruthy();
-      expect(styles.roundedLg).toBeDefined();
-      expect(styles.boxShadow).toBeDefined();
+      expect(styles.roundedLg).toBeTruthy();
+      expect(styles.boxShadow).toBeTruthy();
       console.log(`✓ Styles extracted for ${pageConfig.url}`);
     });
   }
